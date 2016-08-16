@@ -22,11 +22,10 @@ typedef int64 calc_type;
 
 class Integer {
 private:
-	uint64 _exponential = 0;
 	char _signal = 1;
 	vector<save_type> _number{ 0 };
 
-	Integer(vector<save_type> Number, char Signal = 1, uint64 Exponential = 0);
+	Integer(vector<save_type> Number, char Signal = 1);
 
 public:
 	Integer() {}
@@ -37,6 +36,12 @@ public:
 
 	int setSignal(const int& signal);
 	//int negative();
+
+	bool operator>(const Integer&) const;
+	bool operator<(const Integer&) const;
+	bool operator==(const Integer&) const;
+	bool operator>=(const Integer&) const;
+	bool operator<=(const Integer&) const;
 
 	Integer operator- () const;
 	Integer operator+(const Integer&) const;
