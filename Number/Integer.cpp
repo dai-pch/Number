@@ -1,9 +1,12 @@
 #include "Integer.h"
 
-Integer::Integer(vector<save_type> Number, char Signal) : _number(Number), _signal(Signal) {}
+Integer::Integer(vector<save_type> Number, char Signal) : _number(), _signal(Signal) 
+{
+	_number.swap(Number);
+}
 
 Integer::Integer(const Integer& src) : _number(src._number), _signal(src._signal) {}
-
+/*
 Integer::Integer(const int src) : _signal(src > 0 ? 1 : -1) 
 {
 	_number[0] =  src > 0 ? src : -src;
@@ -13,7 +16,7 @@ Integer::Integer(const unsigned int src) : _signal(1)
 {
 	_number[0] = src;
 }
-
+*/
 int Integer::setSignal(const int& signal)
 {
 	return _signal = signal >= 0 ? 1 : -1;
@@ -90,16 +93,6 @@ bool Integer::operator==(const Integer& Obj2) const
 	return true;
 }
 
-bool Integer::operator>=(const Integer& Obj2) const
-{
-	return !(*this < Obj2);
-}
-
-bool Integer::operator<=(const Integer& Obj2) const
-{
-	return !(*this > Obj2);
-}
-
 
 Integer Integer::operator-() const
 {
@@ -115,7 +108,7 @@ Integer Integer::operator+(const Integer& Obj2) const
 	const Integer *p1, *p2;
 	this->_number.size() > Obj2._number.size() ? (p1 = &Obj2, p2 = this) : (p1 = this, p2 = &Obj2);
 
-	uint64 size1 = p1->_number.size(), size2 = p2->_number.size();
+	unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
 	vector<save_type> result(size2);
 	vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
 	vector<save_type>::iterator it_result = result.begin();
@@ -126,15 +119,15 @@ Integer Integer::operator+(const Integer& Obj2) const
 	for (;it1 != p1->_number.end();it1++, it2++, it_result++)
 	{
 		temp = *it1 + *it2 + c;
-		*it_result = (save_type)(temp % MODEL);
-		c = (char)(temp / MODEL);
+		*it_result = (save_type)(temp % MODULE);
+		c = (char)(temp / MODULE);
 	}
 	
 	for (;it2 != p2->_number.end();it2++, it_result++)
 	{
 		temp = *it2 + c;
-		*it_result = (save_type)(temp % MODEL);
-		c = (char)(temp / MODEL);
+		*it_result = (save_type)(temp % MODULE);
+		c = (char)(temp / MODULE);
 	}
 	
 	if (c != 0)
@@ -149,8 +142,8 @@ Integer Integer::operator-(const Integer& Obj2) const
 	if (this->_signal != Obj2._signal)
 		return (*this + (-Obj2));
 
-	bool gt;
 	//比较两数绝对值的大小，绝对值大的赋给p1
+	bool gt;
 	const Integer *p1 = nullptr, *p2 = nullptr;
 	int nonEqualCounter_re = 0;
 	if (_number.size() != Obj2._number.size()) //位数不同直接判断
@@ -168,7 +161,7 @@ Integer Integer::operator-(const Integer& Obj2) const
 	}
 	gt ? (p1 = this, p2 = &Obj2) : (p1 = &Obj2, p2 = this);
 
-	uint64 size1 = p1->_number.size(), size2 = p2->_number.size();
+	unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
 	vector<save_type> result(size1 - nonEqualCounter_re);
 	vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
 	vector<save_type>::iterator it_result = result.begin();
@@ -178,17 +171,17 @@ Integer Integer::operator-(const Integer& Obj2) const
 	for (;it1 != p1->_number.end() - nonEqualCounter_re;it1++, it2++, it_result++)
 	{
 		temp = *it1 - *it2 + c;
-		c = (char)(temp / MODEL);
-		temp += MODEL;
-		*it_result = (save_type)(temp % MODEL);
+		c = (char)(temp / MODULE);
+		temp += MODULE;
+		*it_result = (save_type)(temp % MODULE);
 	}
 
 	for (;it2 != p2->_number.end() - nonEqualCounter_re;it2++, it_result++)
 	{
 		temp = *it2 + c;
-		c = (char)(temp / MODEL);
-		temp += MODEL;
-		*it_result = (save_type)(temp % MODEL);
+		c = (char)(temp / MODULE);
+		temp += MODULE;
+		*it_result = (save_type)(temp % MODULE);
 	}
 
 	//除去可能的高位的零
