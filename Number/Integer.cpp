@@ -96,7 +96,7 @@ bool Integer::operator==(const Integer& Obj2) const
 
 Integer Integer::operator-() const
 {
-	return Integer(_number, -_signal);
+	return Integer(vector<save_type>(_number), -_signal);
 }
 
 Integer Integer::operator+(const Integer& Obj2) const

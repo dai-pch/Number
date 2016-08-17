@@ -28,60 +28,6 @@ private:
 
 	Integer(vector<save_type> Number, char Signal = 1);
 
-	//大于
-	//32位以下整数
-	template<typename T>
-	inline bool LargerThan(const T& Number2,
-		typename std::enable_if<(sizeof T <= sizeof save_type) &&
-		(std::is_integral<T>::value)>::type* = nullptr) const
-	{
-		return (_number.size() == 1) ?
-			(_signal*_number[0]) > (calc_type)Number2 : (_signal > 0);
-	}
-	//32位以上整数
-	template<typename T>
-	inline bool LargerThan(const T& Number2,
-		typename std::enable_if<(sizeof T > sizeof save_type) &&
-		(std::is_integral<T>::value)>::type* = nullptr) const
-	{
-		return *this > Integer(Number2);
-	}
-	//小于
-	//32位以下整数
-	template<typename T>
-	inline bool SmallerThan(const T& Number2,
-		typename std::enable_if<(sizeof T <= sizeof save_type) &&
-		(std::is_integral<T>::value)>::type* = nullptr) const
-	{
-		return (_number.size() == 1) ?
-			((_signal*_number[0]) < (calc_type)Number2) : (_signal < 0);
-	}
-	//32位以上整数
-	template<typename T>
-	inline bool SmallerThan(const T& Number2,
-		typename std::enable_if<(sizeof T > sizeof save_type) &&
-		(std::is_integral<T>::value)>::type* = nullptr) const
-	{
-		return *this < Integer(Number2);
-	}
-	//等于
-	//32位以下整数
-	template<typename T>
-	inline bool EqualWith(const T& Number2,
-		typename std::enable_if<(sizeof T <= sizeof save_type) &&
-		(std::is_integral<T>::value)>::type* = nullptr) const
-	{
-		return (_number.size() == 1) ?
-			((_signal*_number[0]) == (calc_type)Number2) : false;
-	}
-	//32位以上整数
-	template<typename T>
-	inline bool EqualWith(const T& Number2,
-		typename std::enable_if<(sizeof T > sizeof save_type) &&
-		(std::is_integral<T>::value)>::type* = nullptr) const
-	{
-		return *this == Integer(Number2);
-	}
 
 public:
 	Integer() {}
@@ -93,11 +39,10 @@ public:
 	{
 		T temp = Source < 0 ? (_signal = -1, -Source) : (_signal = 1, Source);
 		_number.reserve(sizeof(T) / sizeof(save_type) + 1);
-		while (temp != 0)
-		{
+		do{
 			_number.push_back(temp % MODULE);
 			temp /= MODULE;
-		}
+		} while (temp != 0);
 	}
 
 	//Integer(const int);
@@ -113,76 +58,58 @@ public:
 	//>运算符
 	bool operator>(const Integer&) const;
 	template<typename T>
-	friend inline bool operator>(const Integer& Obj1, const T& Obj2)
-	{
-		return Obj1.LargerThan(Obj2);
-	}
-	template<typename T>
 	friend inline bool operator>(const T& Obj1, const Integer& Obj2)
 	{
-		return Obj2.SmallerThan(Obj1);
+		return Obj2 < Obj1;
 	}
 	//<运算符
 	bool operator<(const Integer&) const;
-	//其他类型
-	template<typename T>
-	friend inline bool operator<(const Integer& Obj1, const T& Obj2)// const
-	{
-		return Obj1.SmallerThan(Obj2);
-	}
 	template<typename T>
 	friend inline bool operator<(const T& Obj1, const Integer& Obj2)// const
 	{
-		return Obj2.LargerThan(Obj1);
+		return Obj2 > Obj1;
 	}
 	//==运算符
 	bool operator==(const Integer&) const;
-	//其他类型
-	template<typename T>
-	friend inline bool operator==(const Integer& Obj1, const T& Obj2)
-	{
-		return Obj1.EqualWith(Obj2);
-	}
 	template<typename T>
 	friend inline bool operator==(const T& Obj1, const Integer& Obj2)
 	{
-		return Obj2.EqualWith(Obj1);
+		return Obj2 == Obj1;
 	}
 	//>=运算符
-	friend inline bool operator>=(const Integer& Number1, const Integer& Number2)
+	inline bool operator>=(const Integer& Number2)
 	{
-		return !(Number1 < Number2);
-	}
-	template<typename T>
-	friend inline bool operator>=(const Integer& Number1, const T& Number2)
-	{
-		return !(Number1 < Number2);
+		return !(*this < Number2);
 	}
 	template<typename T>
 	friend inline bool operator>=(const T& Number1, const Integer& Number2)
 	{
-		return !(Number1 < Number2);
+		return !(Number2 > Number1);
 	}
 	//<=运算符
-	friend inline bool operator<=(const Integer& Number1, const Integer& Number2)
+	inline bool operator<=(const Integer& Number2)
 	{
-		return !(Number1 > Number2);
-	}
-	template<typename T>
-	friend inline bool operator<=(const Integer& Number1, const T& Number2)
-	{
-		return !(Number1 > Number2);
+		return !(*this > Number2);
 	}
 	template<typename T>
 	friend inline bool operator<=(const T& Number1, const Integer& Number2)
 	{
-		return !(Number1 > Number2);
+		return !(Number2 < Number1);
 	}
 
 	Integer operator-() const;
 	Integer operator+(const Integer&) const;
+	template<typename T>
+	friend inline Integer operator+(const T& Number1, const Integer& Number2)
+	{
+		return Number2 + Number1;
+	}
 	Integer operator-(const Integer&) const;
-
+	template<typename T>
+	friend inline Integer operator-(const T& Number1, const Integer& Number2)
+	{
+		return (-Number2) + Number1;
+	}
 
 
 

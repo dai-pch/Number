@@ -13,7 +13,7 @@ int main()
 	//i4 = i1 + i2;
 	i3 = i4/i5;
 	vector<int> b(5,10);
-	cout << (a >= i4) << (i4 <= a);
+	cout << (a >= i4) << (i4 > a);
 	a + 4;
 	cout << i1 << ", " << i2 << endl;
 	cout << i3 << ", " << i4 << endl;
