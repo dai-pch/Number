@@ -110,24 +110,18 @@ Integer Integer::operator+(const Integer& Obj2) const
 
 	unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
 	vector<save_type> result(size2);
-	vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
-	vector<save_type>::iterator it_result = result.begin();
 
 	calc_type temp = 0;
-	unsigned char c = 0;
-	//int ii = 0;
-	for (;it1 != p1->_number.end();it1++, it2++, it_result++)
+	save_type c = 0;
+	unsigned int ii = 0;
+	for (;ii < size1;ii++)
 	{
-		temp = *it1 + *it2 + c;
-		*it_result = (save_type)(temp % MODULE);
-		c = (char)(temp / MODULE);
+		result[ii] = FullAdder(p1->_number[ii], p2->_number[ii], c);
 	}
 	
-	for (;it2 != p2->_number.end();it2++, it_result++)
+	for (;ii < size2;ii++)
 	{
-		temp = *it2 + c;
-		*it_result = (save_type)(temp % MODULE);
-		c = (char)(temp / MODULE);
+		result[ii] = FullAdder(0, p2->_number[ii], c);
 	}
 	
 	if (c != 0)
@@ -163,25 +157,19 @@ Integer Integer::operator-(const Integer& Obj2) const
 
 	unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
 	vector<save_type> result(size1 - nonEqualCounter_re);
-	vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
-	vector<save_type>::iterator it_result = result.begin();
+	//vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
+	//vector<save_type>::iterator it_result = result.begin();
 	calc_type temp = 0;
-	unsigned char c = 0;
-	//int ii = 0;
-	for (;it1 != p1->_number.end() - nonEqualCounter_re;it1++, it2++, it_result++)
+	save_type c = 0;
+	unsigned int ii = 0;
+	for (;ii < size2 - nonEqualCounter_re;ii++)
 	{
-		temp = *it1 - *it2 + c;
-		c = (char)(temp / MODULE);
-		temp += MODULE;
-		*it_result = (save_type)(temp % MODULE);
+		result[ii] = FullSuber(p1->_number[ii], p2->_number[ii], c);
 	}
 
-	for (;it2 != p2->_number.end() - nonEqualCounter_re;it2++, it_result++)
+	for (;ii < size1 - nonEqualCounter_re;ii++)
 	{
-		temp = *it2 + c;
-		c = (char)(temp / MODULE);
-		temp += MODULE;
-		*it_result = (save_type)(temp % MODULE);
+		result[ii] = FullSuber(p1->_number[ii], 0, c);
 	}
 
 	//除去可能的高位的零
@@ -195,4 +183,24 @@ Integer Integer::operator-(const Integer& Obj2) const
 	result.erase(result.end()-nonEqualCounter_re, result.end());
 
 	return Integer(result, gt ? _signal : -_signal);
+}
+
+save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
+{
+	calc_type temp;
+	temp = static_cast<calc_type>(Num1)
+		+ static_cast<calc_type>(Num2)
+		+ static_cast<calc_type>(c);
+	c = static_cast<save_type>(static_cast<calc_type>(temp) / MODULE);
+	return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
+}
+
+save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c)
+{
+	calc_type temp;
+	temp = static_cast<calc_type>(Num1)
+		- static_cast<calc_type>(Num2)
+		- static_cast<calc_type>(c);
+	c = temp < 0 ? 1 : 0;
+	return static_cast<save_type>((static_cast<calc_type>(temp) + MODULE) % MODULE);
 }

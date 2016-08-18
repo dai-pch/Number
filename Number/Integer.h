@@ -58,41 +58,41 @@ public:
 	//>ÔËËã·û
 	bool operator>(const Integer&) const;
 	template<typename T>
-	friend inline bool operator>(const T& Obj1, const Integer& Obj2)
+	friend bool operator>(const T& Obj1, const Integer& Obj2)
 	{
 		return Obj2 < Obj1;
 	}
 	//<ÔËËã·û
 	bool operator<(const Integer&) const;
 	template<typename T>
-	friend inline bool operator<(const T& Obj1, const Integer& Obj2)// const
+	friend bool operator<(const T& Obj1, const Integer& Obj2)// const
 	{
 		return Obj2 > Obj1;
 	}
 	//==ÔËËã·û
 	bool operator==(const Integer&) const;
 	template<typename T>
-	friend inline bool operator==(const T& Obj1, const Integer& Obj2)
+	friend bool operator==(const T& Obj1, const Integer& Obj2)
 	{
 		return Obj2 == Obj1;
 	}
 	//>=ÔËËã·û
-	inline bool operator>=(const Integer& Number2)
+	bool operator>=(const Integer& Number2)
 	{
 		return !(*this < Number2);
 	}
 	template<typename T>
-	friend inline bool operator>=(const T& Number1, const Integer& Number2)
+	friend bool operator>=(const T& Number1, const Integer& Number2)
 	{
 		return !(Number2 > Number1);
 	}
 	//<=ÔËËã·û
-	inline bool operator<=(const Integer& Number2)
+	bool operator<=(const Integer& Number2)
 	{
 		return !(*this > Number2);
 	}
 	template<typename T>
-	friend inline bool operator<=(const T& Number1, const Integer& Number2)
+	friend bool operator<=(const T& Number1, const Integer& Number2)
 	{
 		return !(Number2 < Number1);
 	}
@@ -100,13 +100,13 @@ public:
 	Integer operator-() const;
 	Integer operator+(const Integer&) const;
 	template<typename T>
-	friend inline Integer operator+(const T& Number1, const Integer& Number2)
+	friend Integer operator+(const T& Number1, const Integer& Number2)
 	{
 		return Number2 + Number1;
 	}
 	Integer operator-(const Integer&) const;
 	template<typename T>
-	friend inline Integer operator-(const T& Number1, const Integer& Number2)
+	friend Integer operator-(const T& Number1, const Integer& Number2)
 	{
 		return (-Number2) + Number1;
 	}
