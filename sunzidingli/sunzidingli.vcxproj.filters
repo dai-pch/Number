@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Integer.h">
+    <ClInclude Include="..\Number\Integer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="algrm.h">
+    <ClInclude Include="..\Number\algrm.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Integer.cpp">
+    <ClCompile Include="..\Number\Integer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">

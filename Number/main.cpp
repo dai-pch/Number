@@ -1,22 +1,21 @@
 #include <iostream>
 #include <vector>
+#include <math.h>
 #include "Integer.h"
+#include "algrm.h"
 using namespace std;
 
 int main()
 {
-	unsigned char i1 = 127, i2 = 127;
-	short i3;
-	int i4 = -5, i5 = 4, i6 = i4 + i5;
-	Integer a(10);
-	//i3 = i1 - i2;
-	//i4 = i1 + i2;
-	i3 = i4/i5;
-	vector<int> b(5,10);
-	cout << (a >= i4) << (i4 > a);
-	a + 4;
-	cout << i1 << ", " << i2 << endl;
-	cout << i3 << ", " << i4 << endl;
+	int i(17);
+	int j(0);
+	Integer a = 35, b(3),c,d;
+	//ÊäÈë
+	cin >> a;
+	//Êä³ö
+	//a / 14532;
+	cout << a.ToString16() << endl;
+	//cout << c << " " << d << endl;
 	system("pause");
 	return 0;
 }
