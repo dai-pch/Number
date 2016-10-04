@@ -3,9 +3,9 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace UnitTestForInteger
+namespace UnitTestForNumber
 {		
-	TEST_CLASS(UnitTest1)
+	TEST_CLASS(UnitTest_Integer)
 	{
 	public:
 		

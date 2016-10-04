@@ -3,6 +3,7 @@
 #include "../Number/algrm.h"
 
 using namespace std;
+using namespace Number;
 
 int main()
 {

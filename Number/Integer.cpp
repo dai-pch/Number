@@ -1,636 +1,640 @@
 #include "Integer.h"
 
+namespace Number {
 
-Integer::Integer(vector<save_type> Number, char Signal) : _number(), _signal(Signal) 
-{
-	_number.swap(Number);
-}
-
-int CharToNumber(const char& ch)
-{
-	if (ch >= '0' && ch <= '9')
-		return (ch - '0');
-	else if (ch >= 'a' && ch <= 'f')
-		return (ch - 'a' + 10);
-	else
-		return (ch - 'A' + 10);
-}
-
-char NumberToChar(const unsigned int& ch)
-{
-	if (ch >= 0 && ch < 10)
-		return (static_cast<char>(ch) + '0');
-	else if (ch >= 10 && ch <= 15)
-		return (static_cast<char>(ch) + 'A' - 10);
-	else
-		throw std::logic_error("Wrong Number when convert number to char.");
-}
-
-void Integer::FromString10(string::const_iterator &it,
-	const string::const_iterator &end, const char &signal)
-{
-	_signal = signal;
-	
-	Integer result;
-	for (;it != end;it++)
+	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number(), _signal(Signal)
 	{
-		result = (result << 3) + (result << 1);
-		result = result + CharToNumber(*it);
+		_number.swap(Number);
 	}
-	result._number.swap(_number);
-}
 
-void Integer::FromString2(string::const_iterator &it,
-	const string::const_iterator &end, const char &signal)
-{
-	vector<save_type> result;
-	_signal = signal;
-	do {
-		save_type temp = 0;
-		for (int jj = 0;jj < 32 && it != end;it++)
+	int CharToNumber(const char& ch)
+	{
+		if (ch >= '0' && ch <= '9')
+			return (ch - '0');
+		else if (ch >= 'a' && ch <= 'f')
+			return (ch - 'a' + 10);
+		else
+			return (ch - 'A' + 10);
+	}
+
+	char NumberToChar(const unsigned int& ch)
+	{
+		if (ch >= 0 && ch < 10)
+			return (static_cast<char>(ch) + '0');
+		else if (ch >= 10 && ch <= 15)
+			return (static_cast<char>(ch) + 'A' - 10);
+		else
+			throw std::logic_error("Wrong Number when convert number to char.");
+	}
+
+	void Integer::FromString10(::std::string::const_iterator &it,
+		const ::std::string::const_iterator &end, const char &signal)
+	{
+		_signal = signal;
+
+		Integer result;
+		for (;it != end;it++)
 		{
-			temp <<= 1;
-			temp += CharToNumber(*it);
+			result = (result << 3) + (result << 1);
+			result = result + CharToNumber(*it);
 		}
-		result.push_back(temp);
-	} while (it != end);
-	_number.swap(result);
-}
-
-void Integer::FromString8(string::const_iterator &it,
-	const string::const_iterator &end, const char &signal)
-{
-	_signal = signal;
-
-	Integer result;
-	for (;it != end;it++)
-	{
-		result = result << 3;
-		result = result + CharToNumber(*it);
+		result._number.swap(_number);
 	}
-	result._number.swap(_number);
-}
 
-void Integer::FromString16(string::const_iterator &it,
-	const string::const_iterator &end, const char &signal)
-{
-	vector<save_type> result;
-	_signal = signal;
-	do {
-		save_type temp = 0;
-		for (int jj = 0;jj < 8 && it != end;it++)
+	void Integer::FromString2(::std::string::const_iterator &it,
+		const ::std::string::const_iterator &end, const char &signal)
+	{
+		::std::vector<save_type> result;
+		_signal = signal;
+		do {
+			save_type temp = 0;
+			for (int jj = 0;jj < 32 && it != end;it++)
+			{
+				temp <<= 1;
+				temp += CharToNumber(*it);
+			}
+			result.push_back(temp);
+		} while (it != end);
+		_number.swap(result);
+	}
+
+	void Integer::FromString8(::std::string::const_iterator &it,
+		const ::std::string::const_iterator &end, const char &signal)
+	{
+		_signal = signal;
+
+		Integer result;
+		for (;it != end;it++)
 		{
-			temp <<= 4;
-			temp += CharToNumber(*it);
+			result = result << 3;
+			result = result + CharToNumber(*it);
 		}
-		result.push_back(temp);
-	} while (it != end);
-	_number.swap(result);
-}
-
-
-Integer::Integer(const Integer& src) : _number(src._number), _signal(src._signal) {}
-
-
-int Integer::setSignal(const int& signal)
-{
-	return _signal = signal >= 0 ? 1 : -1;
-}
-
-
-bool Integer::operator>(const Integer& Obj2) const
-{
-	//两数均为零时有符号问题，单独考虑
-	if (_number.back() == 0 && Obj2._number.back() == 0)
-		return false;
-	//符号不同直接判断
-	if (_signal != Obj2._signal)
-		return _signal > Obj2._signal ? true : false;
-	//位数不同直接判断
-	if (_number.size() != Obj2._number.size())
-		return _number.size() > Obj2._number.size() ? true : false;
-	//逐位比较绝对值大小
-	vector<save_type>::const_reverse_iterator it1=_number.rbegin(), it2=Obj2._number.rbegin();
-	while (it1 != _number.rend()-1 && *it1 != *it2)
-	{
-		it1++;
-		it2++;
+		result._number.swap(_number);
 	}
-	return _signal > 0 ? *it1 > *it2:*it1 < *it2;
-}
 
-bool Integer::operator<(const Integer& Obj2) const
-{
-	//两数均为零时有符号问题，单独考虑
-	if (_number.back() == 0 && Obj2._number.back() == 0)
-		return false;
-	//符号不同直接判断
-	if (_signal != Obj2._signal)
-		return _signal < Obj2._signal ? true : false;
-	//位数不同直接判断
-	if (_number.size() != Obj2._number.size())
-		return _number.size() < Obj2._number.size() ? true : false;
-	//逐位比较绝对值大小
-	vector<save_type>::const_reverse_iterator it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-	while (it1 != _number.rend() - 1 && *it1 != *it2)
+	void Integer::FromString16(::std::string::const_iterator &it,
+		const ::std::string::const_iterator &end, const char &signal)
 	{
-		it1++;
-		it2++;
+		::std::vector<save_type> result;
+		_signal = signal;
+		do {
+			save_type temp = 0;
+			for (int jj = 0;jj < 8 && it != end;it++)
+			{
+				temp <<= 4;
+				temp += CharToNumber(*it);
+			}
+			result.push_back(temp);
+		} while (it != end);
+		_number.swap(result);
 	}
-	return _signal>0 ? *it1<*it2:*it1>*it2;
-}
 
-bool Integer::operator==(const Integer& Obj2) const
-{
-	//两数均为零时有符号问题，单独考虑
-	if (_number.back() == 0 && Obj2._number.back() == 0)
-		return true;
-	//符号不同直接判断
-	if (_signal != Obj2._signal)
-		return false;
-	//位数不同直接判断
-	if (_number.size() != Obj2._number.size())
-		return false;
-	//逐位比较绝对值大小
-	vector<save_type>::const_reverse_iterator it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-	while (it1 != _number.rend())
+
+	Integer::Integer(const Integer& src) : _number(src._number), _signal(src._signal) {}
+
+
+	int Integer::setSignal(const int& signal)
 	{
-		if (*it1 != *it2)
+		return _signal = signal >= 0 ? 1 : -1;
+	}
+
+
+	bool Integer::operator>(const Integer& Obj2) const
+	{
+		//两数均为零时有符号问题，单独考虑
+		if (_number.back() == 0 && Obj2._number.back() == 0)
 			return false;
-		it1++;
-		it2++;
-	}
-	return true;
-}
-
-
-Integer Integer::operator<<(const int &num) const
-{
-	if (num < 0)
-		return this->operator>>(-num);
-
-	const unsigned int num_s = num % (BIT_NUMBER), num_sr = BIT_NUMBER - num_s, num_i = num / (BIT_NUMBER);
-	unsigned int size = _number.size();
-	vector<save_type> result(size + num_i);
-
-	result[num_i] = _number[0] << num_s;
-	for (unsigned int ii = 1; ii < size; ii++)
-	{
-		result[ii + num_i] = (_number[ii] << num_s) | (_number[ii - 1] >> num_sr);
-	}
-	if ((_number[size - 1] >> num_sr) != 0)
-		result.push_back(_number[size - 1] >> num_sr);
-
-	return Integer(result, _signal);
-}
-
-Integer Integer::operator>>(const int &num) const
-{
-	if (num < 0)
-		return this->operator<<(-num);
-
-	const unsigned int num_s = num % (BIT_NUMBER), num_sr = BIT_NUMBER - num_s, num_d = num / (BIT_NUMBER);
-	unsigned int size = _number.size();
-
-	if (num_d >= size)
-		return Integer(0);
-
-	vector<save_type> result(size - num_d);
-	for (unsigned int ii = 0;ii < size - num_d - 1;ii++)
-	{
-		result[ii] = (_number[ii + num_d] >> num_s) | (_number[ii + num_d + 1] << num_sr);
-	}
-	result[size - num_d - 1] = _number[size - 1] >> num_s;
-
-	if (result.back() == 0 && size != 1)
-		result.pop_back();
-
-	return Integer(result, _signal);
-}
-
-
-save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
-{
-	calc_type temp;
-	temp = static_cast<calc_type>(Num1)
-		+ static_cast<calc_type>(Num2)
-		+ static_cast<calc_type>(c);
-	c = static_cast<save_type>(temp / MODULE);
-	return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
-}
-
-//一位减法器，c=0代表借位，c=1代表不借位
-save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c)
-{
-	calc_type temp;
-	temp = static_cast<calc_type>(Num1)
-		- static_cast<calc_type>(Num2)
-		+ static_cast<calc_type>(c)
-		+ MODULE - 1;
-	c = static_cast<save_type>(temp / MODULE);
-	return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
-}
-
-Integer Integer::operator-() const
-{
-	return Integer(vector<save_type>(_number), -_signal);
-}
-
-Integer Integer::operator+(const Integer& Obj2) const
-{
-	//若两数符号不同，则实际为减法
-	if (this->_signal != Obj2._signal)
-		return (*this - (-Obj2));
-
-	const Integer *p1, *p2;
-	this->_number.size() > Obj2._number.size() ? (p1 = &Obj2, p2 = this) : (p1 = this, p2 = &Obj2);
-
-	unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
-	vector<save_type> result(size2);
-
-	calc_type temp = 0;
-	save_type c = 0;
-	unsigned int ii = 0;
-	for (;ii < size1;ii++)
-	{
-		result[ii] = FullAdder(p1->_number[ii], p2->_number[ii], c);
-	}
-	
-	for (;ii < size2;ii++)
-	{
-		result[ii] = FullAdder(0, p2->_number[ii], c);
-	}
-	
-	if (c != 0)
-		result.push_back(c);
-
-	return Integer(result, _signal);
-}
-
-Integer Integer::operator-(const Integer& Obj2) const
-{
-	//若两数符号不同，则实际为加法
-	if (this->_signal != Obj2._signal)
-		return (*this + (-Obj2));
-
-	//比较两数绝对值的大小，绝对值大的赋给p1
-	bool gt;
-	const Integer *p1 = nullptr, *p2 = nullptr;
-	int nonEqualCounter_re = 0;
-	//位数不同直接判断
-	if (_number.size() != Obj2._number.size())
-		gt = (_number.size()) > (Obj2._number.size());
-	else //否则逐位比较绝对值大小
-	{
-		vector<save_type>::const_reverse_iterator it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
+		//符号不同直接判断
+		if (_signal != Obj2._signal)
+			return _signal > Obj2._signal ? true : false;
+		//位数不同直接判断
+		if (_number.size() != Obj2._number.size())
+			return _number.size() > Obj2._number.size() ? true : false;
+		//逐位比较绝对值大小
+		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
 		while (it1 != _number.rend() - 1 && *it1 != *it2)
 		{
 			it1++;
 			it2++;
-			nonEqualCounter_re++;
 		}
-		gt = *it1 > *it2 ? true : false;
-	}
-	gt ? (p1 = this, p2 = &Obj2) : (p1 = &Obj2, p2 = this);
-
-	unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
-	vector<save_type> result(size1 - nonEqualCounter_re);
-	//vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
-	//vector<save_type>::iterator it_result = result.begin();
-	calc_type temp = 0;
-	save_type c = 1; //参见一位减法器说明
-	unsigned int ii = 0;
-	for (;ii < size2 - nonEqualCounter_re;ii++)
-	{
-		result[ii] = FullSuber(p1->_number[ii], p2->_number[ii], c);
+		return _signal > 0 ? *it1 > *it2:*it1 < *it2;
 	}
 
-	for (;ii < size1 - nonEqualCounter_re;ii++)
+	bool Integer::operator<(const Integer& Obj2) const
 	{
-		result[ii] = FullSuber(p1->_number[ii], 0, c);
-	}
-
-	//除去可能的高位的零
-	vector<save_type>::reverse_iterator it_result_re = result.rbegin();
-	nonEqualCounter_re = 0;
-	while ((it_result_re != result.rend() - 1) && *it_result_re == 0)
-	{
-		nonEqualCounter_re++;
-		it_result_re++;
-	}
-	result.erase(result.end()-nonEqualCounter_re, result.end());
-
-	return Integer(result, gt ? _signal : -_signal);
-}
-
-Integer Integer::operator*(const Integer& Obj2) const
-{
-	unsigned int size1 = this->_number.size(), size2 = Obj2._number.size();
-	vector<save_type> result(size1 + size2, 0);
-	const vector<save_type> &number1 = (this->_number);
-	const vector<save_type>	&number2 = (Obj2._number);
-	for (unsigned int ii = 0;ii < size1;ii++)
-	{
-		for (unsigned int jj = 0;jj < size2;jj++)
+		//两数均为零时有符号问题，单独考虑
+		if (_number.back() == 0 && Obj2._number.back() == 0)
+			return false;
+		//符号不同直接判断
+		if (_signal != Obj2._signal)
+			return _signal < Obj2._signal ? true : false;
+		//位数不同直接判断
+		if (_number.size() != Obj2._number.size())
+			return _number.size() < Obj2._number.size() ? true : false;
+		//逐位比较绝对值大小
+		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
+		while (it1 != _number.rend() - 1 && *it1 != *it2)
 		{
-			calc_type_u temp = static_cast<calc_type_u>(number1[ii]) * static_cast<calc_type_u>(number2[jj]);
-			result[ii + jj] += static_cast<save_type>(temp % MODULE);
-			result[ii + jj + 1] += static_cast<save_type>(temp / MODULE);
+			it1++;
+			it2++;
 		}
-	}
-	if (result.back() == 0)
-		result.pop_back();
-	return Integer(result, this->_signal * Obj2._signal);
-}
-
-Integer _Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
-{
-	//前置判断
-	if (Obj1.Abs() < Obj2.Abs())
-	{
-		mod = Obj1;
-		return Integer(0);
+		return _signal > 0 ? *it1<*it2 : *it1>*it2;
 	}
 
-	if (Obj2._number.size() < 2)
+	bool Integer::operator==(const Integer& Obj2) const
 	{
-		calc_type_u temp = 0;
-		save_type number2 = Obj2._number[0];
-		unsigned int size1 = Obj1._number.size();
-		vector<save_type> result(size1);
-		vector<save_type> number1 = Obj1._number;
-		//temp = 0;
-		for (int ii = size1 - 1;ii >= 0;ii--)
+		//两数均为零时有符号问题，单独考虑
+		if (_number.back() == 0 && Obj2._number.back() == 0)
+			return true;
+		//符号不同直接判断
+		if (_signal != Obj2._signal)
+			return false;
+		//位数不同直接判断
+		if (_number.size() != Obj2._number.size())
+			return false;
+		//逐位比较绝对值大小
+		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
+		while (it1 != _number.rend())
 		{
-			temp *= MODULE;
-			temp += number1[ii];
-			result[ii] = static_cast<save_type>(temp / number2);
-			temp = static_cast<calc_type_u>(temp % number2);
+			if (*it1 != *it2)
+				return false;
+			it1++;
+			it2++;
 		}
-		if (result.back() == 0 && result.size() > 1)
+		return true;
+	}
+
+
+	Integer Integer::operator<<(const int &num) const
+	{
+		if (num < 0)
+			return this->operator >> (-num);
+
+		const unsigned int num_s = num % (BIT_NUMBER), num_sr = BIT_NUMBER - num_s, num_i = num / (BIT_NUMBER);
+		unsigned int size = _number.size();
+		::std::vector<save_type> result(size + num_i);
+
+		result[num_i] = _number[0] << num_s;
+		for (unsigned int ii = 1; ii < size; ii++)
+		{
+			result[ii + num_i] = (_number[ii] << num_s) | (_number[ii - 1] >> num_sr);
+		}
+		if ((_number[size - 1] >> num_sr) != 0)
+			result.push_back(_number[size - 1] >> num_sr);
+
+		return Integer(result, _signal);
+	}
+
+	Integer Integer::operator >> (const int &num) const
+	{
+		if (num < 0)
+			return this->operator<<(-num);
+
+		const unsigned int num_s = num % (BIT_NUMBER), num_sr = BIT_NUMBER - num_s, num_d = num / (BIT_NUMBER);
+		unsigned int size = _number.size();
+
+		if (num_d >= size)
+			return Integer(0);
+
+		::std::vector<save_type> result(size - num_d);
+		for (unsigned int ii = 0;ii < size - num_d - 1;ii++)
+		{
+			result[ii] = (_number[ii + num_d] >> num_s) | (_number[ii + num_d + 1] << num_sr);
+		}
+		result[size - num_d - 1] = _number[size - 1] >> num_s;
+
+		if (result.back() == 0 && size != 1)
 			result.pop_back();
 
-		mod = Integer(vector<save_type>(1, static_cast<save_type>(temp)), Obj1._signal);
+		return Integer(result, _signal);
+	}
+
+
+	save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
+	{
+		calc_type temp;
+		temp = static_cast<calc_type>(Num1)
+			+ static_cast<calc_type>(Num2)
+			+ static_cast<calc_type>(c);
+		c = static_cast<save_type>(temp / MODULE);
+		return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
+	}
+
+	//一位减法器，c=0代表借位，c=1代表不借位
+	save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c)
+	{
+		calc_type temp;
+		temp = static_cast<calc_type>(Num1)
+			- static_cast<calc_type>(Num2)
+			+ static_cast<calc_type>(c)
+			+ MODULE - 1;
+		c = static_cast<save_type>(temp / MODULE);
+		return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
+	}
+
+	Integer Integer::operator-() const
+	{
+		return Integer(::std::vector<save_type>(_number), -_signal);
+	}
+
+	Integer Integer::operator+(const Integer& Obj2) const
+	{
+		//若两数符号不同，则实际为减法
+		if (this->_signal != Obj2._signal)
+			return (*this - (-Obj2));
+
+		const Integer *p1, *p2;
+		this->_number.size() > Obj2._number.size() ? (p1 = &Obj2, p2 = this) : (p1 = this, p2 = &Obj2);
+
+		unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
+		::std::vector<save_type> result(size2);
+
+		calc_type temp = 0;
+		save_type c = 0;
+		unsigned int ii = 0;
+		for (;ii < size1;ii++)
+		{
+			result[ii] = FullAdder(p1->_number[ii], p2->_number[ii], c);
+		}
+
+		for (;ii < size2;ii++)
+		{
+			result[ii] = FullAdder(0, p2->_number[ii], c);
+		}
+
+		if (c != 0)
+			result.push_back(c);
+
+		return Integer(result, _signal);
+	}
+
+	Integer Integer::operator-(const Integer& Obj2) const
+	{
+		//若两数符号不同，则实际为加法
+		if (this->_signal != Obj2._signal)
+			return (*this + (-Obj2));
+
+		//比较两数绝对值的大小，绝对值大的赋给p1
+		bool gt;
+		const Integer *p1 = nullptr, *p2 = nullptr;
+		int nonEqualCounter_re = 0;
+		//位数不同直接判断
+		if (_number.size() != Obj2._number.size())
+			gt = (_number.size()) > (Obj2._number.size());
+		else //否则逐位比较绝对值大小
+		{
+			auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
+			while (it1 != _number.rend() - 1 && *it1 != *it2)
+			{
+				it1++;
+				it2++;
+				nonEqualCounter_re++;
+			}
+			gt = *it1 > *it2 ? true : false;
+		}
+		gt ? (p1 = this, p2 = &Obj2) : (p1 = &Obj2, p2 = this);
+
+		unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
+		::std::vector<save_type> result(size1 - nonEqualCounter_re);
+		//vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
+		//vector<save_type>::iterator it_result = result.begin();
+		calc_type temp = 0;
+		save_type c = 1; //参见一位减法器说明
+		unsigned int ii = 0;
+		for (;ii < size2 - nonEqualCounter_re;ii++)
+		{
+			result[ii] = FullSuber(p1->_number[ii], p2->_number[ii], c);
+		}
+
+		for (;ii < size1 - nonEqualCounter_re;ii++)
+		{
+			result[ii] = FullSuber(p1->_number[ii], 0, c);
+		}
+
+		//除去可能的高位的零
+		auto it_result_re = result.rbegin();
+		nonEqualCounter_re = 0;
+		while ((it_result_re != result.rend() - 1) && *it_result_re == 0)
+		{
+			nonEqualCounter_re++;
+			it_result_re++;
+		}
+		result.erase(result.end() - nonEqualCounter_re, result.end());
+
+		return Integer(result, gt ? _signal : -_signal);
+	}
+
+	Integer Integer::operator*(const Integer& Obj2) const
+	{
+		unsigned int size1 = this->_number.size(), size2 = Obj2._number.size();
+		::std::vector<save_type> result(size1 + size2, 0);
+		const ::std::vector<save_type> &number1 = (this->_number);
+		const ::std::vector<save_type>	&number2 = (Obj2._number);
+		for (unsigned int ii = 0;ii < size1;ii++)
+		{
+			for (unsigned int jj = 0;jj < size2;jj++)
+			{
+				calc_type_u temp = static_cast<calc_type_u>(number1[ii]) * static_cast<calc_type_u>(number2[jj]);
+				result[ii + jj] += static_cast<save_type>(temp % MODULE);
+				result[ii + jj + 1] += static_cast<save_type>(temp / MODULE);
+			}
+		}
+		if (result.back() == 0)
+			result.pop_back();
+		return Integer(result, this->_signal * Obj2._signal);
+	}
+
+	//除法
+	Integer _Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
+	{
+		//如果被除数小于除数，直接返回结果
+		if (Obj1.Abs() < Obj2.Abs())
+		{
+			mod = Obj1;
+			return Integer(0);
+		}
+
+		//如果除数只有一位
+		if (Obj2._number.size() < 2)
+		{
+			calc_type_u temp = 0;
+			save_type number2 = Obj2._number[0];
+			unsigned int size1 = Obj1._number.size();
+			::std::vector<save_type> result(size1);
+			::std::vector<save_type> number1 = Obj1._number;
+			//temp = 0;
+			for (int ii = size1 - 1;ii >= 0;ii--)
+			{
+				temp *= MODULE;
+				temp += number1[ii];
+				result[ii] = static_cast<save_type>(temp / number2);
+				temp = static_cast<calc_type_u>(temp % number2);
+			}
+			if (result.back() == 0 && result.size() > 1)
+				result.pop_back();
+
+			mod = Integer(::std::vector<save_type>(1, static_cast<save_type>(temp)), Obj1._signal);
+			return Integer(result, Obj1._signal * Obj2._signal);
+		}
+
+		//规格化
+		save_type temp = Obj2._number.back();
+		int shift = 0;
+		if ((temp & 0xffff0000) == 0) { shift += 16; temp &= 0xffff0000; }
+		if ((temp & 0xff00ff00) == 0) { shift += 8; temp &= 0xff00ff00; }
+		if ((temp & 0xf0f0f0f0) == 0) { shift += 4; temp &= 0xf0f0f0f0; }
+		if ((temp & 0xcccccccc) == 0) { shift += 2; temp &= 0xcccccccc; }
+		if ((temp & 0xaaaaaaaa) == 0) { shift += 1; temp &= 0xaaaaaaaa; }
+		::std::vector<save_type> &Number1 = (Obj1 << shift)._number;
+		const ::std::vector<save_type>	&Number2 = (Obj2 << shift)._number;
+
+		//除法
+		if (Number1.size() == Obj1._number.size())
+			Number1.push_back(0);
+		unsigned int size1 = Number1.size(), size2 = Number2.size();
+		::std::vector<save_type> result(size1 - size2);
+		for (int ii = size1 - size2;ii >= 0;ii--)
+		{
+			//预测q
+			calc_type_u qBar = Number1[ii + size2 - 1] * MODULE + Number1[ii + size2 - 2];
+			calc_type_u rBar = qBar % Number2.back();
+			qBar /= Number2.back();
+			if (qBar == MODULE || qBar*Number2[size2 - 2] > rBar * MODULE + Number1[ii + size2 - 3])
+				qBar--;
+
+			//减法
+			::std::vector<save_type> &tempvec = (Integer(Number2, 1) * qBar)._number;
+			if (tempvec.size() == size2)
+				tempvec.push_back(0);
+			save_type c = 1;
+			for (unsigned int jj = 0;jj <= tempvec.size();jj++)
+				Number1[jj + ii] = FullSuber(Number1[jj + ii], tempvec[jj], c);
+
+			//如果预测不正确
+			if (c == 0)
+			{
+				unsigned int jj = 0;
+				for (;jj <= tempvec.size();jj++)
+					Number1[jj + ii] = FullAdder(Number1[jj + ii], Number2[jj], c);
+				qBar--;
+			}
+			result[ii] = static_cast<save_type>(qBar);
+		}
+
+		mod = Integer(Number1, Obj1._signal) >> shift;
 		return Integer(result, Obj1._signal * Obj2._signal);
 	}
 
-	//规格化
-	save_type temp = Obj2._number.back();
-	int shift = 0;
-	if ((temp & 0xffff0000) == 0) { shift += 16; temp &= 0xffff0000; }
-	if ((temp & 0xff00ff00) == 0) { shift += 8; temp &= 0xff00ff00; }
-	if ((temp & 0xf0f0f0f0) == 0) { shift += 4; temp &= 0xf0f0f0f0; }
-	if ((temp & 0xcccccccc) == 0) { shift += 2; temp &= 0xcccccccc; }
-	if ((temp & 0xaaaaaaaa) == 0) { shift += 1; temp &= 0xaaaaaaaa; }
-	vector<save_type> &Number1 = (Obj1 << shift)._number;
-	const vector<save_type>	&Number2 = (Obj2 << shift)._number;
-
-	//除法
-	if (Number1.size() == Obj1._number.size())
-		Number1.push_back(0);
-	unsigned int size1 = Number1.size(), size2 = Number2.size();
-	vector<save_type> result(size1 - size2);
-	for (int ii = size1 - size2;ii >= 0;ii--)
+	::std::ostream & operator<<(::std::ostream & os, const Integer & Obj)
 	{
-		//预测q
-		calc_type_u qBar = Number1[ii + size2 - 1] * MODULE + Number1[ii + size2 - 2];
-		calc_type_u rBar = qBar % Number2.back();
-		qBar /= Number2.back();
-		if (qBar == MODULE || qBar*Number2[size2 - 2] > rBar * MODULE + Number1[ii + size2 - 3])
-			qBar--;
+		// TODO: 在此处插入 return 语句
+		return (os << Obj.ToString10());
+	}
 
-		//减法
-		vector<save_type> &tempvec = (Integer(Number2, 1) * qBar)._number;
-		if (tempvec.size() == size2)
-			tempvec.push_back(0);
-		save_type c = 1;
-		for (unsigned int jj = 0;jj <= tempvec.size();jj++)
-			Number1[jj + ii] = FullSuber(Number1[jj + ii], tempvec[jj], c);
+	::std::istream & operator >> (::std::istream &is, Integer &Num)
+	{
+		// TODO: 在此处插入 return 语句
+		::std::string str;
+		is >> str;
+		Num.Parse(str);
+		return is;
+	}
 
-		//如果预测不正确
-		if (c == 0)
+
+	::std::string Integer::ToString10() const
+	{
+		::std::string result;
+		Integer q = this->Abs(), mod;
+		do
 		{
-			unsigned int jj = 0;
-			for (;jj <= tempvec.size();jj++)
-				Number1[jj + ii] = FullAdder(Number1[jj + ii], Number2[jj], c);
-			qBar--;
-		}
-		result[ii] = static_cast<save_type>(qBar);
+			q = _Devide(q, 1000000000, mod);
+			save_type temp = mod._number[0];
+			for (int ii = 0;ii < 9 && temp != 0;ii++)
+			{
+				result.push_back('0' + temp % 10);
+				temp /= 10;
+			}
+		} while (q != 0);
+		if (_signal < 0)
+			result.push_back('-');
+		std::reverse(result.begin(), result.end());
+		return result;
 	}
 
-	mod = Integer(Number1, Obj1._signal) >> shift;
-	return Integer(result, Obj1._signal * Obj2._signal);
-}
-
-ostream & operator<<(ostream & os, const Integer & Obj)
-{
-	// TODO: 在此处插入 return 语句
-	return (os << Obj.ToString10());
-}
-
-istream & operator >> (istream &is, Integer &Num)
-{
-	// TODO: 在此处插入 return 语句
-	string str;
-	is >> str;
-	Num.Parse(str);
-	return is;
-}
-
-
-string Integer::ToString10() const
-{
-	string result;
-	Integer q = this->Abs(), mod;
-	do
+	::std::string Integer::ToString16() const
 	{
-		q = _Devide(q, 1000000000, mod);
-		save_type temp = mod._number[0];
-		for (int ii = 0;ii<9 && temp != 0;ii++)
+		::std::string result;
+		if (_signal < 0)
+			result.push_back('-');
+		result.append("0x");
+
+		save_type temp = _number.back();
+		unsigned int jj = 0;
+		while (!(temp & ((save_type)15 << (BIT_NUMBER - 4))))
 		{
-			result.push_back('0' + temp % 10);
-			temp /= 10;
+			temp <<= 4;
+			jj++;
 		}
-	} while (q != 0);
-	if (_signal < 0)
-		result.push_back('-');
-	std::reverse(result.begin(), result.end());
-	return result;
-}
-
-string Integer::ToString16() const
-{
-	string result;
-	if (_signal < 0)
-		result.push_back('-');
-	result.append("0x");
-
-	save_type temp = _number.back();
-	unsigned int jj = 0;
-	while (!(temp & ((save_type)15 << (BIT_NUMBER - 4))))
-	{
-		temp <<= 4;
-		jj++;
-	}
-	for (;jj < 8;jj++)
-	{
-		result.push_back(
-			NumberToChar(
-				static_cast<unsigned int>(
-					(temp & ((save_type)15 << (BIT_NUMBER - 4))) >> (BIT_NUMBER - 4)
-					)));
-		temp <<= 4;
-	}
-	for (int ii = _number.size() - 2;ii >= 0;ii--)
-	{
-		temp = _number[ii];
-		for (jj = 0;jj < 8;jj++)
+		for (;jj < 8;jj++)
 		{
 			result.push_back(
 				NumberToChar(
 					static_cast<unsigned int>(
-						(temp & ((save_type)15 << (BIT_NUMBER - 4))) >> (BIT_NUMBER - 4)
-			)));
+					(temp & ((save_type)15 << (BIT_NUMBER - 4))) >> (BIT_NUMBER - 4)
+						)));
 			temp <<= 4;
 		}
+		for (int ii = _number.size() - 2;ii >= 0;ii--)
+		{
+			temp = _number[ii];
+			for (jj = 0;jj < 8;jj++)
+			{
+				result.push_back(
+					NumberToChar(
+						static_cast<unsigned int>(
+						(temp & ((save_type)15 << (BIT_NUMBER - 4))) >> (BIT_NUMBER - 4)
+							)));
+				temp <<= 4;
+			}
+		}
+		return result;
 	}
-	return result;
-}
 
 
-//状态转移函数
-int _Delta(const int &status, const char &input)
-{
+	//状态转移函数
+	int _Delta(const int &status, const char &input)
+	{
 #define _STATUS_ERR 12
 
-	const int statusTrans[9][13]=
-	{{ 1,2,2,3,8,9,10,11,8,9,10,11,_STATUS_ERR },
-	{ 2,2,2,3,8,9,10,11,8,9,10,11,_STATUS_ERR },
-	{ 2,2,2,3,3,9,10,11,3,9,10,11,_STATUS_ERR },
-	{ 2,2,2,3,3,_STATUS_ERR,10,11,3,_STATUS_ERR,10,11,_STATUS_ERR },
-	{ 3,4,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
-	{ 3,6,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
-	{ 3,3,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
-	{ _STATUS_ERR,5,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR },
-	{ _STATUS_ERR,7,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR },
-	};
+		const int statusTrans[9][13] =
+		{ { 1,2,2,3,8,9,10,11,8,9,10,11,_STATUS_ERR },
+		{ 2,2,2,3,8,9,10,11,8,9,10,11,_STATUS_ERR },
+		{ 2,2,2,3,3,9,10,11,3,9,10,11,_STATUS_ERR },
+		{ 2,2,2,3,3,_STATUS_ERR,10,11,3,_STATUS_ERR,10,11,_STATUS_ERR },
+		{ 3,4,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
+		{ 3,6,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
+		{ 3,3,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
+		{ _STATUS_ERR,5,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR },
+		{ _STATUS_ERR,7,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR },
+		};
 
-	switch (input)
-	{
-	case '0': 
-		return statusTrans[0][status]; break;
-	case '1': 
-		return statusTrans[1][status]; break;
-	case '2': case '3':	case '4': case '5':	case '6': case '7': 
-		return statusTrans[2][status]; break;
-	case '8': case '9': 
-		return statusTrans[3][status]; break;
-	case 'b': case 'B': 
-		return statusTrans[4][status]; break;
-	case 'd': case 'D':
-		return statusTrans[5][status]; break;
-	case 'o': case 'O': 
-		return statusTrans[7][status]; break;
-	case 'x': case 'X': 
-		return statusTrans[8][status]; break;
-	case 'a': case 'c': case 'e': case 'f': case 'A': case 'C': case 'E': case 'F': 
-		return statusTrans[0][status]; break;
-	default:
-		return _STATUS_ERR;
-	}
-}
-
-//从字符串输入数值
-//支持2，8，10，16进制
-//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|((0d|ε) num10 num10*))
-void Integer::Parse(const string &str)
-{
-	char signal = 1;
-	string::const_iterator it = str.begin();
-	int flag = 0;
-	//处理符号
-	if (*it == '-')
-	{
-		signal = -1;
-		it++;
-		flag = 1;
-	}
-	else if (*it == '+')
-	{
-		it++;
-		flag = 1;
+		switch (input)
+		{
+		case '0':
+			return statusTrans[0][status]; break;
+		case '1':
+			return statusTrans[1][status]; break;
+		case '2': case '3':	case '4': case '5':	case '6': case '7':
+			return statusTrans[2][status]; break;
+		case '8': case '9':
+			return statusTrans[3][status]; break;
+		case 'b': case 'B':
+			return statusTrans[4][status]; break;
+		case 'd': case 'D':
+			return statusTrans[5][status]; break;
+		case 'o': case 'O':
+			return statusTrans[7][status]; break;
+		case 'x': case 'X':
+			return statusTrans[8][status]; break;
+		case 'a': case 'c': case 'e': case 'f': case 'A': case 'C': case 'E': case 'F':
+			return statusTrans[0][status]; break;
+		default:
+			return _STATUS_ERR;
+		}
 	}
 
-	//状态机
-	
-	int status = 0;
-	for (;it != str.end();it++)
+	//从字符串输入数值
+	//支持2，8，10，16进制
+	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|((0d|ε) num10 num10*))
+	void Integer::Parse(const ::std::string &str)
 	{
-		status = _Delta(status, *it);
-		if (status == _STATUS_ERR)
+		char signal = 1;
+		auto it = str.begin();
+		int flag = 0;
+		//处理符号
+		if (*it == '-')
+		{
+			signal = -1;
+			it++;
+			flag = 1;
+		}
+		else if (*it == '+')
+		{
+			it++;
+			flag = 1;
+		}
+
+		//状态机
+
+		int status = 0;
+		for (;it != str.end();it++)
+		{
+			status = _Delta(status, *it);
+			if (status == _STATUS_ERR)
+				break;
+		}
+
+		switch (status)
+		{
+			//二进制
+		case 8:
+			this->FromString2(str.begin() + 2 + flag, str.end(), signal);
 			break;
+			//八进制
+		case 9:
+			this->FromString8(str.begin() + 2 + flag, str.end(), signal);
+			break;
+			//标志十进制
+		case 10:
+			this->FromString10(str.begin() + 2 + flag, str.end(), signal);
+			break;
+			//标志十六进制
+		case 11:
+			this->FromString16(str.begin() + 2 + flag, str.end(), signal);
+			break;
+			//无标志十进制
+		case 1: case 2:
+			this->FromString10(str.begin() + flag, str.end(), signal);
+			break;
+			//无标志十六进制
+			this->FromString16(str.begin() + flag, str.end(), signal);
+			break;
+			//错误处理
+		default:
+			//std::cout << "输入字符串不是一个有效的整数表示。";
+			throw std::logic_error("输入字符串不是一个合法的整数。");
+		}
 	}
 
-	switch (status)
+
+	unsigned char Integer::backbit() const
 	{
-	//二进制
-	case 8: 
-		this->FromString2(str.begin() + 2 + flag,str.end(), signal);
-		break;
-	//八进制
-	case 9:
-		this->FromString8(str.begin() + 2 + flag, str.end(), signal);
-		break;
-	//标志十进制
-	case 10:
-		this->FromString10(str.begin() + 2 + flag, str.end(), signal);
-		break;
-	//标志十六进制
-	case 11:
-		this->FromString16(str.begin() + 2 + flag, str.end(), signal);
-		break;
-	//无标志十进制
-	case 1: case 2:
-		this->FromString10(str.begin() + flag, str.end(), signal);
-		break;
-	//无标志十六进制
-		this->FromString16(str.begin() + flag, str.end(), signal);
-		break;
-	//错误处理
-	default:
-		//std::cout << "输入字符串不是一个有效的整数表示。";
-		throw std::logic_error("输入字符串不是一个合法的整数。");
+		return static_cast<unsigned char>(_number[0] & 1);
 	}
-}
 
-
-unsigned char Integer::backbit() const
-{
-	return static_cast<unsigned char>(_number[0] & 1);
-}
-
-Integer Integer::Abs() const
-{
-	return Integer(vector<save_type>(_number), 1);
-}
-
-Integer Integer::Power(const Integer & Exp) const
-{
-	Integer result(1), temp(*this), exp(Exp);
-	unsigned char flag = exp.backbit();
-	if (flag)
-		result = result * temp;
-	exp = exp >> 1;
-	while (exp != 0)
+	Integer Integer::Abs() const
 	{
-		if (DEBUG_MODE)
-			cout << result << endl;
-		temp = temp * temp;
-		flag = exp.backbit();
+		return Integer(::std::vector<save_type>(_number), 1);
+	}
+
+	Integer Integer::Power(const Integer & Exp) const
+	{
+		Integer result(1), temp(*this), exp(Exp);
+		unsigned char flag = exp.backbit();
 		if (flag)
 			result = result * temp;
 		exp = exp >> 1;
+		while (exp != 0)
+		{
+			if (DEBUG_MODE)
+				::std::cout << result << ::std::endl;
+			temp = temp * temp;
+			flag = exp.backbit();
+			if (flag)
+				result = result * temp;
+			exp = exp >> 1;
+		}
+		return result;
 	}
-	return result;
-}
 
+}

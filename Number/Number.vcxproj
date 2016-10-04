@@ -112,6 +112,7 @@
   <ItemGroup>
     <ClInclude Include="algrm.h" />
     <ClInclude Include="Integer.h" />
+    <ClInclude Include="Number.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Integer.cpp" />
