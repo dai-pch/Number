@@ -5,7 +5,10 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Number", "Number\Number.vcxproj", "{D591E9BB-72C5-435E-BA36-ACE3BE6F075A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTestForInteger", "UnitTestForInteger\UnitTestForInteger.vcxproj", "{AFC125AC-F5D6-4E07-9A8D-AC4D27B71A15}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTestForNumber", "UnitTestForInteger\UnitTestForInteger.vcxproj", "{AFC125AC-F5D6-4E07-9A8D-AC4D27B71A15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D591E9BB-72C5-435E-BA36-ACE3BE6F075A} = {D591E9BB-72C5-435E-BA36-ACE3BE6F075A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sunzidingli", "sunzidingli\sunzidingli.vcxproj", "{6BAE9E9E-31A5-47AD-B579-17EFB71434DA}"
 EndProject
