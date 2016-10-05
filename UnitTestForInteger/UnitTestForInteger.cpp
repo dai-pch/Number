@@ -39,15 +39,21 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TEST_INTEGER_INITIALIZE((unsigned int)5);
 			TEST_INTEGER_INITIALIZE((long)-0x60000000);
 			TEST_INTEGER_INITIALIZE((unsigned long)7);
-			TEST_INTEGER_INITIALIZE((long long)-0x8000700060005000);
+			TEST_INTEGER_INITIALIZE((signed long long)-0x800700060005000);
 			TEST_INTEGER_INITIALIZE((unsigned long long)0xfff0fff0fff0fff0);
 		}
 
-#define TEST_INTEGER_COM_BASE(num1, num2, op, res, linfo) do{\
-if(res)\
-	Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing failed.\n", linfo);\
-else \
-	Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing failed.\n", linfo);\
+#define TEST_INTEGER_COM_BASE(num1, num2, op, res, linfo) do{ \
+	if(res) { \
+		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing failed.\n", linfo); \
+		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed.\n", linfo); \
+		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed.\n", linfo); \
+	} \
+	else { \
+		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing failed.\n", linfo);\
+		Assert::IsFalse((num1) op Integer(num2), L"Comparing failed.\n", linfo);\
+		Assert::IsFalse(Integer(num1) op (num2), L"Comparing failed.\n", linfo);\
+	}\
 }while(0)
 
 		//num1 <= num2, eq = true iff num1 == num2
