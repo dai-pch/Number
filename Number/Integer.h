@@ -22,13 +22,20 @@ namespace Number {
 		void SetNumber(const T &num)
 		{
 			T temp = num;
-			_number.reserve((sizeof(T) + 3) / sizeof(save_type));
+			_number.clear();
 			do {
-				_number.push_back(static_cast<save_type>(temp % MODULE));
-				temp = static_cast<T>(temp / MODULE);
+				save_type lowbyte, highbyte;
+				CalcTypeToSaveType(temp, highbyte, lowbyte);
+				_number.push_back(lowbyte);
+				temp = static_cast<T>(highbyte);
 			} while (temp != 0);
 		}
 
+		int setSignal(const int& signal);
+		//int negative();
+
+		//其他辅助操作
+		unsigned char backbit() const;
 
 		void FromString10(::std::string::const_iterator &it,
 			const ::std::string::const_iterator &end, const char &signal);
@@ -50,7 +57,6 @@ namespace Number {
 		Integer(const T& Source, typename std::enable_if<
 			std::is_integral<T>::value && std::is_unsigned<T>::value
 		>::type* = nullptr)
-			: _number(), _signal(1)
 		{
 			this->SetNumber(Source);
 		}
@@ -58,7 +64,7 @@ namespace Number {
 		template<typename T>
 		Integer(const T& Source, typename std::enable_if<
 			std::is_integral<T>::value && std::is_signed<T>::value
-		>::type* = nullptr) : _number(0), _signal(1)
+		>::type* = nullptr)
 		{
 			std::make_unsigned_t<T> temp = (Source < 0 ? (_signal = -1, -Source) : Source);
 			this->SetNumber(temp);
@@ -77,11 +83,8 @@ namespace Number {
 		~Integer() {}
 
 
-		int setSignal(const int& signal);
-		//int negative();
-
-
 		//比较运算
+		int Compare(const Integer&) const; //小于输出负数，大于输出正数，等于输出零
 		//>运算符
 		bool operator>(const Integer&) const;
 		template<typename T>
@@ -138,7 +141,7 @@ namespace Number {
 		//逻辑操作符
 		Integer operator<<(const int&) const;
 
-		Integer operator >> (const int&) const;
+		Integer operator>>(const int&) const;
 
 
 		//算数操作符
@@ -216,9 +219,6 @@ namespace Number {
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
 		friend ::std::istream& operator>>(::std::istream&, Integer&);
-
-		//其他辅助操作
-		unsigned char backbit() const;
 
 		//其他算数运算
 		Integer Abs() const;

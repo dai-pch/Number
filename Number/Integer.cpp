@@ -2,7 +2,7 @@
 
 namespace Number {
 
-	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number(), _signal(Signal)
+	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number()
 	{
 		_number.swap(Number);
 	}
@@ -99,69 +99,45 @@ namespace Number {
 	}
 
 
-	bool Integer::operator>(const Integer& Obj2) const
+	int Integer::Compare(const Integer &Obj2) const
 	{
 		//两数均为零时有符号问题，单独考虑
 		if (_number.back() == 0 && Obj2._number.back() == 0)
-			return false;
+			return 0;
 		//符号不同直接判断
 		if (_signal != Obj2._signal)
-			return _signal > Obj2._signal ? true : false;
+			return static_cast<int>(_signal - Obj2._signal);
 		//位数不同直接判断
 		if (_number.size() != Obj2._number.size())
-			return _number.size() > Obj2._number.size() ? true : false;
-		//逐位比较绝对值大小
-		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-		while (it1 != _number.rend() - 1 && *it1 != *it2)
-		{
-			it1++;
-			it2++;
-		}
-		return _signal > 0 ? *it1 > *it2:*it1 < *it2;
-	}
-
-	bool Integer::operator<(const Integer& Obj2) const
-	{
-		//两数均为零时有符号问题，单独考虑
-		if (_number.back() == 0 && Obj2._number.back() == 0)
-			return false;
-		//符号不同直接判断
-		if (_signal != Obj2._signal)
-			return _signal < Obj2._signal ? true : false;
-		//位数不同直接判断
-		if (_number.size() != Obj2._number.size())
-			return _number.size() < Obj2._number.size() ? true : false;
-		//逐位比较绝对值大小
-		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-		while (it1 != _number.rend() - 1 && *it1 != *it2)
-		{
-			it1++;
-			it2++;
-		}
-		return _signal > 0 ? *it1<*it2 : *it1>*it2;
-	}
-
-	bool Integer::operator==(const Integer& Obj2) const
-	{
-		//两数均为零时有符号问题，单独考虑
-		if (_number.back() == 0 && Obj2._number.back() == 0)
-			return true;
-		//符号不同直接判断
-		if (_signal != Obj2._signal)
-			return false;
-		//位数不同直接判断
-		if (_number.size() != Obj2._number.size())
-			return false;
+			return (_number.size() > Obj2._number.size() ? 1 : -1);
 		//逐位比较绝对值大小
 		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
 		while (it1 != _number.rend())
 		{
-			if (*it1 != *it2)
-				return false;
+			if (*it1 < *it2) {
+				return -_signal;
+			}
+			else if (*it1 > *it2) {
+				return _signal;
+			}
 			it1++;
 			it2++;
 		}
-		return true;
+		return 0;
+	}
+
+	bool Integer::operator>(const Integer& Obj2) const
+	{
+		return ((this->Compare(Obj2)) > 0);
+	}
+
+	bool Integer::operator<(const Integer& Obj2) const {
+		return ((this->Compare(Obj2)) < 0);
+	}
+
+	bool Integer::operator==(const Integer& Obj2) const
+	{
+		return ((this->Compare(Obj2)) == 0);
 	}
 
 
@@ -209,15 +185,15 @@ namespace Number {
 		return Integer(result, _signal);
 	}
 
-
 	save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
 	{
 		calc_type temp;
 		temp = static_cast<calc_type>(Num1)
 			+ static_cast<calc_type>(Num2)
 			+ static_cast<calc_type>(c);
-		c = static_cast<save_type>(temp / MODULE);
-		return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
+		save_type res;
+		CalcTypeToSaveType(temp, c, res);
+		return res;
 	}
 
 	//一位减法器，c=0代表借位，c=1代表不借位
@@ -228,8 +204,9 @@ namespace Number {
 			- static_cast<calc_type>(Num2)
 			+ static_cast<calc_type>(c)
 			+ MODULE - 1;
-		c = static_cast<save_type>(temp / MODULE);
-		return static_cast<save_type>(static_cast<calc_type>(temp) % MODULE);
+		save_type res;
+		CalcTypeToSaveType(temp, c, res);
+		return res;
 	}
 
 	Integer Integer::operator-() const
