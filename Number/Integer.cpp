@@ -322,6 +322,7 @@ namespace Number {
 	}
 
 	//除法
+	//使用Knuth算法
 	Integer _Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
 	{
 		//如果被除数小于除数，直接返回结果
@@ -361,7 +362,7 @@ namespace Number {
 		if ((temp & 0xff00ff00) == 0) { shift += 8; temp &= 0xff00ff00; }
 		if ((temp & 0xf0f0f0f0) == 0) { shift += 4; temp &= 0xf0f0f0f0; }
 		if ((temp & 0xcccccccc) == 0) { shift += 2; temp &= 0xcccccccc; }
-		if ((temp & 0xaaaaaaaa) == 0) { shift += 1; temp &= 0xaaaaaaaa; }
+		if ((temp & 0xaaaaaaaa) == 0) { shift += 1;}
 		::std::vector<save_type> &Number1 = (Obj1 << shift)._number;
 		const ::std::vector<save_type>	&Number2 = (Obj2 << shift)._number;
 
@@ -520,10 +521,53 @@ namespace Number {
 		}
 	}
 
+#define EXPECT(it, ch) do{ \
+if (*(it++) != (ch) \
+	return Number_Parse_Failed; \
+}
+
+	bool IsCharB(char c) {
+		return (c >= '0' && c <= '1');
+	}
+
+	bool IsCharO(char c) {
+		return (c >= '0' && c <= '7');
+	}
+
+	bool IsCharD(char c) {
+		return (c >= '0' && c <= '9');
+	}
+
+	bool IsCharH(char c) {
+		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+	}
+
+	int IntegerParseSignal(::std::string::const_iterator SrcIt,
+		const::std::string::const_iterator SrcEnd, char& Signal) {
+		if (SrcIt == SrcEnd)
+			return Number_Parse_Failed;
+		Signal = 1;
+		if (*SrcIt == '-')
+		{
+			++SrcIt;
+			Signal = -1;
+		}
+		else if (*SrcIt == '+')
+			++SrcIt;
+		return Number_Parse_OK;
+	}
+
+	int IntegerParseValue(::std::string::const_iterator SrcIt,
+		const ::std::string::const_iterator SrcEnd, ::std::string &c) {
+		if (*SrcIt)
+			;
+		return Number_Parse_OK;
+	}
+
 	//从字符串输入数值
 	//支持2，8，10，16进制
 	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|((0d|ε) num10 num10*))
-	void Integer::Parse(const ::std::string &str)
+	int Integer::Parse(const ::std::string &str)
 	{
 		char signal = 1;
 		auto it = str.begin();

@@ -214,7 +214,7 @@ namespace Number {
 		::std::string ToString10() const;
 		::std::string ToString16() const;
 
-		void Parse(const ::std::string&);
+		int Parse(const ::std::string&);
 
 		//ÊäÈëÊä³ö
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);

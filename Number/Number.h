@@ -23,6 +23,10 @@ const size_t BIT_NUMBER = (8 * sizeof(save_type));
 const calc_type_u MODULE = ((calc_type_u)1 << BIT_NUMBER); //0x100000000//4294967296 //2^32
 const save_type MASK_CODE = (save_type)(MODULE - 1);
 
+#define	Number_Parse_Failed 0
+#define	Number_Parse_OK     1
+
+
 inline void CalcTypeToSaveType(const calc_type_u CalcValue, save_type &High, save_type &Low) {
 	Low = static_cast<save_type>(CalcValue & MASK_CODE);
 	High = static_cast<save_type>(static_cast<calc_type_u>(CalcValue) >> BIT_NUMBER);
