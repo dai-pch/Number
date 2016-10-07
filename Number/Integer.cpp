@@ -34,6 +34,7 @@ namespace Number {
 	}
 
 	void Integer::FromString10(const std::string &c) {
+		assert(c[0] != '0' || c.length() == 1);
 		auto it = c.cbegin(), end = c.cend();
 
 		Integer result;
@@ -46,23 +47,23 @@ namespace Number {
 	}
 
 	void Integer::FromString2(const std::string &c)	{
-		auto it = c.cbegin(), end = c.cend();
+		assert(c[0] != '0' || c.length() == 1);
+		auto it = c.crbegin(), end = c.crend();
 
 		::std::vector<save_type> result;
 		do {
 			save_type temp = 0;
 			for (int jj = 0;jj < 32 && it != end;++it, ++jj)
 			{
-				temp <<= 1;
-				temp += CharToNumber(*it);
+				temp += (CharToNumber(*it) << jj);
 			}
 			result.push_back(temp);
 		} while (it != end);
-		std::reverse(result.begin(), result.end());
 		_number.swap(result);
 	}
 
 	void Integer::FromString8(const std::string &c)	{
+		assert(c[0] != '0' || c.length() == 1);
 		auto it = c.cbegin(), end = c.cend();
 
 		Integer result;
@@ -74,20 +75,19 @@ namespace Number {
 		result._number.swap(_number);
 	}
 
-	void Integer::FromString16(const std::string &c)	{
-		auto it = c.cbegin(), end = c.cend();
+	void Integer::FromString16(const std::string &c) {
+		assert(c[0] != '0' || c.length() == 1);
+		auto it = c.crbegin(), end = c.crend();
 
 		::std::vector<save_type> result;
 		do {
 			save_type temp = 0;
 			for (int jj = 0;jj < 8 && it != end;++it, ++jj)
 			{
-				temp <<= 4;
-				temp += CharToNumber(*it);
+				temp += (CharToNumber(*it) << (4*jj));
 			}
 			result.push_back(temp);
 		} while (it != end);
-		std::reverse(result.begin(), result.end());
 		_number.swap(result);
 	}
 
@@ -424,16 +424,24 @@ namespace Number {
 	::std::string Integer::ToString10() const
 	{
 		::std::string result;
+		if (_number.back() == 0)
+		{
+			result.push_back('0');
+			return result;
+		}
+
 		Integer q = this->Abs(), mod;
 		do
 		{
 			q = _Devide(q, 1000000000, mod);
 			save_type temp = mod._number[0];
-			for (int ii = 0;ii < 9 && temp != 0;ii++)
+			int ii = 0;
+			do
 			{
 				result.push_back('0' + temp % 10);
 				temp /= 10;
-			}
+				++ii;
+			} while (ii < 9 && temp != 0);
 		} while (q != 0);
 		if (_signal < 0)
 			result.push_back('-');
@@ -444,11 +452,20 @@ namespace Number {
 	::std::string Integer::ToString16() const
 	{
 		::std::string result;
+		
+		if (_number.back() == 0)
+		{
+			result= "0x0";
+			return result;
+		}
+		
 		if (_signal < 0)
 			result.push_back('-');
 		result.append("0x");
 
-		save_type temp = _number.back();
+		auto it = _number.crbegin();
+		save_type temp = *(it++);
+		assert(temp != 0);
 		unsigned int jj = 0;
 		while (!(temp & ((save_type)15 << (BIT_NUMBER - 4))))
 		{
@@ -464,9 +481,9 @@ namespace Number {
 						)));
 			temp <<= 4;
 		}
-		for (int ii = _number.size() - 2;ii >= 0;ii--)
+		for (;it != _number.crend();it++)
 		{
-			temp = _number[ii];
+			temp = *it;
 			for (jj = 0;jj < 8;jj++)
 			{
 				result.push_back(
@@ -547,11 +564,16 @@ if (*(it++) != (ch) \
 	int IntegerParseNumber(std::string::const_iterator &SrcIt, std::string &c, decltype(IsCharB) fun, int Ret) {
 		if (!fun(*SrcIt))
 			return Number_Integer_Parse_Failed;
+		//Ìø¹ýÇ°µ¼Áã
+		while (*SrcIt == '0')
+			++SrcIt;
+		if (!fun(*SrcIt))
+			--SrcIt;
 
 		c.clear();
-		do {
+		while (fun(*SrcIt)) {
 			c.push_back(*(SrcIt++));
-		} while (fun(*SrcIt));
+		}
 		return Ret;
 	}
 
