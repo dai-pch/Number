@@ -1,5 +1,11 @@
 #include "Integer.h"
 
+#define Number_Integer_Parse_Failed 0
+#define Number_Integer_Parse_B 2
+#define Number_Integer_Parse_O 8
+#define Number_Integer_Parse_H 16
+#define Number_Integer_Parse_D 4
+
 namespace Number {
 
 	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number()
@@ -27,10 +33,8 @@ namespace Number {
 			throw std::logic_error("Wrong Number when convert number to char.");
 	}
 
-	void Integer::FromString10(::std::string::const_iterator &it,
-		const ::std::string::const_iterator &end, const char &signal)
-	{
-		_signal = signal;
+	void Integer::FromString10(const std::string &c) {
+		auto it = c.cbegin(), end = c.cend();
 
 		Integer result;
 		for (;it != end;it++)
@@ -41,27 +45,25 @@ namespace Number {
 		result._number.swap(_number);
 	}
 
-	void Integer::FromString2(::std::string::const_iterator &it,
-		const ::std::string::const_iterator &end, const char &signal)
-	{
+	void Integer::FromString2(const std::string &c)	{
+		auto it = c.cbegin(), end = c.cend();
+
 		::std::vector<save_type> result;
-		_signal = signal;
 		do {
 			save_type temp = 0;
-			for (int jj = 0;jj < 32 && it != end;it++)
+			for (int jj = 0;jj < 32 && it != end;++it, ++jj)
 			{
 				temp <<= 1;
 				temp += CharToNumber(*it);
 			}
 			result.push_back(temp);
 		} while (it != end);
+		std::reverse(result.begin(), result.end());
 		_number.swap(result);
 	}
 
-	void Integer::FromString8(::std::string::const_iterator &it,
-		const ::std::string::const_iterator &end, const char &signal)
-	{
-		_signal = signal;
+	void Integer::FromString8(const std::string &c)	{
+		auto it = c.cbegin(), end = c.cend();
 
 		Integer result;
 		for (;it != end;it++)
@@ -72,20 +74,20 @@ namespace Number {
 		result._number.swap(_number);
 	}
 
-	void Integer::FromString16(::std::string::const_iterator &it,
-		const ::std::string::const_iterator &end, const char &signal)
-	{
+	void Integer::FromString16(const std::string &c)	{
+		auto it = c.cbegin(), end = c.cend();
+
 		::std::vector<save_type> result;
-		_signal = signal;
 		do {
 			save_type temp = 0;
-			for (int jj = 0;jj < 8 && it != end;it++)
+			for (int jj = 0;jj < 8 && it != end;++it, ++jj)
 			{
 				temp <<= 4;
 				temp += CharToNumber(*it);
 			}
 			result.push_back(temp);
 		} while (it != end);
+		std::reverse(result.begin(), result.end());
 		_number.swap(result);
 	}
 
@@ -542,10 +544,53 @@ if (*(it++) != (ch) \
 		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 	}
 
-	int IntegerParseSignal(::std::string::const_iterator SrcIt,
-		const::std::string::const_iterator SrcEnd, char& Signal) {
-		if (SrcIt == SrcEnd)
-			return Number_Parse_Failed;
+	int IntegerParseNumber(std::string::const_iterator &SrcIt, std::string &c, decltype(IsCharB) fun, int Ret) {
+		if (!fun(*SrcIt))
+			return Number_Integer_Parse_Failed;
+
+		c.clear();
+		do {
+			c.push_back(*(SrcIt++));
+		} while (fun(*SrcIt));
+		return Ret;
+	}
+
+	int IntegerParse2(std::string::const_iterator &SrcIt, std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharB, Number_Integer_Parse_B);
+	}
+
+	int IntegerParse8(std::string::const_iterator &SrcIt, std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharO, Number_Integer_Parse_O);
+	}
+
+	int IntegerParse16(std::string::const_iterator &SrcIt, std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharH, Number_Integer_Parse_H);
+	}
+
+	int IntegerParse10(std::string::const_iterator &SrcIt, std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharD, Number_Integer_Parse_D);
+	}
+
+	int IntegerParseZero(std::string::const_iterator &SrcIt, std::string &c) {
+		switch (*SrcIt) {
+		case 'b': case 'B': return IntegerParse2(++SrcIt, c);
+		case 'o': case 'O': return IntegerParse8(++SrcIt, c);
+		case 'x': case 'X': return IntegerParse16(++SrcIt, c);
+		default: 
+			std::string c = "0";
+			return Number_Integer_Parse_D;
+		}
+	}
+
+	int IntegerParseValue(std::string::const_iterator &SrcIt, std::string &c) {
+
+		switch (*SrcIt) {
+		case '0': return IntegerParseZero(++SrcIt, c);
+		default:  return IntegerParse10(SrcIt, c);
+		}
+	}
+
+	void IntegerParseSignal(::std::string::const_iterator &SrcIt, char& Signal) {
 		Signal = 1;
 		if (*SrcIt == '-')
 		{
@@ -554,77 +599,33 @@ if (*(it++) != (ch) \
 		}
 		else if (*SrcIt == '+')
 			++SrcIt;
-		return Number_Parse_OK;
-	}
-
-	int IntegerParseValue(::std::string::const_iterator SrcIt,
-		const ::std::string::const_iterator SrcEnd, ::std::string &c) {
-		if (*SrcIt)
-			;
-		return Number_Parse_OK;
 	}
 
 	//从字符串输入数值
 	//支持2，8，10，16进制
-	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|((0d|ε) num10 num10*))
-	int Integer::Parse(const ::std::string &str)
+	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|(num10 num10*))
+	int Integer::Parse(std::string str)
 	{
-		char signal = 1;
+		str.push_back('\0');
 		auto it = str.begin();
-		int flag = 0;
+		std::string c;
 		//处理符号
-		if (*it == '-')
-		{
-			signal = -1;
-			it++;
-			flag = 1;
-		}
-		else if (*it == '+')
-		{
-			it++;
-			flag = 1;
-		}
+		IntegerParseSignal(it, _signal);
 
-		//状态机
+		int res = IntegerParseValue(it, c);
 
-		int status = 0;
-		for (;it != str.end();it++)
-		{
-			status = _Delta(status, *it);
-			if (status == _STATUS_ERR)
-				break;
-		}
+		if (*it != '\0')
+			return Number_Parse_Failed;
 
-		switch (status)
-		{
-			//二进制
-		case 8:
-			this->FromString2(str.begin() + 2 + flag, str.end(), signal);
-			break;
-			//八进制
-		case 9:
-			this->FromString8(str.begin() + 2 + flag, str.end(), signal);
-			break;
-			//标志十进制
-		case 10:
-			this->FromString10(str.begin() + 2 + flag, str.end(), signal);
-			break;
-			//标志十六进制
-		case 11:
-			this->FromString16(str.begin() + 2 + flag, str.end(), signal);
-			break;
-			//无标志十进制
-		case 1: case 2:
-			this->FromString10(str.begin() + flag, str.end(), signal);
-			break;
-			//无标志十六进制
-			this->FromString16(str.begin() + flag, str.end(), signal);
-			break;
-			//错误处理
-		default:
-			//std::cout << "输入字符串不是一个有效的整数表示。";
-			throw std::logic_error("输入字符串不是一个合法的整数。");
+		switch (res) {
+		case Number_Integer_Parse_B:  this->FromString2(c);  break;
+		case Number_Integer_Parse_O:  this->FromString8(c);  break;
+		case Number_Integer_Parse_D:  this->FromString10(c); break;
+		case Number_Integer_Parse_H:  this->FromString16(c); break;
+		case Number_Integer_Parse_Failed: default:
+			return Number_Parse_Failed;
 		}
+		return Number_Parse_OK;
 	}
 
 

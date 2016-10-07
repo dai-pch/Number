@@ -37,14 +37,10 @@ namespace Number {
 		//其他辅助操作
 		unsigned char backbit() const;
 
-		void FromString10(::std::string::const_iterator &it,
-			const ::std::string::const_iterator &end, const char &signal);
-		void FromString2(::std::string::const_iterator &it,
-			const ::std::string::const_iterator &end, const char &signal);
-		void FromString8(::std::string::const_iterator &it,
-			const ::std::string::const_iterator &end, const char &signal);
-		void FromString16(::std::string::const_iterator &it,
-			const ::std::string::const_iterator &end, const char &signal);
+		void FromString10(const std::string & c);
+		void FromString2(const std::string & c);
+		void FromString8(const std::string & c);
+		void FromString16(const std::string & c);
 
 
 	public:
@@ -214,7 +210,7 @@ namespace Number {
 		::std::string ToString10() const;
 		::std::string ToString16() const;
 
-		int Parse(const ::std::string&);
+		int Parse(std::string);
 
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
