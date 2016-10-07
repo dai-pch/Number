@@ -27,10 +27,10 @@ namespace UnitTestForNumber
 			Logger::WriteMessage("In Method TestIntegerInitialize.\n");
 
 #define TEST_INTEGER_INITIALIZE(num) do{\
-Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO());\
+Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO());\
 }while(0)
 
-			Assert::IsTrue(Integer() == 0, L"Initialize Integer failed.\n", LINE_INFO());
+			Assert::IsTrue(Integer() == 0, L"Initialize Integer failed", LINE_INFO());
 			TEST_INTEGER_INITIALIZE((char)0);
 			TEST_INTEGER_INITIALIZE((unsigned char)1);
 			TEST_INTEGER_INITIALIZE((short)65535);
@@ -45,14 +45,14 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 
 #define TEST_INTEGER_COM_BASE(num1, num2, op, res, linfo) do{ \
 	if(res) { \
-		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing failed.\n", linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed.\n", linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed.\n", linfo); \
+		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing failed", linfo); \
+		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed", linfo); \
+		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed", linfo); \
 	} \
 	else { \
-		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing failed.\n", linfo);\
-		Assert::IsFalse((num1) op Integer(num2), L"Comparing failed.\n", linfo);\
-		Assert::IsFalse(Integer(num1) op (num2), L"Comparing failed.\n", linfo);\
+		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing failed", linfo);\
+		Assert::IsFalse((num1) op Integer(num2), L"Comparing failed", linfo);\
+		Assert::IsFalse(Integer(num1) op (num2), L"Comparing failed", linfo);\
 	}\
 }while(0)
 
@@ -86,7 +86,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 		TEST_METHOD(TestIntegerCompareOperator)
 		{
 			// TODO: 在此输入测试代码
-			Logger::WriteMessage("In Method TestIntegerCompareOperator.\n");
+			Logger::WriteMessage("In Method TestIntegerCompareOperator");
 
 			//two equal numbers
 			TestIntegerCompareNumber(0, 0, LINE_INFO());
@@ -122,8 +122,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 		void TestIntegerParseBase(T num, const std::string &str, int res, __LineInfo* pLineInfo) {
 			Integer a(num), b;
 			auto res2 = b.Parse(str);
-			Assert::IsTrue(res == res2, L"Integer Parse Error.\n", pLineInfo);
-			Assert::IsTrue(b == a, L"Integer Parse Value Error.\n", pLineInfo);
+			Assert::IsTrue(res == res2, L"Integer Parse Error", pLineInfo);
+			Assert::IsTrue(b == a, L"Integer Parse Value Error", pLineInfo);
 		}
 
 		template <typename T>
@@ -141,6 +141,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TestIntegerParseRight(0b0, "-0b0", LINE_INFO());
 			TestIntegerParseRight(0b0, "+0b0", LINE_INFO());
 			TestIntegerParseRight(0b0, "0B0", LINE_INFO());
+			TestIntegerParseRight(0b110, "0b00000110", LINE_INFO());
 			TestIntegerParseRight(0b11010010, "0b11010010", LINE_INFO());
 			TestIntegerParseRight(-0b10001101, "-0b10001101", LINE_INFO());
 			TestIntegerParseRight(0b10001100111011110111001101100101, "0B10001100111011110111001101100101", LINE_INFO());
@@ -152,6 +153,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TestIntegerParseRight(01, "0O1", LINE_INFO());
 			TestIntegerParseRight(-03, "-0o3", LINE_INFO());
 			TestIntegerParseRight(05, "+0o5", LINE_INFO());
+			TestIntegerParseRight(073, "0o000073", LINE_INFO());
 			TestIntegerParseRight(0123045676, "0o123045676", LINE_INFO());
 			TestIntegerParseRight(-0775310246, "-0O775310246", LINE_INFO());
 			TestIntegerParseRight(012345673452671535530, "0o12345673452671535530", LINE_INFO());
@@ -174,6 +176,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TestIntegerParseRight(0x5, "+0x5", LINE_INFO());
 			TestIntegerParseRight(-0x8, "-0x8", LINE_INFO());
 			TestIntegerParseRight(-0x7, "-0X7", LINE_INFO());
+			TestIntegerParseRight(0xA8, "0x0000A8", LINE_INFO());
 			TestIntegerParseRight(0x123456789ABCDEFD, "0x123456789abcdefd", LINE_INFO());
 			TestIntegerParseRight(-0x123456789ABCDEFC, "-0x123456789abcdefc", LINE_INFO());
 			TestIntegerParseRight(0xAA00CCDD00000000, "0XAA00CCDD00000000", LINE_INFO());
@@ -191,6 +194,38 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TestIntegerParseWrong("0x23c4dfaeg", LINE_INFO());
 			TestIntegerParseWrong("0x-3df", LINE_INFO());
 			//TestIntegerParseWrong("", LINE_INFO());
+		}
+
+		void TestIntegerToString(std::string str, std::string str10, std::string str16, __LineInfo* pLineInfo) {
+			Integer a;
+			Assert::AreEqual(Number_Parse_OK, a.Parse(str), L"Integer Parse error when test ToString()", pLineInfo);
+			if (!str10.empty())
+				Assert::AreEqual(str10, a.ToString10(), L"Integer error when convert to string 10", pLineInfo);
+			if (!str16.empty())
+				Assert::AreEqual(str16, a.ToString16(), L"Integer error when convert to string 10", pLineInfo);
+		}
+
+		TEST_METHOD(TestIntegerToString) {
+			TestIntegerToString("0", "0", "0x0", LINE_INFO());
+			TestIntegerToString("-0", "0", "0x0", LINE_INFO());
+
+			TestIntegerToString("10", "10", "", LINE_INFO());
+			TestIntegerToString("-20", "-20", "", LINE_INFO());
+			TestIntegerToString("65536327680", "65536327680", "", LINE_INFO());
+			TestIntegerToString("12345678909876543211357924681010987654321",
+				"12345678909876543211357924681010987654321", "", LINE_INFO());
+			TestIntegerToString("-12345678909876543211357924681010987654321",
+				"-12345678909876543211357924681010987654321", "", LINE_INFO());
+
+			TestIntegerToString("0x10", "16", "0x10", LINE_INFO());
+			TestIntegerToString("-0XCC", "", "-0xCC", LINE_INFO());
+			TestIntegerToString("-0X0000CC", "", "-0xCC", LINE_INFO());
+			TestIntegerToString("0xabcdef", "", "0xABCDEF", LINE_INFO());
+			TestIntegerToString("0X1237aaef", "", "0x1237AAEF", LINE_INFO());
+			TestIntegerToString("0x123456789abcdeffeddc", "", "0x123456789ABCDEFFEDDC", LINE_INFO());
+			TestIntegerToString("0x00000aacd", "", "0XAACD", LINE_INFO());
+			//TestIntegerToString("", "", "", LINE_INFO());
+			
 		}
 
 	};
