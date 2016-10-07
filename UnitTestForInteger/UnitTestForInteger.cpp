@@ -56,7 +56,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 	}\
 }while(0)
 
-		//num1 <= num2, eq = true iff num1 == num2
+		//num1 <= num2, eq = true iff. num1 == num2
 		template<typename U, typename V> 
 		void TestIntegerCompareBase2(U num1, V num2, bool eq, const __LineInfo* pLineInfo = NULL) {
 			TEST_INTEGER_COM_BASE(num1, num2, == , eq, pLineInfo);
@@ -231,6 +231,37 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TestIntegerToString("0x00000aacd", "", "0xAACD", LINE_INFO());
 			//TestIntegerToString("", "", "", LINE_INFO());
 			
+		}
+
+		void TestIntegerAddSub(std::string str1, std::string str2, std::string str3, __LineInfo* pLineInfo) {
+			Integer a, b, s;
+			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test +-", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test +-", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, s.Parse(str3), L"Integer Parse error when test +-", pLineInfo);
+			Assert::IsTrue(a + b == s, L"Add error.", pLineInfo);
+			Assert::IsTrue(b + a == s, L"Add error.", pLineInfo);
+			Assert::IsTrue(s - a == b, L"Sub error.", pLineInfo);
+			Assert::IsTrue(s - b == a, L"Sub error.", pLineInfo);
+			Assert::IsTrue(a - s == -b, L"Sub error.", pLineInfo);
+			Assert::IsTrue(b - s == -a, L"Sub error.", pLineInfo);
+		}
+
+		TEST_METHOD(TestIntegerAS) {
+			TestIntegerAddSub("0", "0", "0", LINE_INFO());
+			TestIntegerAddSub("-0", "0", "0", LINE_INFO());
+			TestIntegerAddSub("0", "1", "1", LINE_INFO());
+			TestIntegerAddSub("0", "-3", "-3", LINE_INFO());
+			TestIntegerAddSub("-7", "7", "0", LINE_INFO());
+			TestIntegerAddSub("32768", "65536", "98304", LINE_INFO());
+			TestIntegerAddSub("-10086", "-10010", "-20096", LINE_INFO());
+			TestIntegerAddSub("-135790", "867312", "731522", LINE_INFO());
+			TestIntegerAddSub("-32346523", "13172830", "-19173693", LINE_INFO());
+			TestIntegerAddSub("3450293875023475024570345923485702950923457875029452934509287437676816581876214",
+				"7490918801118394765103491093498587360192023441273509150198327409213539834673455",
+				"10941212676141869249317755947568473202180937324699248638761280159108409466028032", LINE_INFO());
+			TestIntegerAddSub("2384750193485324891786231019823648917632491019432579320923759071264016501924345",
+				"-9965977871263490182375019843750912381720472136487651923245912386419827364981234",
+				"-7581227677778165469753559505548545170431534976763442745451266534407585134542848", LINE_INFO());
 		}
 
 	};
