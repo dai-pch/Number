@@ -144,8 +144,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TestIntegerParseRight(0b11010010, "0b11010010", LINE_INFO());
 			TestIntegerParseRight(-0b10001101, "-0b10001101", LINE_INFO());
 			TestIntegerParseRight(0b10001100111011110111001101100101, "0B10001100111011110111001101100101", LINE_INFO());
-			TestIntegerParseRight(0b1000110011101111011100110110010110001100111011110111001101100101,
-				"1000110011101111011100110110010110001100111011110111001101100101", LINE_INFO());
+			TestIntegerParseRight(0b0100110011101111011100110110010110001100111011110111001101100101,
+				"0b0100110011101111011100110110010110001100111011110111001101100101", LINE_INFO());
 
 			//8
 			TestIntegerParseRight(00, "0o0", LINE_INFO());
@@ -161,7 +161,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed.\n", LINE_INFO
 			TestIntegerParseRight(0, "0", LINE_INFO());
 			TestIntegerParseRight(1, "1", LINE_INFO());
 			TestIntegerParseRight(2, "+2", LINE_INFO());
-			TestIntegerParseRight(9, "-9", LINE_INFO());
+			TestIntegerParseRight(-9, "-9", LINE_INFO());
 			TestIntegerParseRight(300753992, "300753992", LINE_INFO());
 			TestIntegerParseRight(-10010, "-10010", LINE_INFO());
 			TestIntegerParseRight(10086, "+10086", LINE_INFO());
