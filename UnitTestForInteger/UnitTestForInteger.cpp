@@ -144,6 +144,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TestIntegerParseRight(0b110, "0b00000110", LINE_INFO());
 			TestIntegerParseRight(0b11010010, "0b11010010", LINE_INFO());
 			TestIntegerParseRight(-0b10001101, "-0b10001101", LINE_INFO());
+			TestIntegerParseRight(0b110100101010, "0b110100101010", LINE_INFO());
+			TestIntegerParseRight(-0b100011011010, "-0b100011011010", LINE_INFO());
 			TestIntegerParseRight(0b10001100111011110111001101100101, "0B10001100111011110111001101100101", LINE_INFO());
 			TestIntegerParseRight(0b0100110011101111011100110110010110001100111011110111001101100101,
 				"0b0100110011101111011100110110010110001100111011110111001101100101", LINE_INFO());
@@ -176,11 +178,14 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TestIntegerParseRight(0x5, "+0x5", LINE_INFO());
 			TestIntegerParseRight(-0x8, "-0x8", LINE_INFO());
 			TestIntegerParseRight(-0x7, "-0X7", LINE_INFO());
-			TestIntegerParseRight(0xA8, "0x0000A8", LINE_INFO());
+			TestIntegerParseRight(0xB0A8, "0x00000B0A8", LINE_INFO());
+			TestIntegerParseRight(0xA0B0CCDD00F0, "0XA0B0CCDD00F0", LINE_INFO());
+			TestIntegerParseRight(-0xE00BCCDD00F0, "-0XE00BCCDD00F0", LINE_INFO());
 			TestIntegerParseRight(0x123456789ABCDEFD, "0x123456789abcdefd", LINE_INFO());
 			TestIntegerParseRight(-0x123456789ABCDEFC, "-0x123456789abcdefc", LINE_INFO());
 			TestIntegerParseRight(0xAA00CCDD00000000, "0XAA00CCDD00000000", LINE_INFO());
 			TestIntegerParseRight(0xAA00CCDD00000000, "0xAA00ccdd00000000", LINE_INFO());
+			
 			//TestIntegerParseRight(, "", LINE_INFO());
 			//TestIntegerParseRight(, "", LINE_INFO());
 
@@ -223,7 +228,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TestIntegerToString("0xabcdef", "", "0xABCDEF", LINE_INFO());
 			TestIntegerToString("0X1237aaef", "", "0x1237AAEF", LINE_INFO());
 			TestIntegerToString("0x123456789abcdeffeddc", "", "0x123456789ABCDEFFEDDC", LINE_INFO());
-			TestIntegerToString("0x00000aacd", "", "0XAACD", LINE_INFO());
+			TestIntegerToString("0x00000aacd", "", "0xAACD", LINE_INFO());
 			//TestIntegerToString("", "", "", LINE_INFO());
 			
 		}
