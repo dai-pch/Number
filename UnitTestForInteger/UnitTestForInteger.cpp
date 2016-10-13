@@ -246,7 +246,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			Assert::IsTrue(b - s == -a, L"Sub error", pLineInfo);
 		}
 
-		TEST_METHOD(TestIntegerAS) {
+		TEST_METHOD(TestIntegerAddSub) {
 			TestIntegerAddSub("0", "0", "0", LINE_INFO());
 			TestIntegerAddSub("-0", "0", "0", LINE_INFO());
 			TestIntegerAddSub("0", "1", "1", LINE_INFO());
@@ -283,11 +283,11 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, d.Parse(str3), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, m.Parse(str4), L"Integer Parse error when test */", pLineInfo);
-			Assert::IsTrue(a / b == d, L"Mul error", pLineInfo);
-			Assert::IsTrue(a % b == m, L"Mul error", pLineInfo);
+			Assert::IsTrue(a / b == d, L"Dev error", pLineInfo);
+			Assert::IsTrue(a % b == m, L"Mod error", pLineInfo);
 		}
 
-		TEST_METHOD(TestIntegerMD) {
+		TEST_METHOD(TestIntegerDevMod) {
 			TestIntegerMulDev("0", "0", "0", LINE_INFO());
 			TestIntegerMulDev("-0", "0", "0", LINE_INFO());
 			TestIntegerMulDev("0", "1", "0", LINE_INFO());
@@ -297,6 +297,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 
 			TestIntegerMulDev("338745", "24325", "8239972125", LINE_INFO());
 			TestIntegerMulDev("-60374", "22580", "-1363244920", LINE_INFO());
+			TestIntegerMulDev("-34750247679359595104195192713491853248905703459234", "-1",
+				"34750247679359595104195192713491853248905703459234", LINE_INFO());
 			TestIntegerMulDev("34502938750234750245703459234857029503464564775029452934509287437676816581876214",
 				"7490918801118394765103491091168307360192023441273509150198327409213539834673455",
 				"258458712577969901107793595983076419519271833012883483684123496626476994193811141762278729300587831551290525355683871785611321045319590811232460657255921699370", LINE_INFO());
@@ -306,7 +308,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 		
 			TestIntegerModDev("21", "3", "7", "0", LINE_INFO());
 			TestIntegerModDev("-36", "7", "-5", "-1", LINE_INFO());
-			TestIntegerModDev("255", "-37", "6", "33", LINE_INFO());
+			TestIntegerModDev("255", "-37", "-6", "33", LINE_INFO());
 			TestIntegerModDev("543236477908091324347895763687597890476356245978",
 				"23456", "23159808914908395478679048588318463952777807",
 				"4986", LINE_INFO());
@@ -316,7 +318,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TestIntegerModDev("-1234567890987654324365365654687642131648799957636875978904763599963213215486085098705444654156847908091326163546513",
 				"2198764316887651346789040168799981316487987643",
 				"-561482593430106196115167812503616771605925073683615704771777410662229",
-				"-1554144376565044617564612370009628257964710266", LINE_INFO());		
+				"-1554144376565044617564612370009628257964710266", LINE_INFO());	
 		}
 	};
 }
