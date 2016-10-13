@@ -303,7 +303,7 @@ namespace Number {
 
 	//除法
 	//使用Knuth算法
-	Integer _Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
+	Integer Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
 	{
 		assert(Obj2 != 0);
 		//如果被除数小于除数，直接返回结果
@@ -414,7 +414,7 @@ namespace Number {
 		Integer q = this->Abs(), mod;
 		do
 		{
-			q = _Devide(q, 1000000000, mod);
+			q = Devide(q, 1000000000, mod);
 			save_type temp = mod._number[0];
 			int ii = 0;
 			do

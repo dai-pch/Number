@@ -166,44 +166,44 @@ namespace Number {
 			return Number2 * Number1;
 		}
 
-		friend Integer _Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod);
+		friend Integer Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod);
 
 		Integer operator/(const Integer& Num2) const
 		{
 			Integer mod;
-			return _Devide(*this, Num2, mod);
+			return Devide(*this, Num2, mod);
 		}
 		template<typename T>
 		Integer operator/(const T& Num2) const
 		{
 			Integer mod;
-			return _Devide(*this, Num2, mod);
+			return Devide(*this, Num2, mod);
 		}
 		template<typename T>
 		friend Integer operator/(const T& Num1, const Integer& Num2)
 		{
 			Integer mod;
-			return _Devide(Integer(Num1), Num2, mod);
+			return Devide(Integer(Num1), Num2, mod);
 		}
 
 		Integer operator%(const Integer& Num2) const
 		{
 			Integer mod;
-			_Devide(*this, Num2, mod);
+			Devide(*this, Num2, mod);
 			return mod;
 		}
 		template<typename T>
 		Integer operator%(const T& Num2) const
 		{
 			Integer mod;
-			_Devide(*this, Num2, mod);
+			Devide(*this, Num2, mod);
 			return mod;
 		}
 		template<typename T>
 		friend Integer operator%(const T& Num1, const Integer& Num2)
 		{
 			Integer mod;
-			_Devide(Integer(Num1), Num2, mod);
+			Devide(Integer(Num1), Num2, mod);
 			return mod;
 		}
 
