@@ -36,6 +36,7 @@ namespace Number {
 
 		//ÆäËû¸¨Öú²Ù×÷
 		int _compare(const Integer&, size_t&) const;
+
 		unsigned char backbit() const;
 
 		void FromString10(const std::string & c);

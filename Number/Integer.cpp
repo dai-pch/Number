@@ -100,6 +100,17 @@ namespace Number {
 		return _signal = signal >= 0 ? 1 : -1;
 	}
 
+	//除去可能的高位的零
+	void eraseZero(std::vector<save_type> &vec) {
+		auto it_re = vec.rbegin();
+		size_t counter = 0;
+		while ((it_re != vec.rend() - 1) && *it_re == 0)
+		{
+			++counter;
+			++it_re;
+		}
+		vec.erase(vec.end() - counter, vec.end());
+	}
 
 	int Integer::Compare(const Integer &Obj2) const
 	{
@@ -142,7 +153,7 @@ namespace Number {
 		return Integer(result, _signal);
 	}
 
-	Integer Integer::operator >> (const int &num) const
+	Integer Integer::operator>>(const int &num) const
 	{
 		if (num < 0)
 			return this->operator<<(-num);
@@ -261,14 +272,7 @@ namespace Number {
 		}
 
 		//除去可能的高位的零
-		auto it_result_re = result.rbegin();
-		nonEqualCounter_re = 0;
-		while ((it_result_re != result.rend() - 1) && *it_result_re == 0)
-		{
-			nonEqualCounter_re++;
-			it_result_re++;
-		}
-		result.erase(result.end() - nonEqualCounter_re, result.end());
+		eraseZero(result);
 
 		return Integer(result, gt ? _signal : -_signal);
 	}
@@ -284,8 +288,12 @@ namespace Number {
 			for (unsigned int jj = 0;jj < size2;jj++)
 			{
 				calc_type_u temp = static_cast<calc_type_u>(number1[ii]) * static_cast<calc_type_u>(number2[jj]);
-				result[ii + jj] += static_cast<save_type>(temp % MODULE);
-				result[ii + jj + 1] += static_cast<save_type>(temp / MODULE);
+				save_type high, low, c = 0;
+				CalcTypeToSaveType(temp, high, low);
+				result[ii + jj] = FullAdder(result[ii + jj], low, c);
+				result[ii + jj + 1] = FullAdder(result[ii + jj + 1], high, c);
+				if (c)
+					++result[ii + jj + 2];
 			}
 		}
 		if (result.back() == 0)
@@ -297,6 +305,7 @@ namespace Number {
 	//使用Knuth算法
 	Integer _Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
 	{
+		assert(Obj2 != 0);
 		//如果被除数小于除数，直接返回结果
 		if (Obj1.Abs() < Obj2.Abs())
 		{
@@ -329,27 +338,27 @@ namespace Number {
 
 		//规格化
 		save_type temp = Obj2._number.back();
-		int shift = 0;
-		if ((temp & 0xffff0000) == 0) { shift += 16; temp &= 0xffff0000; }
-		if ((temp & 0xff00ff00) == 0) { shift += 8; temp &= 0xff00ff00; }
-		if ((temp & 0xf0f0f0f0) == 0) { shift += 4; temp &= 0xf0f0f0f0; }
-		if ((temp & 0xcccccccc) == 0) { shift += 2; temp &= 0xcccccccc; }
-		if ((temp & 0xaaaaaaaa) == 0) { shift += 1;}
+		int shift = 31;
+		if ((temp & 0xffff0000)	!= 0) { shift -= 16; temp &= 0xffff0000; }
+		if ((temp & 0xff00ff00) != 0) {	shift -= 8; temp &= 0xff00ff00; }
+		if ((temp & 0xf0f0f0f0)	!= 0) { shift -= 4; temp &= 0xf0f0f0f0; }
+		if ((temp & 0xcccccccc)	!= 0) { shift -= 2; temp &= 0xcccccccc; }
+		if ((temp & 0xaaaaaaaa)	!= 0) { shift -= 1;}
 		::std::vector<save_type> &Number1 = (Obj1 << shift)._number;
 		const ::std::vector<save_type>	&Number2 = (Obj2 << shift)._number;
 
 		//除法
 		if (Number1.size() == Obj1._number.size())
 			Number1.push_back(0);
-		unsigned int size1 = Number1.size(), size2 = Number2.size();
+		size_t size1 = Number1.size(), size2 = Number2.size();
 		::std::vector<save_type> result(size1 - size2);
-		for (int ii = size1 - size2;ii >= 0;ii--)
+		for (int ii = size1 - size2 - 1;ii >= 0;ii--)
 		{
 			//预测q
-			calc_type_u qBar = Number1[ii + size2 - 1] * MODULE + Number1[ii + size2 - 2];
+			calc_type_u qBar = Number1[ii + size2] * MODULE + Number1[ii + size2 - 1];
 			calc_type_u rBar = qBar % Number2.back();
 			qBar /= Number2.back();
-			if (qBar == MODULE || qBar*Number2[size2 - 2] > rBar * MODULE + Number1[ii + size2 - 3])
+			if (qBar == MODULE || qBar*Number2[size2 - 2] > rBar * MODULE + Number1[ii + size2 - 2])
 				qBar--;
 
 			//减法
@@ -357,13 +366,13 @@ namespace Number {
 			if (tempvec.size() == size2)
 				tempvec.push_back(0);
 			save_type c = 1;
-			for (unsigned int jj = 0;jj <= tempvec.size();jj++)
+			for (unsigned int jj = 0;jj < tempvec.size();jj++)
 				Number1[jj + ii] = FullSuber(Number1[jj + ii], tempvec[jj], c);
 
 			//如果预测不正确
 			if (c == 0)
 			{
-				unsigned int jj = 0;
+				size_t jj = 0;
 				for (;jj <= tempvec.size();jj++)
 					Number1[jj + ii] = FullAdder(Number1[jj + ii], Number2[jj], c);
 				qBar--;
@@ -371,6 +380,8 @@ namespace Number {
 			result[ii] = static_cast<save_type>(qBar);
 		}
 
+		//除去可能的高位的零
+		eraseZero(Number1);
 		mod = Integer(Number1, Obj1._signal) >> shift;
 		return Integer(result, Obj1._signal * Obj2._signal);
 	}
@@ -657,7 +668,7 @@ if (*(it++) != (ch) \
 
 	Integer Integer::Abs() const
 	{
-		return Integer(::std::vector<save_type>(_number), 1);
+		return Integer(std::vector<save_type>(_number), 1);
 	}
 
 	Integer Integer::Power(const Integer & Exp) const
