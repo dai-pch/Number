@@ -8,7 +8,7 @@
 
 namespace Number {
 
-	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number()
+	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number(), _signal(Signal)
 	{
 		_number.swap(Number);
 	}
@@ -236,7 +236,11 @@ namespace Number {
 		bool gt;
 		const Integer *p1 = nullptr, *p2 = nullptr;
 		size_t nonEqualCounter_re;
-		gt = (this->_compare(Obj2, nonEqualCounter_re)) >= 0;
+		int com = this->_compare(Obj2, nonEqualCounter_re);
+		com *= _signal;
+		if (com == 0)
+			return Integer();
+		gt = com > 0;
 		gt ? (p1 = this, p2 = &Obj2) : (p1 = &Obj2, p2 = this);
 
 		size_t size1 = p1->_number.size(), size2 = p2->_number.size();
