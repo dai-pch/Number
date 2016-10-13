@@ -264,5 +264,59 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 				"-7581227677778165290588788823927263464087981117055072602322153315155810863056889", LINE_INFO());
 		}
 
+		void TestIntegerMulDev(std::string str1, std::string str2, std::string str3, __LineInfo* pLineInfo) {
+			Integer a, b, s;
+			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, s.Parse(str3), L"Integer Parse error when test */", pLineInfo);
+			Assert::IsTrue(a * b == s, L"Mul error", pLineInfo);
+			Assert::IsTrue(b * a == s, L"Mul error", pLineInfo);
+			if (a != 0)
+				Assert::IsTrue(s / a == b, L"Dev error", pLineInfo);
+			if (b != 0)
+				Assert::IsTrue(s / b == a, L"Dev error", pLineInfo);
+		}
+		
+		void TestIntegerModDev(std::string str1, std::string str2, std::string str3, std::string str4, __LineInfo* pLineInfo) {
+			Integer a, b, m, d;
+			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, d.Parse(str3), L"Integer Parse error when test */", pLineInfo);
+			Assert::AreEqual(Number_Parse_OK, m.Parse(str4), L"Integer Parse error when test */", pLineInfo);
+			Assert::IsTrue(a / b == d, L"Mul error", pLineInfo);
+			Assert::IsTrue(a % b == m, L"Mul error", pLineInfo);
+		}
+
+		TEST_METHOD(TestIntegerMD) {
+			TestIntegerMulDev("0", "0", "0", LINE_INFO());
+			TestIntegerMulDev("-0", "0", "0", LINE_INFO());
+			TestIntegerMulDev("0", "1", "0", LINE_INFO());
+			TestIntegerMulDev("-3", "0", "0", LINE_INFO());
+			TestIntegerMulDev("2", "70", "140", LINE_INFO());
+			TestIntegerMulDev("-5", "30", "-150", LINE_INFO());
+
+			TestIntegerMulDev("338745", "24325", "8239972125", LINE_INFO());
+			TestIntegerMulDev("-60374", "22580", "-1363244920", LINE_INFO());
+			TestIntegerMulDev("34502938750234750245703459234857029503464564775029452934509287437676816581876214",
+				"7490918801118394765103491091168307360192023441273509150198327409213539834673455",
+				"258458712577969901107793595983076419519271833012883483684123496626476994193811141762278729300587831551290525355683871785611321045319590811232460657255921699370", LINE_INFO());
+			TestIntegerMulDev("2384750193485324891786231019822357117632491019432579320923759071264016501924345",
+				"-9965977871263490182375019843750912381720472136487651923245912386419827364981234",
+				"-23766367656766074498187360121055082313211874311420286616610754823487880627777351412999960762652087319961498758734391202707977726944188275025244657025812741730", LINE_INFO());
+		
+			TestIntegerModDev("21", "3", "7", "0", LINE_INFO());
+			TestIntegerModDev("-36", "7", "-5", "-1", LINE_INFO());
+			TestIntegerModDev("255", "-37", "6", "33", LINE_INFO());
+			TestIntegerModDev("543236477908091324347895763687597890476356245978",
+				"23456", "23159808914908395478679048588318463952777807",
+				"4986", LINE_INFO());
+			TestIntegerModDev("743253647658608509870544465415684761635465130220632563020006465312",
+				"6478643219876431688765134681331000016879998999999999632132154",
+				"114723", "4261544724637240341919369348446698941004943632605222909361970", LINE_INFO());
+			TestIntegerModDev("-1234567890987654324365365654687642131648799957636875978904763599963213215486085098705444654156847908091326163546513",
+				"2198764316887651346789040168799981316487987643",
+				"-561482593430106196115167812503616771605925073683615704771777410662229",
+				"-1554144376565044617564612370009628257964710266", LINE_INFO());		
+		}
 	};
 }
