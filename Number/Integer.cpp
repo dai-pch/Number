@@ -103,29 +103,8 @@ namespace Number {
 
 	int Integer::Compare(const Integer &Obj2) const
 	{
-		//两数均为零时有符号问题，单独考虑
-		if (_number.back() == 0 && Obj2._number.back() == 0)
-			return 0;
-		//符号不同直接判断
-		if (_signal != Obj2._signal)
-			return static_cast<int>(_signal - Obj2._signal);
-		//位数不同直接判断
-		if (_number.size() != Obj2._number.size())
-			return (_number.size() > Obj2._number.size() ? 1 : -1);
-		//逐位比较绝对值大小
-		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-		while (it1 != _number.rend())
-		{
-			if (*it1 < *it2) {
-				return -_signal;
-			}
-			else if (*it1 > *it2) {
-				return _signal;
-			}
-			it1++;
-			it2++;
-		}
-		return 0;
+		size_t temp;
+		return this->_compare(Obj2, temp);
 	}
 
 	bool Integer::operator>(const Integer& Obj2) const
@@ -256,25 +235,12 @@ namespace Number {
 		//比较两数绝对值的大小，绝对值大的赋给p1
 		bool gt;
 		const Integer *p1 = nullptr, *p2 = nullptr;
-		int nonEqualCounter_re = 0;
-		//位数不同直接判断
-		if (_number.size() != Obj2._number.size())
-			gt = (_number.size()) > (Obj2._number.size());
-		else //否则逐位比较绝对值大小
-		{
-			auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-			while (it1 != _number.rend() - 1 && *it1 != *it2)
-			{
-				it1++;
-				it2++;
-				nonEqualCounter_re++;
-			}
-			gt = *it1 > *it2 ? true : false;
-		}
+		size_t nonEqualCounter_re;
+		gt = (this->_compare(Obj2, nonEqualCounter_re)) >= 0;
 		gt ? (p1 = this, p2 = &Obj2) : (p1 = &Obj2, p2 = this);
 
-		unsigned int size1 = p1->_number.size(), size2 = p2->_number.size();
-		::std::vector<save_type> result(size1 - nonEqualCounter_re);
+		size_t size1 = p1->_number.size(), size2 = p2->_number.size();
+		std::vector<save_type> result(size1 - nonEqualCounter_re);
 		//vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
 		//vector<save_type>::iterator it_result = result.begin();
 		calc_type temp = 0;
@@ -650,6 +616,35 @@ if (*(it++) != (ch) \
 		return Number_Parse_OK;
 	}
 
+
+	int Integer::_compare(const Integer &Obj2, size_t &NonEqualPosition) const
+	{
+		NonEqualPosition = 0;
+		//两数均为零时有符号问题，单独考虑
+		if (_number.back() == 0 && Obj2._number.back() == 0)
+			return 0;
+		//符号不同直接判断
+		if (_signal != Obj2._signal)
+			return static_cast<int>(_signal - Obj2._signal);
+		//位数不同直接判断
+		if (_number.size() != Obj2._number.size())
+			return (_number.size() > Obj2._number.size() ? 1 : -1);
+		//逐位比较绝对值大小
+		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
+		while (it1 != _number.rend())
+		{
+			if (*it1 < *it2) {
+				return -_signal;
+			}
+			else if (*it1 > *it2) {
+				return _signal;
+			}
+			++it1;
+			++it2;
+			++NonEqualPosition;
+		}
+		return 0;
+	}
 
 	unsigned char Integer::backbit() const
 	{
