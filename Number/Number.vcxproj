@@ -113,9 +113,11 @@
     <ClInclude Include="algrm.h" />
     <ClInclude Include="Integer.h" />
     <ClInclude Include="Number.h" />
+    <ClInclude Include="Real.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Integer.cpp" />
+    <ClCompile Include="Real.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
