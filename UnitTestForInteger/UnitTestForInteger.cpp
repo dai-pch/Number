@@ -1,9 +1,22 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
+#include <string>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Number;
 
+namespace Microsoft {
+	namespace VisualStudio {
+		namespace CppUnitTestFramework
+		{
+			template<>
+			std::wstring ToString<Integer>(const Number::Integer &num) {
+				std::string temp = num.ToString10();
+				return std::wstring(temp.begin(), temp.end());
+			}
+		}
+	}
+}
 namespace UnitTestForNumber
 {		
 	BEGIN_TEST_MODULE_ATTRIBUTE()
@@ -24,7 +37,6 @@ namespace UnitTestForNumber
 		TEST_METHOD(TestIntegerInitialize)
 		{
 			// TODO: 在此输入测试代码
-			Logger::WriteMessage("In Method TestIntegerInitialize.\n");
 
 #define TEST_INTEGER_INITIALIZE(num) do{\
 Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO());\
@@ -122,8 +134,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 		void TestIntegerParseBase(T num, const std::string &str, int res, __LineInfo* pLineInfo) {
 			Integer a(num), b;
 			auto res2 = b.Parse(str);
-			Assert::IsTrue(res == res2, L"Integer Parse Error", pLineInfo);
-			Assert::IsTrue(b == a, L"Integer Parse Value Error", pLineInfo);
+			Assert::AreEqual(res, res2, L"Integer Parse Error", pLineInfo);
+			Assert::AreEqual(a, b, L"Integer Parse Value Error", pLineInfo);
 		}
 
 		template <typename T>
@@ -238,12 +250,12 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test +-", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test +-", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, s.Parse(str3), L"Integer Parse error when test +-", pLineInfo);
-			Assert::IsTrue(a + b == s, L"Add error", pLineInfo);
-			Assert::IsTrue(b + a == s, L"Add error", pLineInfo);
-			Assert::IsTrue(s - a == b, L"Sub error", pLineInfo);
-			Assert::IsTrue(s - b == a, L"Sub error", pLineInfo);
-			Assert::IsTrue(a - s == -b, L"Sub error", pLineInfo);
-			Assert::IsTrue(b - s == -a, L"Sub error", pLineInfo);
+			Assert::AreEqual(s, a + b, L"Add error", pLineInfo);
+			Assert::AreEqual(s, b + a, L"Add error", pLineInfo);
+			Assert::AreEqual(b, s - a, L"Sub error", pLineInfo);
+			Assert::AreEqual(a, s - b, L"Sub error", pLineInfo);
+			Assert::AreEqual(-b, a - s, L"Sub error", pLineInfo);
+			Assert::AreEqual(-a, b - s, L"Sub error", pLineInfo);
 		}
 
 		TEST_METHOD(TestIntegerAddSub) {
@@ -269,12 +281,12 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, s.Parse(str3), L"Integer Parse error when test */", pLineInfo);
-			Assert::IsTrue(a * b == s, L"Mul error", pLineInfo);
-			Assert::IsTrue(b * a == s, L"Mul error", pLineInfo);
+			Assert::AreEqual(s, a * b, L"Mul error", pLineInfo);
+			Assert::AreEqual(s, b * a, L"Mul error", pLineInfo);
 			if (a != 0)
-				Assert::IsTrue(s / a == b, L"Dev error", pLineInfo);
+				Assert::AreEqual(b, s / a, L"Dev error", pLineInfo);
 			if (b != 0)
-				Assert::IsTrue(s / b == a, L"Dev error", pLineInfo);
+				Assert::AreEqual(a, s / b, L"Dev error", pLineInfo);
 		}
 		
 		void TestIntegerModDev(std::string str1, std::string str2, std::string str3, std::string str4, __LineInfo* pLineInfo) {
@@ -283,8 +295,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, d.Parse(str3), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, m.Parse(str4), L"Integer Parse error when test */", pLineInfo);
-			Assert::IsTrue(a / b == d, L"Dev error", pLineInfo);
-			Assert::IsTrue(a % b == m, L"Mod error", pLineInfo);
+			Assert::AreEqual(d, a / b, L"Dev error", pLineInfo);
+			Assert::AreEqual(m, a % b, L"Mod error", pLineInfo);
 		}
 
 		TEST_METHOD(TestIntegerDevMod) {
