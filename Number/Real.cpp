@@ -7,5 +7,10 @@ namespace Number {
 
 	Real::Real(Integer &Obj): _number(Obj) {}
 
+	int Real::Compare(const Real &) const
+	{
+		return 0;
+	}
+
 
 }

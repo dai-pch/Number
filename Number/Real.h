@@ -12,9 +12,14 @@ namespace Number {
 		Real(){} //空构造
 		Real(Real&); //拷贝构造
 		Real(Integer&); 
+		//从整数构造
 		template<typename T>
-		Real(T& Number, typename std::enable_if<
-		std::is_floating_point<T>::value>::type* = nullptr) { //从浮点数构造
+		Real(const T& Number, typename std::enable_if<
+			std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
+		//从浮点数构造
+		template<typename T>
+		Real(const T& Number, typename std::enable_if<
+		std::is_floating_point<T>::value>::type* = nullptr) { 
 
 		}
 

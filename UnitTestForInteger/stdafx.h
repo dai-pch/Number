@@ -12,4 +12,6 @@
 
 // TODO:  在此处引用程序需要的其他头文件
 #include "../Number/Integer.h"
+#include "../Number/Real.h"
 #include "../Number/algrm.h"
+#include <string>

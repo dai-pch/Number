@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "CppUnitTest.h"
-#include <string>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Number;
@@ -23,6 +21,17 @@ namespace UnitTestForNumber
 	TEST_MODULE_ATTRIBUTE(L"Date", L"2010/6/12")
 	END_TEST_MODULE_ATTRIBUTE()
 
+	template<typename T, typename U>
+	void TestInitializeBase(U num, const wchar_t* message = NULL, __LineInfo* pLineInfo = NULL) {
+		T temp(num);
+		T temp2 = temp;
+		Assert::IsTrue(temp == (num), message, pLineInfo);
+		Assert::IsTrue(temp2 == (num), message, pLineInfo);
+	}
+#define TEST_INTEGER_INITIALIZE(num) TestInitializeBase<Integer>(num, L"Initialize Integer failed", LINE_INFO())
+#define TEST_REAL_INITIALIZE(num) TestInitializeBase<Real>(num, L"Initialize Real failed", LINE_INFO())
+
+
 	TEST_CLASS(UnitTestForInteger)
 	{
 	public:
@@ -37,11 +46,6 @@ namespace UnitTestForNumber
 		TEST_METHOD(TestIntegerInitialize)
 		{
 			// TODO: 在此输入测试代码
-
-#define TEST_INTEGER_INITIALIZE(num) do{\
-Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO());\
-}while(0)
-
 			Assert::IsTrue(Integer() == 0, L"Initialize Integer failed", LINE_INFO());
 			TEST_INTEGER_INITIALIZE((char)0);
 			TEST_INTEGER_INITIALIZE((unsigned char)1);
@@ -335,8 +339,20 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 	};
 
 	TEST_CLASS(UnitTestForReal) {
-		TEST_METHOD(TestDecimalReal) {
 
+		TEST_METHOD(TestRealInitialize)
+		{
+			Assert::IsTrue(Real() == 0, L"Initialize Real failed", LINE_INFO());
+			TEST_REAL_INITIALIZE(Integer(0));
+			TEST_REAL_INITIALIZE((unsigned char)120);
+			TEST_REAL_INITIALIZE((unsigned int)3);
+			TEST_REAL_INITIALIZE((unsigned long)65536);
+			TEST_REAL_INITIALIZE((char)-105);
+			TEST_REAL_INITIALIZE((int)-236);
+			TEST_REAL_INITIALIZE((long)-657386);
+			TEST_REAL_INITIALIZE((float)3.1415926e12);
+			TEST_REAL_INITIALIZE((double)-2.718281828e6);
+			TEST_REAL_INITIALIZE((long double)308273954e-12);
 		}
 	};
 }
