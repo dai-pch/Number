@@ -58,7 +58,7 @@ namespace Number {
 		template<typename T>
 		friend bool operator>(const T& Number1, const Integer& Number2)
 		{
-			return Number2 < Number1;
+			return Number2.operator<(Number1);
 		}
 		//<ÔËËã·û	
 		bool operator<(const Integer& Number2) const {
@@ -67,7 +67,7 @@ namespace Number {
 		template<typename T>
 		friend bool operator<(const T& Number1, const Integer& Number2)
 		{
-			return Number2 > Number1;
+			return Number2.operator>(Number1);
 		}
 		//==ÔËËã·û
 		bool operator==(const Integer& Number2) const	{
@@ -76,7 +76,7 @@ namespace Number {
 		template<typename T>
 		friend bool operator==(const T& Number1, const Integer& Number2)
 		{
-			return Number2 == Number1;
+			return Number2.operator==(Number1);
 		}
 		//!=ÔËËã·û
 		bool operator!=(const Integer& Number2) const
@@ -86,7 +86,7 @@ namespace Number {
 		template<typename T>
 		friend bool operator!=(const T& Number1, const Integer& Number2)
 		{
-			return (Number2 != Number1);
+			return Number2.operator!=(Number1);
 		}
 		//>=ÔËËã·û
 		bool operator>=(const Integer& Number2) const
@@ -96,7 +96,7 @@ namespace Number {
 		template<typename T>
 		friend bool operator>=(const T& Number1, const Integer& Number2)
 		{
-			return (Number2 <= Number1);
+			return Number2.operator<=(Number1);
 		}
 		//<=ÔËËã·û
 		bool operator<=(const Integer& Number2) const
@@ -106,7 +106,7 @@ namespace Number {
 		template<typename T>
 		friend bool operator<=(const T& Number1, const Integer& Number2)
 		{
-			return (Number2 >= Number1);
+			return Number2.operator>=(Number1);
 		}
 
 
