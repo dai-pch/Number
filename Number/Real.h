@@ -117,7 +117,7 @@ namespace Number {
 
 		//ÊäÈëÊä³ö
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
-		friend ::std::istream& operator >> (::std::istream&, Integer&);
+		friend ::std::istream& operator>>(::std::istream&, Integer&);
 
 	private:
 		Integer _number{0};
