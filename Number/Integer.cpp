@@ -118,20 +118,6 @@ namespace Number {
 		return this->_compare(Obj2, temp);
 	}
 
-	bool Integer::operator>(const Integer& Obj2) const
-	{
-		return ((this->Compare(Obj2)) > 0);
-	}
-
-	bool Integer::operator<(const Integer& Obj2) const {
-		return ((this->Compare(Obj2)) < 0);
-	}
-
-	bool Integer::operator==(const Integer& Obj2) const
-	{
-		return ((this->Compare(Obj2)) == 0);
-	}
-
 
 	Integer Integer::operator<<(const int &num) const
 	{
@@ -392,7 +378,7 @@ namespace Number {
 		return (os << Obj.ToString10());
 	}
 
-	::std::istream & operator >> (::std::istream &is, Integer &Num)
+	::std::istream & operator>>(::std::istream &is, Integer &Num)
 	{
 		// TODO: 在此处插入 return 语句
 		::std::string str;
@@ -631,20 +617,15 @@ if (*(it++) != (ch) \
 		return Number_Parse_OK;
 	}
 
-
-	int Integer::_compare(const Integer &Obj2, size_t &NonEqualPosition) const
+	size_t Integer::get_bit_number() const
 	{
-		NonEqualPosition = 0;
-		//两数均为零时有符号问题，单独考虑
-		if (_number.back() == 0 && Obj2._number.back() == 0)
-			return 0;
-		//符号不同直接判断
-		if (_signal != Obj2._signal)
-			return static_cast<int>(_signal - Obj2._signal);
-		//位数不同直接判断
-		if (_number.size() != Obj2._number.size())
-			return (_number.size() > Obj2._number.size() ? 1 : -1);
-		//逐位比较绝对值大小
+		return _number.size();
+	}
+
+
+	//逐位比较绝对值大小
+	int Integer::_compare_helper(const Integer &Obj2, size_t &NonEqualPosition) const
+	{
 		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
 		while (it1 != _number.rend())
 		{
@@ -659,6 +640,22 @@ if (*(it++) != (ch) \
 			++NonEqualPosition;
 		}
 		return 0;
+	}
+
+	int Integer::_compare(const Integer &Obj2, size_t &NonEqualPosition) const
+	{
+		NonEqualPosition = 0;
+		//两数均为零时有符号问题，单独考虑
+		if (_number.back() == 0 && Obj2._number.back() == 0)
+			return 0;
+		//符号不同直接判断
+		if (_signal != Obj2._signal)
+			return static_cast<int>(_signal - Obj2._signal);
+		//位数不同直接判断
+		if (_number.size() != Obj2._number.size())
+			return (_number.size() > Obj2._number.size() ? 1 : -1);
+		//逐位比较绝对值大小
+		return this->_compare_helper(Obj2, NonEqualPosition);
 	}
 
 	unsigned char Integer::backbit() const
