@@ -12,39 +12,7 @@
 namespace Number {
 
 	class Integer {
-	private:
-		char _signal = 1;
-		::std::vector<save_type> _number{ 0 };
-
-		Integer(::std::vector<save_type> Number, char Signal = 1);
-
-		template<typename T>
-		void SetNumber(const T &num)
-		{
-			T temp = num;
-			_number.clear();
-			do {
-				save_type lowbyte, highbyte;
-				CalcTypeToSaveType(temp, highbyte, lowbyte);
-				_number.push_back(lowbyte);
-				temp = static_cast<T>(highbyte);
-			} while (temp != 0);
-		}
-
-		int setSignal(const int& signal);
-		//int negative();
-
-		//其他辅助操作
-		int _compare(const Integer&, size_t&) const;
-
-		unsigned char backbit() const;
-
-		void FromString10(const std::string & c);
-		void FromString2(const std::string & c);
-		void FromString8(const std::string & c);
-		void FromString16(const std::string & c);
-
-
+		friend class Real;
 	public:
 		Integer() {}
 		Integer(const Integer&);
@@ -70,10 +38,10 @@ namespace Number {
 		//浮点数
 		/*template<typename T>
 		Integer(const T& Source, typename std::enable_if<
-			std::is_floating_point<T>::value
+		std::is_floating_point<T>::value
 		>::type* = nullptr) : _number(0), _signal(1)
 		{
-			T temp = (Source < 0 ? (_signal = -1, -Source) : Source);
+		T temp = (Source < 0 ? (_signal = -1, -Source) : Source);
 
 		}*/
 
@@ -84,55 +52,61 @@ namespace Number {
 		//比较运算
 		int Compare(const Integer&) const; //小于输出负数，大于输出正数，等于输出零
 		//>运算符
-		bool operator>(const Integer&) const;
-		template<typename T>
-		friend bool operator>(const T& Obj1, const Integer& Obj2)
-		{
-			return Obj2 < Obj1;
+		bool operator>(const Integer &Number2) const {
+			return ((this->Compare(Number2)) > 0);
 		}
-		//<运算符
-		bool operator<(const Integer&) const;
 		template<typename T>
-		friend bool operator<(const T& Obj1, const Integer& Obj2)
+		friend bool operator>(const T& Number1, const Integer& Number2)
 		{
-			return Obj2 > Obj1;
+			return Number2 < Number1;
+		}
+		//<运算符	
+		bool operator<(const Integer& Number2) const {
+			return ((this->Compare(Number2)) < 0);
+		}
+		template<typename T>
+		friend bool operator<(const T& Number1, const Integer& Number2)
+		{
+			return Number2 > Number1;
 		}
 		//==运算符
-		bool operator==(const Integer&) const;
+		bool operator==(const Integer& Number2) const	{
+			return ((this->Compare(Number2)) == 0);
+		}
 		template<typename T>
-		friend bool operator==(const T& Obj1, const Integer& Obj2)
+		friend bool operator==(const T& Number1, const Integer& Number2)
 		{
-			return Obj2 == Obj1;
+			return Number2 == Number1;
 		}
 		//!=运算符
-		bool operator!=(const Integer& Obj2) const
+		bool operator!=(const Integer& Number2) const
 		{
-			return !(*this == Obj2);
+			return ((this->Compare(Number2)) != 0);
 		}
 		template<typename T>
-		friend bool operator!=(const T& Obj1, const Integer& Obj2)
+		friend bool operator!=(const T& Number1, const Integer& Number2)
 		{
-			return !(Obj2 == Obj1);
+			return (Number2 != Number1);
 		}
 		//>=运算符
 		bool operator>=(const Integer& Number2) const
 		{
-			return !(*this < Number2);
+			return ((this->Compare(Number2)) >= 0);
 		}
 		template<typename T>
 		friend bool operator>=(const T& Number1, const Integer& Number2)
 		{
-			return !(Number2 > Number1);
+			return (Number2 <= Number1);
 		}
 		//<=运算符
 		bool operator<=(const Integer& Number2) const
 		{
-			return !(*this > Number2);
+			return ((this->Compare(Number2)) <= 0);
 		}
 		template<typename T>
 		friend bool operator<=(const T& Number1, const Integer& Number2)
 		{
-			return !(Number2 < Number1);
+			return (Number2 >= Number1);
 		}
 
 
@@ -166,7 +140,7 @@ namespace Number {
 			return Number2 * Number1;
 		}
 
-		friend Integer Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod);
+		friend Integer Devide(const Integer &Number1, const Integer &Number2, Integer &Mod);
 
 		Integer operator/(const Integer& Num2) const
 		{
@@ -207,12 +181,13 @@ namespace Number {
 			return mod;
 		}
 
-
 		//转换为10进制字串
 		::std::string ToString10() const;
 		::std::string ToString16() const;
 
 		int Parse(std::string);
+
+		size_t get_bit_number() const;
 
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
@@ -220,8 +195,40 @@ namespace Number {
 
 		//其他算数运算
 		Integer Abs() const;
-
 		Integer Power(const Integer &exp) const;
+
+	private:
+		char _signal = 1;
+		::std::vector<save_type> _number{ 0 };
+
+		Integer(::std::vector<save_type> Number, char Signal = 1);
+
+		template<typename T>
+		void SetNumber(const T &num)
+		{
+			T temp = num;
+			_number.clear();
+			do {
+				save_type lowbyte, highbyte;
+				CalcTypeToSaveType(temp, highbyte, lowbyte);
+				_number.push_back(lowbyte);
+				temp = static_cast<T>(highbyte);
+			} while (temp != 0);
+		}
+
+		int setSignal(const int& signal);
+		//int negative();
+
+		//其他辅助操作
+		int _compare_helper(const Integer&, size_t&) const;
+		int _compare(const Integer&, size_t&) const;
+
+		unsigned char backbit() const;
+
+		void FromString10(const std::string & c);
+		void FromString2(const std::string & c);
+		void FromString8(const std::string & c);
+		void FromString16(const std::string & c);
 
 	};
 }
