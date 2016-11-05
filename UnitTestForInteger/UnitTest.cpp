@@ -24,9 +24,9 @@ namespace UnitTestForNumber
 	template<typename T, typename U>
 	void TestInitializeBase(U num, const wchar_t* message = NULL, __LineInfo* pLineInfo = NULL) {
 		T temp(num);
-		T temp2 = temp;
+		T temp2(num + 1);
 		Assert::IsTrue(temp == (num), message, pLineInfo);
-		Assert::IsTrue(temp2 == (num), message, pLineInfo);
+		Assert::IsTrue(temp2 != (num), message, pLineInfo);
 	}
 #define TEST_INTEGER_INITIALIZE(num) TestInitializeBase<Integer>(num, L"Initialize Integer failed", LINE_INFO())
 #define TEST_REAL_INITIALIZE(num) TestInitializeBase<Real>(num, L"Initialize Real failed", LINE_INFO())
