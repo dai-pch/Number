@@ -112,6 +112,10 @@ namespace Number {
 		vec.erase(vec.end() - counter, vec.end());
 	}
 
+	Integer::operator int() const	{
+		return static_cast<int>(_number[0]);
+	}
+
 	int Integer::Compare(const Integer &Obj2) const
 	{
 		size_t temp;

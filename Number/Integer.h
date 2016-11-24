@@ -76,7 +76,7 @@ namespace Number {
 			T temp = (Source < 0 ? (_signal = -1, -Source) : Source);
 
 		}*/
-
+		explicit operator int() const;
 
 		~Integer() {}
 
