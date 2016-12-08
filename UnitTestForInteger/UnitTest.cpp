@@ -61,14 +61,14 @@ namespace UnitTestForNumber
 
 #define TEST_INTEGER_COM_BASE(num1, num2, op, res, linfo) do{ \
 	if(res) { \
-		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing failed", linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed", linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed", linfo); \
+		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing true failed1" , linfo); \
+		Assert::IsTrue(Integer(num1) op (num2), L"Comparing true failed2", linfo); \
+		Assert::IsTrue((num1) op Integer(num2), L"Comparing true failed3", linfo); \
 	} \
 	else { \
-		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing failed", linfo);\
-		Assert::IsFalse((num1) op Integer(num2), L"Comparing failed", linfo);\
-		Assert::IsFalse(Integer(num1) op (num2), L"Comparing failed", linfo);\
+		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing false failed1", linfo);\
+		Assert::IsFalse((num1) op Integer(num2), L"Comparing false failed2", linfo);\
+		Assert::IsFalse(Integer(num1) op (num2), L"Comparing false failed3", linfo);\
 	}\
 }while(0)
 
@@ -233,6 +233,8 @@ namespace UnitTestForNumber
 			TestIntegerToString("10", "10", "", LINE_INFO());
 			TestIntegerToString("-20", "-20", "", LINE_INFO());
 			TestIntegerToString("65536327680", "65536327680", "", LINE_INFO());
+			TestIntegerToString("10000000000000000000000000000000000000",
+				"10000000000000000000000000000000000000", "", LINE_INFO());
 			TestIntegerToString("12345678909876543211357924681010987654321",
 				"12345678909876543211357924681010987654321", "", LINE_INFO());
 			TestIntegerToString("-12345678909876543211357924681010987654321",

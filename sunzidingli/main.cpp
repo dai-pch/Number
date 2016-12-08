@@ -11,8 +11,8 @@ int main()
 	unsigned int number;
 	cout << "Please input the total number:" << endl;
 	cin >> number;
-	vector<inte> num(number, 0), mod(number, 0);
-	vector<inte> n2(number, 1);
+	vector<inte> num(number, inte(0)), mod(number, inte(0));
+	vector<inte> n2(number, inte(1));
 	inte temp;
 	for (unsigned int ii = 0;ii < number;ii++)
 	{
@@ -31,7 +31,7 @@ int main()
 		ExGCD(n2[ii], num[ii], tem1, tem2);
 		n2[ii] = n2[ii] * tem1;
 	}
-	inte temp2 = 1;
+	inte temp2(1);
 	for (unsigned int ii = 0;ii < number;ii++)
 	{
 		temp = temp + n2[ii] * mod[ii];

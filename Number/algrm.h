@@ -30,11 +30,11 @@ namespace Number {
 		}
 		else
 		{
-			T temp, r;
-			r = Devide(a, b, temp);
-			temp = ExGCD(b, temp, y, x);
-			y = y - r * x;
-			return temp;
+			T r, q;
+			Devide(a, b, r, q);
+			r = ExGCD(b, r, y, x);
+			y = y - q * x;
+			return r;
 		}
 	}
 

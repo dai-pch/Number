@@ -1,4 +1,6 @@
 #include "Integer.h"
+#include <cassert>
+#include <algorithm>
 
 #define Number_Integer_Parse_Failed 0
 #define Number_Integer_Parse_B 2
@@ -8,7 +10,7 @@
 
 namespace Number {
 
-	Integer::Integer(::std::vector<save_type> Number, char Signal) : _number(), _signal(Signal)
+	Integer::Integer(::std::vector<save_type>& Number, char Signal) : _number(), _signal(Signal)
 	{
 		_number.swap(Number);
 	}
@@ -118,48 +120,64 @@ namespace Number {
 		return this->_compare(Obj2, temp);
 	}
 
+	std::vector<save_type> shift_left(const std::vector<save_type>& src, int num) {
+		assert(num >= 0);
+		assert(!src.empty());
+		const unsigned int num_s = num % (BIT_NUMBER);
+		const unsigned int num_sr = BIT_NUMBER - num_s;
+		const unsigned int num_i = num / (BIT_NUMBER);
+		auto size = src.size();
+		std::vector<save_type> result(size + num_i);
 
-	Integer Integer::operator<<(const int &num) const
-	{
-		if (num < 0)
-			return this->operator >> (-num);
-
-		const unsigned int num_s = num % (BIT_NUMBER), num_sr = BIT_NUMBER - num_s, num_i = num / (BIT_NUMBER);
-		unsigned int size = _number.size();
-		::std::vector<save_type> result(size + num_i);
-
-		result[num_i] = _number[0] << num_s;
-		for (unsigned int ii = 1; ii < size; ii++)
+		result[num_i] = src[0] << num_s;
+		for (decltype(size) ii = 1; ii < size; ii++)
 		{
-			result[ii + num_i] = (_number[ii] << num_s) | (_number[ii - 1] >> num_sr);
+			result[ii + num_i] = (src[ii] << num_s) | (src[ii - 1] >> num_sr);
 		}
-		if ((_number[size - 1] >> num_sr) != 0)
-			result.push_back(_number[size - 1] >> num_sr);
-
-		return Integer(result, _signal);
+		if ((src[size - 1] >> num_sr) != 0)
+			result.push_back(src[size - 1] >> num_sr);
+		return result;
 	}
 
-	Integer Integer::operator>>(const int &num) const
-	{
-		if (num < 0)
-			return this->operator<<(-num);
-
-		const unsigned int num_s = num % (BIT_NUMBER), num_sr = BIT_NUMBER - num_s, num_d = num / (BIT_NUMBER);
-		unsigned int size = _number.size();
+	std::vector<save_type> shift_right(const std::vector<save_type>& src, int num) {
+		assert(num >= 0);
+		assert(!src.empty());
+		const unsigned int num_s = num % (BIT_NUMBER);
+		const unsigned int num_sr = BIT_NUMBER - num_s;
+		const unsigned int num_d = num / (BIT_NUMBER);
+		auto size = src.size();
 
 		if (num_d >= size)
-			return Integer(0);
-
-		::std::vector<save_type> result(size - num_d);
+			return std::vector<save_type>{0};
+		std::vector<save_type> result(size - num_d);
 		for (unsigned int ii = 0;ii < size - num_d - 1;ii++)
 		{
-			result[ii] = (_number[ii + num_d] >> num_s) | (_number[ii + num_d + 1] << num_sr);
+			result[ii] = (src[ii + num_d] >> num_s) | (src[ii + num_d + 1] << num_sr);
 		}
-		result[size - num_d - 1] = _number[size - 1] >> num_s;
+		result[size - num_d - 1] = src[size - 1] >> num_s;
 
 		if (result.back() == 0 && size != 1)
 			result.pop_back();
+		return result;
+	}
 
+	Integer Integer::operator<<(int num) const
+	{
+		std::vector<save_type> result;
+		if (num < 0)
+			result = shift_right(_number, - num);
+		else
+			result = shift_left(_number, num);
+		return Integer(result, _signal);
+	}
+
+	Integer Integer::operator>>(int num) const
+	{
+		std::vector<save_type> result;
+		if (num < 0)
+			result = shift_left(_number, -num);
+		else
+			result = shift_right(_number, num);
 		return Integer(result, _signal);
 	}
 
@@ -187,12 +205,12 @@ namespace Number {
 		return res;
 	}
 
-	Integer Integer::operator-() const
-	{
+	// Minus
+	Integer Integer::operator-() const {
 		return Integer(::std::vector<save_type>(_number), -_signal);
 	}
-
-	Integer Integer::operator+(const Integer& Obj2) const
+	// Add
+	Integer Integer::Add(const Integer& Obj2) const
 	{
 		//若两数符号不同，则实际为减法
 		if (this->_signal != Obj2._signal)
@@ -223,8 +241,7 @@ namespace Number {
 		return Integer(result, _signal);
 	}
 
-	Integer Integer::operator-(const Integer& Obj2) const
-	{
+	Integer Integer::Sub(const Integer& Obj2) const	{
 		//若两数符号不同，则实际为加法
 		if (this->_signal != Obj2._signal)
 			return (*this + (-Obj2));
@@ -263,12 +280,10 @@ namespace Number {
 		return Integer(result, gt ? _signal : -_signal);
 	}
 
-	Integer Integer::operator*(const Integer& Obj2) const
-	{
-		unsigned int size1 = this->_number.size(), size2 = Obj2._number.size();
-		::std::vector<save_type> result(size1 + size2, 0);
-		const ::std::vector<save_type> &number1 = (this->_number);
-		const ::std::vector<save_type>	&number2 = (Obj2._number);
+	std::vector<save_type> multiply_vec(const std::vector<save_type>& number1,
+		const std::vector<save_type>& number2) {
+		auto size1 = number1.size(), size2 = number2.size();
+		std::vector<save_type> result(size1 + size2, 0);
 		for (unsigned int ii = 0;ii < size1;ii++)
 		{
 			for (unsigned int jj = 0;jj < size2;jj++)
@@ -284,101 +299,135 @@ namespace Number {
 		}
 		if (result.back() == 0)
 			result.pop_back();
-		return Integer(result, this->_signal * Obj2._signal);
+		return result;
+	}
+
+	Integer Integer::Multiply(const Integer& Obj2) const {
+		unsigned int size1 = this->_number.size(), size2 = Obj2._number.size();
+		::std::vector<save_type> result(size1 + size2, 0);
+		// contents
+		result = multiply_vec(this->_number, Obj2._number);
+		//signal
+		char signal = this->_signal * Obj2._signal;
+		return Integer(result, signal);
 	}
 
 	//除法
-	//使用Knuth算法
-	Integer Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod)
-	{
-		assert(Obj2 != 0);
-		//如果被除数小于除数，直接返回结果
-		if (Obj1.Abs() < Obj2.Abs())
-		{
-			mod = Obj1;
-			return Integer(0);
-		}
-
-		//如果除数只有一位
-		if (Obj2._number.size() < 2)
-		{
-			calc_type_u temp = 0;
-			save_type number2 = Obj2._number[0];
-			unsigned int size1 = Obj1._number.size();
-			::std::vector<save_type> result(size1);
-			::std::vector<save_type> number1 = Obj1._number;
-			//temp = 0;
-			for (int ii = size1 - 1;ii >= 0;ii--)
-			{
-				temp *= MODULE;
-				temp += number1[ii];
-				result[ii] = static_cast<save_type>(temp / number2);
-				temp = static_cast<calc_type_u>(temp % number2);
-			}
-			if (result.back() == 0 && result.size() > 1)
-				result.pop_back();
-
-			mod = Integer(::std::vector<save_type>(1, static_cast<save_type>(temp)), Obj1._signal);
-			return Integer(result, Obj1._signal * Obj2._signal);
-		}
+	void devide_Knuth(const std::vector<save_type>& src1, const std::vector<save_type>& src2,
+		std::vector<save_type>& mod, std::vector<save_type>& quotient) {
+		assert(src1.size() > src2.size() || 
+			(src1.size() == src2.size() && src1.back() >= src2.back()));
 
 		//规格化
-		save_type temp = Obj2._number.back();
+		save_type temp = src2.back();
 		int shift = 31;
-		if ((temp & 0xffff0000)	!= 0) { shift -= 16; temp &= 0xffff0000; }
-		if ((temp & 0xff00ff00) != 0) {	shift -= 8; temp &= 0xff00ff00; }
-		if ((temp & 0xf0f0f0f0)	!= 0) { shift -= 4; temp &= 0xf0f0f0f0; }
-		if ((temp & 0xcccccccc)	!= 0) { shift -= 2; temp &= 0xcccccccc; }
-		if ((temp & 0xaaaaaaaa)	!= 0) { shift -= 1;}
-		::std::vector<save_type> &Number1 = (Obj1 << shift)._number;
-		const ::std::vector<save_type>	&Number2 = (Obj2 << shift)._number;
+		if ((temp & 0xffff0000) != 0) { shift -= 16; temp &= 0xffff0000; }
+		if ((temp & 0xff00ff00) != 0) { shift -= 8; temp &= 0xff00ff00; }
+		if ((temp & 0xf0f0f0f0) != 0) { shift -= 4; temp &= 0xf0f0f0f0; }
+		if ((temp & 0xcccccccc) != 0) { shift -= 2; temp &= 0xcccccccc; }
+		if ((temp & 0xaaaaaaaa) != 0) { shift -= 1; }
+		std::vector<save_type> number1 = shift_left(src1, shift);
+		const std::vector<save_type> number2 = shift_left(src2, shift);
 
 		//除法
-		if (Number1.size() == Obj1._number.size())
-			Number1.push_back(0);
-		size_t size1 = Number1.size(), size2 = Number2.size();
-		::std::vector<save_type> result(size1 - size2);
+		if (number1.back() >= number2.back())
+			number1.push_back(0);
+		size_t size1 = number1.size(), size2 = number2.size();
+		std::vector<save_type> result(size1 - size2);
 		for (int ii = size1 - size2 - 1;ii >= 0;ii--)
 		{
 			//预测q
-			calc_type_u qBar = Number1[ii + size2] * MODULE + Number1[ii + size2 - 1];
-			calc_type_u rBar = qBar % Number2.back();
-			qBar /= Number2.back();
-			if (qBar == MODULE || qBar*Number2[size2 - 2] > rBar * MODULE + Number1[ii + size2 - 2])
+			calc_type_u qBar = number1[ii + size2] * MODULE + number1[ii + size2 - 1];
+			calc_type_u rBar = qBar % number2.back();
+			qBar /= number2.back(); // in this condition, qBar <= MODULE
+			if (qBar == MODULE || qBar*number2[size2 - 2] > rBar * MODULE + number1[ii + size2 - 2])
 				qBar--;
 
 			//减法
-			::std::vector<save_type> &tempvec = (Integer(Number2, 1) * qBar)._number;
+			std::vector<save_type> &tempvec = multiply_vec(number2,
+				std::vector<save_type>{static_cast<save_type>(qBar)});
 			if (tempvec.size() == size2)
 				tempvec.push_back(0);
 			save_type c = 1;
-			for (unsigned int jj = 0;jj < tempvec.size();jj++)
-				Number1[jj + ii] = FullSuber(Number1[jj + ii], tempvec[jj], c);
+			for (decltype(tempvec.size()) jj = 0;jj < tempvec.size();jj++)
+				number1[jj + ii] = FullSuber(number1[jj + ii], tempvec[jj], c);
 
 			//如果预测不正确
 			if (c == 0)
 			{
-				size_t jj = 0;
-				for (;jj <= tempvec.size();jj++)
-					Number1[jj + ii] = FullAdder(Number1[jj + ii], Number2[jj], c);
+				for (decltype(tempvec.size()) jj = 0;jj <= tempvec.size();jj++)
+					number1[jj + ii] = FullAdder(number1[jj + ii], number2[jj], c);
 				qBar--;
 			}
 			result[ii] = static_cast<save_type>(qBar);
 		}
 
 		//除去可能的高位的零
-		eraseZero(Number1);
-		mod = Integer(Number1, Obj1._signal) >> shift;
-		return Integer(result, Obj1._signal * Obj2._signal);
+		eraseZero(number1);
+		mod = shift_right(number1, shift);
+		quotient = result;
+	}
+	void devide_simple(const std::vector<save_type>& src1, const save_type src2,
+		save_type& mod, std::vector<save_type>& quotient) {
+		calc_type_u temp = 0;
+		//save_type number2 = Obj2._number[0];
+		auto size1 = src1.size();
+		std::vector<save_type> result(size1);
+		//std::vector<save_type> number1 = Obj1._number;
+		//temp = 0;
+		for (int ii = size1 - 1;ii >= 0;ii--)
+		{
+			temp *= MODULE;
+			temp += src1[ii];
+			result[ii] = static_cast<save_type>(temp / src2);
+			temp = static_cast<calc_type_u>(temp % src2);
+		}
+		if (result.back() == 0 && result.size() > 1)
+			result.pop_back();
+
+		mod = static_cast<save_type>(temp);
+		quotient = result;
+	}
+	//使用Knuth算法
+	void Devide(const Integer& Obj1, const Integer& Obj2, Integer& mod, Integer& quotient)
+	{
+		assert(Obj2 != 0);
+		//如果被除数小于除数，直接返回结果
+		if (Obj1.Abs() < Obj2.Abs())
+		{
+			mod = Obj1;
+			quotient = Integer(0);
+			return;
+		}
+
+		//如果除数只有一位
+		if (Obj2._number.size() < 2)
+		{
+			std::vector<save_type> quotient_v;
+			save_type mod_n;
+
+			devide_simple(Obj1._number, Obj2._number[0], mod_n, quotient_v);
+			mod = Integer(::std::vector<save_type>{mod_n}, Obj1._signal);
+			quotient = Integer(quotient_v, Obj1._signal * Obj2._signal);
+		}
+		else
+		{
+			std::vector<save_type> mod_v, quotient_v;
+
+			devide_Knuth(Obj1._number, Obj2._number, mod_v, quotient_v);
+			mod = Integer(mod_v, Obj1._signal);
+			quotient = Integer(quotient_v, Obj1._signal * Obj2._signal);
+		}
+		return;
 	}
 
-	::std::ostream & operator<<(::std::ostream & os, const Integer & Obj)
+	std::ostream & operator<<(std::ostream & os, const Integer & Obj)
 	{
 		// TODO: 在此处插入 return 语句
 		return (os << Obj.ToString10());
 	}
 
-	::std::istream & operator>>(::std::istream &is, Integer &Num)
+	std::istream & operator>>(std::istream &is, Integer &Num)
 	{
 		// TODO: 在此处插入 return 语句
 		::std::string str;
@@ -388,27 +437,37 @@ namespace Number {
 	}
 
 
-	::std::string Integer::ToString10() const
+	std::string Integer::ToString10() const
 	{
-		::std::string result;
+#define TO_STRING_10_BIT_ONCE 8
+#define TO_STRING_MOD_ONCE (static_cast<unsigned int>(std::pow(10, TO_STRING_10_BIT_ONCE)))
+
+		std::string result;
 		if (_number.back() == 0)
 		{
 			result.push_back('0');
 			return result;
 		}
 
-		Integer q = this->Abs(), mod;
+		Integer q = this->Abs(), mod, q_tmp;
 		do
 		{
-			q = Devide(q, 1000000000, mod);
+			Devide(q, Integer(TO_STRING_MOD_ONCE), mod, q_tmp);
+			q = q_tmp;
 			save_type temp = mod._number[0];
-			int ii = 0;
-			do
-			{
-				result.push_back('0' + temp % 10);
-				temp /= 10;
-				++ii;
-			} while (ii < 9 && temp != 0);
+			if (q != 0) {
+				for (size_t ii = 0;ii < TO_STRING_10_BIT_ONCE;ii++) {
+					result.push_back('0' + temp % 10);
+					temp /= 10;
+				}
+			}
+			else {
+				size_t ii = 0;
+				do {
+					result.push_back('0' + temp % 10);
+					temp /= 10;
+				} while (ii < TO_STRING_10_BIT_ONCE && temp != 0);
+			}
 		} while (q != 0);
 		if (_signal < 0)
 			result.push_back('-');
@@ -416,9 +475,9 @@ namespace Number {
 		return result;
 	}
 
-	::std::string Integer::ToString16() const
+	std::string Integer::ToString16() const
 	{
-		::std::string result;
+		std::string result;
 		
 		if (_number.back() == 0)
 		{
@@ -670,7 +729,8 @@ if (*(it++) != (ch) \
 
 	Integer Integer::Power(const Integer & Exp) const
 	{
-		Integer result(1), temp(*this), exp(Exp);
+		Integer result(1);
+		Integer temp(*this), exp(Exp);
 		unsigned char flag = exp.backbit();
 		if (flag)
 			result = result * temp;
