@@ -382,6 +382,7 @@ namespace UnitTestForNumber
 			TestRealCompareNumber(0.0, 3.14159265358979, LINE_INFO());
 			TestRealCompareNumber((float)27.1828354, (float)-27.1828354, LINE_INFO());
 			TestRealCompareNumber(-65.336, (double)-30006587.2654, LINE_INFO());
+			TestRealCompareNumber((float)-23.3356, -30006587.2654, LINE_INFO());
 		}
 	};
 }
