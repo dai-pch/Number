@@ -51,7 +51,7 @@ namespace Number { namespace detail {
 
 	int _compare(std::vector<save_type>::const_reverse_iterator it1,
 		std::vector<save_type>::const_reverse_iterator it2,
-		size_t digit_num, int exp1, int exp2, char signal1,
+		size_t digit_num, exp_type exp1, exp_type exp2, char signal1,
 		char signal2, size_t &NonEqualPosition) {
 		//两数均为零时有符号问题，单独考虑
 		if (*it1 == 0 && *it2 == 0)
@@ -61,7 +61,7 @@ namespace Number { namespace detail {
 			return static_cast<int>(signal1 - signal2);
 		//位数不同直接判断
 		if (exp1 != exp2)
-			return (exp1 - exp2);
+			return signal1 * (exp1 - exp2);
 		//逐位比较绝对值大小
 		return signal1 * detail::_compare_by_digit(it1,
 			it2, digit_num, NonEqualPosition);
@@ -109,11 +109,11 @@ namespace Number { namespace detail {
 			++exp;
 		exp -= 127;
 		exp -= 23;
-		int exp_sh = (exp % BIT_NUMBER);
+		int exp_sh = (exp % (exp_type)BIT_NUMBER);
 		if (exp_sh < 0)
 			exp_sh += BIT_NUMBER;
 		temp <<= exp_sh;
-		exp = (exp - exp_sh) / BIT_NUMBER;
+		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
 		tolerance = 1 << exp_sh;
 		res.clear();
 		res.push_back(temp & MASK_CODE);
@@ -126,7 +126,7 @@ namespace Number { namespace detail {
 		int64_t& src = reinterpret_cast<int64_t&>(number);
 		calc_type_u temp = src & (((int64_t)1 << 52) - 1);
 		exp = (src >> 52) & ((1 << 11) - 1);
-		sig = (src >> 52) ? -1 : 1;
+		sig = (src >> 63) ? -1 : 1;
 		if (exp == ((1 << 11) - 1))
 			throw(std::logic_error("Construct real number from NaN or Inf."));
 
@@ -136,12 +136,12 @@ namespace Number { namespace detail {
 			++exp;
 		exp -= 1023;
 		exp -= 52;
-		int exp_sh = (exp % BIT_NUMBER);
+		exp_type exp_sh = (exp % (exp_type)BIT_NUMBER);
 		if (exp_sh < 0)
 			exp_sh += BIT_NUMBER;
 		save_type temp_h = static_cast<save_type>(temp >> (BIT_NUMBER - exp_sh));
 		temp <<= exp_sh;
-		exp = (exp - exp_sh) / BIT_NUMBER;
+		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
 		tolerance = 1 << exp_sh;
 		res.clear();
 		res.push_back(temp & MASK_CODE);

@@ -9,8 +9,8 @@ namespace Number {
 	int Real::Compare(const Real& number2) const
 	{
 		size_t temp;
-		size_t exp1 = _number.size() + _exp;
-		size_t exp2 = number2._number.size()
+		exp_type exp1 = _number.size() + _exp;
+		exp_type exp2 = number2._number.size()
 			+ number2._exp;
 		size_t digit_num = std::min(_number.size(), number2._number.size());
 		auto ret = detail::_compare(_number.rbegin(), number2._number.rbegin(),
