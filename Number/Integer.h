@@ -95,7 +95,8 @@ namespace Number {
 
 		int Parse(std::string);
 
-		size_t get_bit_number() const;
+		size_t get_digit_number() const;
+		//save_type get_highest_digit() const;
 
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
@@ -104,6 +105,8 @@ namespace Number {
 		//其他算数运算
 		Integer Abs() const;
 		Integer Power(const Integer &exp) const;
+
+		friend class Real;
 
 	private:
 		char _signal = 1;
@@ -118,7 +121,7 @@ namespace Number {
 			_number.clear();
 			do {
 				save_type lowbyte, highbyte;
-				CalcTypeToSaveType(temp, highbyte, lowbyte);
+				Number::detail::CalcTypeToSaveType(temp, highbyte, lowbyte);
 				_number.push_back(lowbyte);
 				temp = static_cast<T>(highbyte);
 			} while (temp != 0);
@@ -128,8 +131,7 @@ namespace Number {
 		//int negative();
 
 		//其他辅助操作
-		int _compare_helper(const Integer&, size_t&) const;
-		int _compare(const Integer&, size_t&) const;
+		int do_integer_compare(const Integer&, size_t&) const;
 
 		unsigned char backbit() const;
 

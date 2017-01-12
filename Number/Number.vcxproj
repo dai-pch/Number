@@ -111,6 +111,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="algrm.h" />
+    <ClInclude Include="common.hpp" />
     <ClInclude Include="Integer.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="Real.h" />

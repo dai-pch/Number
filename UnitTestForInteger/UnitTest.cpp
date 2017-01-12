@@ -24,7 +24,8 @@ namespace UnitTestForNumber
 	template<typename T, typename U>
 	void TestInitializeBase(U num, const wchar_t* message = NULL, __LineInfo* pLineInfo = NULL) {
 		T temp(num);
-		T temp2(num + 1);
+		U num2 = num + 2;
+		T temp2(num2);
 		Assert::IsTrue(temp == (num), message, pLineInfo);
 		Assert::IsTrue(temp2 != (num), message, pLineInfo);
 	}
@@ -352,9 +353,9 @@ namespace UnitTestForNumber
 			TEST_REAL_INITIALIZE((char)-105);
 			TEST_REAL_INITIALIZE((int)-236);
 			TEST_REAL_INITIALIZE((long)-657386);
-			TEST_REAL_INITIALIZE((float)3.1415926e12);
+			TEST_REAL_INITIALIZE((float)3.1415926e10);
 			TEST_REAL_INITIALIZE((double)-2.718281828e6);
-			TEST_REAL_INITIALIZE((long double)308273954e-12);
+			TEST_REAL_INITIALIZE((double)308273954e-12);
 		}
 	};
 }

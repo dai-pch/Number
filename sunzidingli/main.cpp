@@ -2,6 +2,8 @@
 #include "../Number/Integer.h"
 #include "../Number/algrm.h"
 
+//#pragma comment(lib, ".\\Number.lib")
+
 using namespace std;
 using namespace Number;
 

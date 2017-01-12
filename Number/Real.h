@@ -3,24 +3,24 @@
 #define _NUMBER_REAL_H__
 
 #include "Number.h"
-#include "Integer.h"
 
 namespace Number {
 	class Real {
 	public:
 		//构造函数
 		Real() = default; //空构造
-		Real(const Real& num) = default; //拷贝构造
-		Real(const Integer&); 
+		Real(const Real&) = default; //拷贝构造
+		explicit Real(const Integer& inte);
 		//从整数构造
 		template<typename T>
-		Real(const T& Number, typename std::enable_if<
+		explicit Real(const T& Number, typename std::enable_if<
 			std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
 		//从浮点数构造
-		template<typename T>
-		Real(const T& Number, typename std::enable_if<
-		std::is_floating_point<T>::value>::type* = nullptr) { 
-
+		explicit Real(const float& Number) {
+			detail::convertFloatingToInteger(Number, _signal, _number, _exp, _tolerance);
+		}
+		explicit Real(const double& Number) {
+			detail::convertFloatingToInteger(Number, _signal, _number, _exp, _tolerance);
 		}
 
 		//比较函数
@@ -49,10 +49,10 @@ namespace Number {
 		friend ::std::istream& operator>>(::std::istream&, Integer&);
 
 	private:
-		Integer _number;
-		int _exp = 0;
-		save_type _tolerance = 0;
-		int _tolexp = 0;
+		char _signal{ 1 };
+		std::vector<save_type> _number{ 0 };
+		exp_type _exp{ 0 };
+		tolerance_type _tolerance{ 0 };
 	}; // class
 
 	// ==运算符

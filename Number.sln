@@ -11,6 +11,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTestForNumber", "UnitTe
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sunzidingli", "sunzidingli\sunzidingli.vcxproj", "{6BAE9E9E-31A5-47AD-B579-17EFB71434DA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D591E9BB-72C5-435E-BA36-ACE3BE6F075A} = {D591E9BB-72C5-435E-BA36-ACE3BE6F075A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

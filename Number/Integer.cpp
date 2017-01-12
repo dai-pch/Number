@@ -1,5 +1,4 @@
 #include "Integer.h"
-#include <cassert>
 #include <algorithm>
 
 #define Number_Integer_Parse_Failed 0
@@ -117,7 +116,7 @@ namespace Number {
 	int Integer::Compare(const Integer &Obj2) const
 	{
 		size_t temp;
-		return this->_compare(Obj2, temp);
+		return do_integer_compare(Obj2, temp);
 	}
 
 	std::vector<save_type> shift_left(const std::vector<save_type>& src, int num) {
@@ -181,30 +180,6 @@ namespace Number {
 		return Integer(result, _signal);
 	}
 
-	save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
-	{
-		calc_type temp;
-		temp = static_cast<calc_type>(Num1)
-			+ static_cast<calc_type>(Num2)
-			+ static_cast<calc_type>(c);
-		save_type res;
-		CalcTypeToSaveType(temp, c, res);
-		return res;
-	}
-
-	//一位减法器，c=0代表借位，c=1代表不借位
-	save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c)
-	{
-		calc_type temp;
-		temp = static_cast<calc_type>(Num1)
-			- static_cast<calc_type>(Num2)
-			+ static_cast<calc_type>(c)
-			+ MODULE - 1;
-		save_type res;
-		CalcTypeToSaveType(temp, c, res);
-		return res;
-	}
-
 	// Minus
 	Integer Integer::operator-() const {
 		return Integer(::std::vector<save_type>(_number), -_signal);
@@ -227,12 +202,12 @@ namespace Number {
 		unsigned int ii = 0;
 		for (;ii < size1;ii++)
 		{
-			result[ii] = FullAdder(p1->_number[ii], p2->_number[ii], c);
+			result[ii] = detail::FullAdder(p1->_number[ii], p2->_number[ii], c);
 		}
 
 		for (;ii < size2;ii++)
 		{
-			result[ii] = FullAdder(0, p2->_number[ii], c);
+			result[ii] = detail::FullAdder(0, p2->_number[ii], c);
 		}
 
 		if (c != 0)
@@ -250,7 +225,7 @@ namespace Number {
 		bool gt;
 		const Integer *p1 = nullptr, *p2 = nullptr;
 		size_t nonEqualCounter_re;
-		int com = this->_compare(Obj2, nonEqualCounter_re);
+		int com = this->do_integer_compare(Obj2, nonEqualCounter_re);
 		com *= _signal;
 		if (com == 0)
 			return Integer();
@@ -266,12 +241,12 @@ namespace Number {
 		unsigned int ii = 0;
 		for (;ii < size2 - nonEqualCounter_re;ii++)
 		{
-			result[ii] = FullSuber(p1->_number[ii], p2->_number[ii], c);
+			result[ii] = detail::FullSuber(p1->_number[ii], p2->_number[ii], c);
 		}
 
 		for (;ii < size1 - nonEqualCounter_re;ii++)
 		{
-			result[ii] = FullSuber(p1->_number[ii], 0, c);
+			result[ii] = detail::FullSuber(p1->_number[ii], 0, c);
 		}
 
 		//除去可能的高位的零
@@ -280,33 +255,11 @@ namespace Number {
 		return Integer(result, gt ? _signal : -_signal);
 	}
 
-	std::vector<save_type> multiply_vec(const std::vector<save_type>& number1,
-		const std::vector<save_type>& number2) {
-		auto size1 = number1.size(), size2 = number2.size();
-		std::vector<save_type> result(size1 + size2, 0);
-		for (unsigned int ii = 0;ii < size1;ii++)
-		{
-			for (unsigned int jj = 0;jj < size2;jj++)
-			{
-				calc_type_u temp = static_cast<calc_type_u>(number1[ii]) * static_cast<calc_type_u>(number2[jj]);
-				save_type high, low, c = 0;
-				CalcTypeToSaveType(temp, high, low);
-				result[ii + jj] = FullAdder(result[ii + jj], low, c);
-				result[ii + jj + 1] = FullAdder(result[ii + jj + 1], high, c);
-				if (c)
-					++result[ii + jj + 2];
-			}
-		}
-		if (result.back() == 0)
-			result.pop_back();
-		return result;
-	}
-
 	Integer Integer::Multiply(const Integer& Obj2) const {
 		unsigned int size1 = this->_number.size(), size2 = Obj2._number.size();
 		::std::vector<save_type> result(size1 + size2, 0);
 		// contents
-		result = multiply_vec(this->_number, Obj2._number);
+		result = detail::multiply_vec(this->_number, Obj2._number);
 		//signal
 		char signal = this->_signal * Obj2._signal;
 		return Integer(result, signal);
@@ -344,19 +297,19 @@ namespace Number {
 				qBar--;
 
 			//减法
-			std::vector<save_type> &tempvec = multiply_vec(number2,
+			std::vector<save_type> &tempvec = detail::multiply_vec(number2,
 				std::vector<save_type>{static_cast<save_type>(qBar)});
 			if (tempvec.size() == size2)
 				tempvec.push_back(0);
 			save_type c = 1;
 			for (decltype(tempvec.size()) jj = 0;jj < tempvec.size();jj++)
-				number1[jj + ii] = FullSuber(number1[jj + ii], tempvec[jj], c);
+				number1[jj + ii] = detail::FullSuber(number1[jj + ii], tempvec[jj], c);
 
 			//如果预测不正确
 			if (c == 0)
 			{
 				for (decltype(tempvec.size()) jj = 0;jj <= tempvec.size();jj++)
-					number1[jj + ii] = FullAdder(number1[jj + ii], number2[jj], c);
+					number1[jj + ii] = detail::FullAdder(number1[jj + ii], number2[jj], c);
 				qBar--;
 			}
 			result[ii] = static_cast<save_type>(qBar);
@@ -523,49 +476,6 @@ namespace Number {
 		return result;
 	}
 
-
-	//状态转移函数
-	int _Delta(const int &status, const char &input)
-	{
-#define _STATUS_ERR 12
-
-		const int statusTrans[9][13] =
-		{ { 1,2,2,3,8,9,10,11,8,9,10,11,_STATUS_ERR },
-		{ 2,2,2,3,8,9,10,11,8,9,10,11,_STATUS_ERR },
-		{ 2,2,2,3,3,9,10,11,3,9,10,11,_STATUS_ERR },
-		{ 2,2,2,3,3,_STATUS_ERR,10,11,3,_STATUS_ERR,10,11,_STATUS_ERR },
-		{ 3,4,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
-		{ 3,6,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
-		{ 3,3,3,3,3,_STATUS_ERR,3,11,3,_STATUS_ERR,3,11,_STATUS_ERR },
-		{ _STATUS_ERR,5,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR },
-		{ _STATUS_ERR,7,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR,_STATUS_ERR },
-		};
-
-		switch (input)
-		{
-		case '0':
-			return statusTrans[0][status]; break;
-		case '1':
-			return statusTrans[1][status]; break;
-		case '2': case '3':	case '4': case '5':	case '6': case '7':
-			return statusTrans[2][status]; break;
-		case '8': case '9':
-			return statusTrans[3][status]; break;
-		case 'b': case 'B':
-			return statusTrans[4][status]; break;
-		case 'd': case 'D':
-			return statusTrans[5][status]; break;
-		case 'o': case 'O':
-			return statusTrans[7][status]; break;
-		case 'x': case 'X':
-			return statusTrans[8][status]; break;
-		case 'a': case 'c': case 'e': case 'f': case 'A': case 'C': case 'E': case 'F':
-			return statusTrans[0][status]; break;
-		default:
-			return _STATUS_ERR;
-		}
-	}
-
 #define EXPECT(it, ch) do{ \
 if (*(it++) != (ch) \
 	return Number_Parse_Failed; \
@@ -676,45 +586,16 @@ if (*(it++) != (ch) \
 		return Number_Parse_OK;
 	}
 
-	size_t Integer::get_bit_number() const
+	size_t Integer::get_digit_number() const
 	{
 		return _number.size();
 	}
 
-
-	//逐位比较绝对值大小
-	int Integer::_compare_helper(const Integer &Obj2, size_t &NonEqualPosition) const
+	int Integer::do_integer_compare(const Integer &Obj2, size_t &NonEqualPosition) const
 	{
-		auto it1 = _number.rbegin(), it2 = Obj2._number.rbegin();
-		while (it1 != _number.rend())
-		{
-			if (*it1 < *it2) {
-				return -_signal;
-			}
-			else if (*it1 > *it2) {
-				return _signal;
-			}
-			++it1;
-			++it2;
-			++NonEqualPosition;
-		}
-		return 0;
-	}
-
-	int Integer::_compare(const Integer &Obj2, size_t &NonEqualPosition) const
-	{
-		NonEqualPosition = 0;
-		//两数均为零时有符号问题，单独考虑
-		if (_number.back() == 0 && Obj2._number.back() == 0)
-			return 0;
-		//符号不同直接判断
-		if (_signal != Obj2._signal)
-			return static_cast<int>(_signal - Obj2._signal);
-		//位数不同直接判断
-		if (_number.size() != Obj2._number.size())
-			return (_number.size() > Obj2._number.size() ? 1 : -1);
-		//逐位比较绝对值大小
-		return this->_compare_helper(Obj2, NonEqualPosition);
+		size_t size1 = _number.size(), size2 = Obj2._number.size();
+		return detail::_compare(_number.rbegin(), Obj2._number.rbegin(),
+			size1, size1, size2, _signal, Obj2._signal, NonEqualPosition);
 	}
 
 	unsigned char Integer::backbit() const
