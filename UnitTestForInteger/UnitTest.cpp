@@ -32,6 +32,56 @@ namespace UnitTestForNumber
 #define TEST_INTEGER_INITIALIZE(num) TestInitializeBase<Integer>(num, L"Initialize Integer failed", LINE_INFO())
 #define TEST_REAL_INITIALIZE(num) TestInitializeBase<Real>(num, L"Initialize Real failed", LINE_INFO())
 
+#define TEST_COM_BASE(TYPE, num1, num2, op, res, linfo) do{ \
+	if(res) { \
+		Assert::IsTrue(TYPE(num1) op TYPE(num2), L"Comparing true failed1" , linfo); \
+		Assert::IsTrue(TYPE(num1) op (num2), L"Comparing true failed2", linfo); \
+		Assert::IsTrue((num1) op TYPE(num2), L"Comparing true failed3", linfo); \
+	} \
+	else { \
+		Assert::IsFalse(TYPE(num1) op TYPE(num2), L"Comparing false failed1", linfo);\
+		Assert::IsFalse((num1) op TYPE(num2), L"Comparing false failed2", linfo);\
+		Assert::IsFalse(TYPE(num1) op (num2), L"Comparing false failed3", linfo);\
+	}\
+}while(0)
+
+	//num1 <= num2, eq = true iff. num1 == num2
+	template<typename Type, typename U, typename V>
+	void TestCompareBase2(U num1, V num2, bool eq, const __LineInfo* pLineInfo = NULL) {
+		TEST_COM_BASE(Type, num1, num2, == , eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, != , !eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, == , eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, != , !eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, <, !eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, <, false, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, >, false, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, >, !eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, <= , true, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, <= , eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, >= , eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, >= , true, pLineInfo);
+	}
+
+	template<typename Type, typename U, typename V>
+	void TestCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
+		if (num1 < num2)
+			TestCompareBase2<Type>(num1, num2, false, pLineInfo);
+		else if (num1 > num2)
+			TestCompareBase2<Type>(num2, num1, false, pLineInfo);
+		else
+			TestCompareBase2<Type>(num1, num2, true, pLineInfo);
+	}
+
+	template<typename U, typename V>
+	void TestIntegerCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
+		TestCompareNumber<Integer>(num1, num2, pLineInfo);
+	}
+
+	template<typename U, typename V>
+	void TestRealCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
+		TestCompareNumber<Real>(num1, num2, pLineInfo);
+	}
+
 
 	TEST_CLASS(UnitTestForInteger)
 	{
@@ -60,51 +110,8 @@ namespace UnitTestForNumber
 			TEST_INTEGER_INITIALIZE((unsigned long long)0xfff0fff0fff0fff0);
 		}
 
-#define TEST_INTEGER_COM_BASE(num1, num2, op, res, linfo) do{ \
-	if(res) { \
-		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing true failed1" , linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing true failed2", linfo); \
-		Assert::IsTrue((num1) op Integer(num2), L"Comparing true failed3", linfo); \
-	} \
-	else { \
-		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing false failed1", linfo);\
-		Assert::IsFalse((num1) op Integer(num2), L"Comparing false failed2", linfo);\
-		Assert::IsFalse(Integer(num1) op (num2), L"Comparing false failed3", linfo);\
-	}\
-}while(0)
-
-		//num1 <= num2, eq = true iff. num1 == num2
-		template<typename U, typename V> 
-		void TestIntegerCompareBase2(U num1, V num2, bool eq, const __LineInfo* pLineInfo = NULL) {
-			TEST_INTEGER_COM_BASE(num1, num2, == , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, != , !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, == , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, != , !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, <, !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, <, false, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, >, false, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, >, !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, <= , true, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, <= , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, >= , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, >= , true, pLineInfo);
-		}
-
-		template<typename U, typename V>
-		void TestIntegerCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
-			if (num1 < num2)
-				TestIntegerCompareBase2(num1, num2, false, pLineInfo);
-			else if (num1 > num2)
-				TestIntegerCompareBase2(num2, num1, false, pLineInfo);
-			else
-				TestIntegerCompareBase2(num1, num2, true, pLineInfo);
-		}
-
 		TEST_METHOD(TestIntegerCompareOperator)
 		{
-			// TODO: 在此输入测试代码
-			Logger::WriteMessage("In Method TestIntegerCompareOperator");
-
 			//two equal numbers
 			TestIntegerCompareNumber(0, 0, LINE_INFO());
 			TestIntegerCompareNumber(0, -0, LINE_INFO());
@@ -355,7 +362,26 @@ namespace UnitTestForNumber
 			TEST_REAL_INITIALIZE((long)-657386);
 			TEST_REAL_INITIALIZE((float)3.1415926e10);
 			TEST_REAL_INITIALIZE((double)-2.718281828e6);
-			TEST_REAL_INITIALIZE((double)308273954e-12);
+			TEST_REAL_INITIALIZE((double)308273954e-200);
+		}
+
+		TEST_METHOD(TestRealCompareOperator)
+		{
+			//equal number
+			TestRealCompareNumber(0, 0, LINE_INFO());
+			TestRealCompareNumber(1, 1, LINE_INFO());
+			TestRealCompareNumber(-2567, -2567, LINE_INFO());
+			TestRealCompareNumber(0.0, 0.0, LINE_INFO());
+			TestRealCompareNumber((float)27.1828354, (float)27.1828354, LINE_INFO());
+			TestRealCompareNumber(-65.336, (double)-65.336, LINE_INFO());
+
+			//nonequal number
+			TestRealCompareNumber(0, -1, LINE_INFO());
+			TestRealCompareNumber(1, 65372, LINE_INFO());
+			TestRealCompareNumber(-106825736, -2567, LINE_INFO());
+			TestRealCompareNumber(0.0, 3.14159265358979, LINE_INFO());
+			TestRealCompareNumber((float)27.1828354, (float)-27.1828354, LINE_INFO());
+			TestRealCompareNumber(-65.336, (double)-30006587.2654, LINE_INFO());
 		}
 	};
 }
