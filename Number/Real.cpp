@@ -1,8 +1,12 @@
 #include "Integer.h"
 #include "Real.h"
 #include <algorithm>
+#include <iterator>
+#include <exception>
 
 namespace Number {
+
+	size_t Real::default_precision = 96;
 
 	Real::Real(const Integer& Obj): _number(Obj._number), _signal(Obj._signal) {}
 
@@ -23,14 +27,85 @@ namespace Number {
 	}
 
 
+	::std::string Real::ToString10() const
+	{
+		return ::std::string();
+	}
+
+	void Real::RealParseF(::std::string::const_iterator it,
+		::std::string::const_iterator end, ::std::vector<save_type>& f,
+		exp_type& e) {
+		::std::string f_dec;
+		auto range = ::std::find_if_not(it, end,
+			[](char c) {return c >= '0' && c <= '9';});
+		::std::copy(it, range, ::std::back_inserter(f_dec));
+		it = range + 1;
+		if (*range == '.') {
+			range = ::std::find_if_not(it, end,
+				[](char c) {return c >= '0' && c <= '9';});
+			::std::copy(it, range, ::std::back_inserter(f_dec));
+		}
+		e = -(range - it);
+		//::std::cout << f_dec << ::std::endl;
+		Integer temp;
+		if (temp.Parse(f_dec) == Number_Parse_Failed)
+			throw ::std::runtime_error("Parse error in number part.");
+		f.swap(temp._number);
+	}
+
+	void Real::RealParseExp(::std::string::const_iterator it,
+		::std::string::const_iterator end, exp_type& e) {
+		if (*it == 'e' || *it == 'E')
+		{
+			::std::string exp_dec;
+			auto range = ::std::find_if_not(++it, end,
+				[](char c) {return c >= '0' && c <= '9';});
+			if (range != end) // if the exponent part contains invalid char.
+				throw ::std::runtime_error("Invalid charactor in exponential part.");
+			Integer temp;
+			if (temp.Parse(exp_dec) == Number_Parse_Failed)
+				throw ::std::runtime_error("Invalid charactor in number part.");
+			if (temp.get_digit_number() > 1)
+				throw ::std::runtime_error("Overflow or underflow.");
+			e += temp._signal * temp.get_digit_number[0];
+		}
+		else if (it == end)
+			return;
+		else
+			throw ::std::runtime_error("Invalid format of floating point number.");
+	}
+
+	inline void AlgorithmM(::std::vector<save_type> f, exp_type k, ::std::vector<save_type>& m, exp_type& e) {
+
+	}
+
 	int Real::Parse(const ::std::string& str)
 	{
-		auto it = str.begin();
-		::std::string r;
+		auto it = str.begin(), end = str.end();
+		::std::vector<save_type> f;
+		exp_type e;
+		int res = Number_Parse_OK;
+		
+		try {
+			detail::NumberParseSignal(it, _signal);
+			RealParseF(it, end, f, e);
+			RealParseExp(it, end, e);
+			AlgorithmM(f, e, _number, _exp);
+		}
+		catch (std::exception e) {
+			res = Number_Parse_Failed;
+		}
+		return res;
+	}
 
-		detail::NumberParseSignal(it, _signal);
+	void Real::SetDefaultPrecision(size_t pre)
+	{
+		default_precision = pre;
+	}
 
-		return 0;
+	size_t Real::GetDefaultPrecision()
+	{
+		return default_precision;
 	}
 
 }

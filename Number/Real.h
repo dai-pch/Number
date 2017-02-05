@@ -48,10 +48,24 @@ namespace Number {
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
 		friend ::std::istream& operator>>(::std::istream&, Integer&);
 
+		static void SetDefaultPrecision(size_t pre);
+		static size_t GetDefaultPrecision();
+
 	private:
+		static size_t default_precision;
 		char _signal{ 1 };
 		::std::vector<save_type> _number{ 0 };
 		exp_type _exp{ 0 };
+		int precision{ (default_precision - 1) / BIT_NUMBER + 2 };
+
+		inline void RealParseF(::std::string::const_iterator it,
+			::std::string::const_iterator end, ::std::vector<save_type>& f,
+			exp_type& e);
+		inline void RealParseExp(::std::string::const_iterator it,
+			::std::string::const_iterator end, exp_type& e);
+
+	public:
+		
 	}; // class
 
 	// ==ÔËËã·û
