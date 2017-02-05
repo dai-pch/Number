@@ -92,7 +92,6 @@ namespace Number {
 		_number.swap(result);
 	}
 
-
 	Integer::Integer(const Integer& src) : _number(src._number), _signal(src._signal) {}
 
 
@@ -548,17 +547,6 @@ if (*(it++) != (ch) \
 		}
 	}
 
-	void IntegerParseSignal(::std::string::const_iterator &SrcIt, char& Signal) {
-		Signal = 1;
-		if (*SrcIt == '-')
-		{
-			++SrcIt;
-			Signal = -1;
-		}
-		else if (*SrcIt == '+')
-			++SrcIt;
-	}
-
 	//从字符串输入数值
 	//支持2，8，10，16进制
 	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|(num10 num10*))
@@ -568,7 +556,7 @@ if (*(it++) != (ch) \
 		auto it = str.begin();
 		::std::string c;
 		//处理符号
-		IntegerParseSignal(it, _signal);
+		detail::NumberParseSignal(it, _signal);
 
 		int res = IntegerParseValue(it, c);
 

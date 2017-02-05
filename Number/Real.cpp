@@ -23,4 +23,14 @@ namespace Number {
 	}
 
 
+	int Real::Parse(const ::std::string& str)
+	{
+		auto it = str.begin();
+		::std::string r;
+
+		detail::NumberParseSignal(it, _signal);
+
+		return 0;
+	}
+
 }

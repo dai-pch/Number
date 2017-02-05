@@ -10,6 +10,7 @@ namespace Number {
 		//构造函数
 		Real() = default; //空构造
 		Real(const Real&) = default; //拷贝构造
+		Real(::std::vector<save_type> vec, signal_type sig = 1) :_number(vec), _signal(sig){}
 		explicit Real(const Integer& inte);
 		//从整数构造
 		template<typename T>
@@ -17,10 +18,10 @@ namespace Number {
 			::std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
 		//从浮点数构造
 		explicit Real(const float& Number) {
-			detail::convertFloatingToInteger(Number, _signal, _number, _exp, _tolerance);
+			detail::convertFloatingToInteger(Number, _signal, _number, _exp);
 		}
 		explicit Real(const double& Number) {
-			detail::convertFloatingToInteger(Number, _signal, _number, _exp, _tolerance);
+			detail::convertFloatingToInteger(Number, _signal, _number, _exp);
 		}
 
 		//比较函数
@@ -41,8 +42,7 @@ namespace Number {
 
 		//转换为字符串
 		::std::string ToString10() const;
-		::std::string ToString16() const;
-		int Parse(::std::string);
+		int Parse(const ::std::string&);
 
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
@@ -52,7 +52,6 @@ namespace Number {
 		char _signal{ 1 };
 		::std::vector<save_type> _number{ 0 };
 		exp_type _exp{ 0 };
-		tolerance_type _tolerance{ 0 };
 	}; // class
 
 	// ==运算符

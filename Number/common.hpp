@@ -90,12 +90,12 @@ namespace Number { namespace detail {
 	}
 
 	template<typename T>
-	inline void convertFloatingToInteger(T, signal_type&, ::std::vector<save_type>&, exp_type&, tolerance_type&) {
+	inline void convertFloatingToInteger(T, signal_type&, ::std::vector<save_type>&, exp_type&) {
 		static_assert(false, "Can't convert this type of floating point number.");
 	}
 
 	inline void convertFloatingToInteger(float number, signal_type& sig, ::std::vector<save_type>& res,
-		exp_type& exp, tolerance_type& tolerance) {
+		exp_type& exp) {
 		int32_t& src = reinterpret_cast<int32_t&>(number);
 		calc_type_u temp = src & ((1 << 23) - 1);
 		exp = (src >> 23) & ((1 << 8) - 1);
@@ -114,7 +114,6 @@ namespace Number { namespace detail {
 			exp_sh += BIT_NUMBER;
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
-		tolerance = 1 << exp_sh;
 		res.clear();
 		res.push_back(temp & MASK_CODE);
 		if (temp >> BIT_NUMBER != 0)
@@ -122,7 +121,7 @@ namespace Number { namespace detail {
 	}
 
 	inline void convertFloatingToInteger(double number, signal_type& sig, ::std::vector<save_type>& res,
-		exp_type& exp, tolerance_type& tolerance) {
+		exp_type& exp) {
 		int64_t& src = reinterpret_cast<int64_t&>(number);
 		calc_type_u temp = src & (((int64_t)1 << 52) - 1);
 		exp = (src >> 52) & ((1 << 11) - 1);
@@ -142,13 +141,23 @@ namespace Number { namespace detail {
 		save_type temp_h = static_cast<save_type>(temp >> (BIT_NUMBER - exp_sh));
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
-		tolerance = 1 << exp_sh;
 		res.clear();
 		res.push_back(temp & MASK_CODE);
 		if (temp_h != 0 || (temp >> BIT_NUMBER != 0))
 			res.push_back(temp >> BIT_NUMBER);
 		if (temp_h != 0)
 			res.push_back(temp_h);
+	}
+
+	inline void NumberParseSignal(::std::string::const_iterator &SrcIt, char& Signal) {
+		Signal = 1;
+		if (*SrcIt == '-')
+		{
+			++SrcIt;
+			Signal = -1;
+		}
+		else if (*SrcIt == '+')
+			++SrcIt;
 	}
 
 };
