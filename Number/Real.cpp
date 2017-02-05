@@ -108,4 +108,22 @@ namespace Number {
 		return default_precision;
 	}
 
+	void Real::SetPrecision(size_t precision)
+	{
+		precision = (precision - 1) / BIT_NUMBER + 2;
+		if (_number.size() > precision) {
+			auto it = _number.begin() + (_number.size() - precision);
+			_number.erase(_number.begin(), it);
+		}
+		else 
+			while(_number.size() < precision) {
+				_number.push_back(0);
+			}
+	}
+
+	size_t Real::GetPrecision()
+	{
+		return _number.size() - 1;
+	}
+
 }

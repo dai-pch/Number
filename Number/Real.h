@@ -8,8 +8,11 @@ namespace Number {
 	class Real {
 	public:
 		//构造函数
-		Real() = default; //空构造
+		Real(size_t precision = default_precision) :_number((precision - 1) / BIT_NUMBER + 2, 0) {} //空构造
 		Real(const Real&) = default; //拷贝构造
+		Real(const Real& real, size_t precision) :Real(real) {
+			this->SetPrecision(precision);
+		}
 		Real(::std::vector<save_type> vec, signal_type sig = 1) :_number(vec), _signal(sig){}
 		explicit Real(const Integer& inte);
 		//从整数构造
@@ -48,15 +51,17 @@ namespace Number {
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
 		friend ::std::istream& operator>>(::std::istream&, Integer&);
 
-		static void SetDefaultPrecision(size_t pre);
+		static void SetDefaultPrecision(size_t);
 		static size_t GetDefaultPrecision();
+		void SetPrecision(size_t);
+		size_t GetPrecision();
 
 	private:
 		static size_t default_precision;
 		char _signal{ 1 };
-		::std::vector<save_type> _number{ 0 };
-		exp_type _exp{ 0 };
-		int precision{ (default_precision - 1) / BIT_NUMBER + 2 };
+		::std::vector<save_type> _number =
+			::std::vector<save_type>((default_precision - 1) / BIT_NUMBER + 2, 0);
+		exp_type _exp{ 0 }; // radix is MODULE
 
 		inline void RealParseF(::std::string::const_iterator it,
 			::std::string::const_iterator end, ::std::vector<save_type>& f,
