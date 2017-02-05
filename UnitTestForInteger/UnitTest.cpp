@@ -15,6 +15,11 @@ namespace Microsoft {
 				::std::string temp = num.ToString10();
 				return ::std::wstring(temp.begin(), temp.end());
 			}
+			template<>
+			::std::wstring ToString<Real>(const Number::Real &num) {
+				::std::string temp = num.ToString10();
+				return ::std::wstring(temp.begin(), temp.end());
+			}
 		}
 	}
 }
@@ -409,7 +414,7 @@ namespace UnitTestForNumber
 			Assert::AreEqual(num, res);
 		}
 
-		void TestRealDecimalRandom(const int times) {
+		void TestRealDecimalRandom(const unsigned times) {
 			for (unsigned ii = 0;ii < times;++ii) {
 				Real num, res;
 				num = RandomRealNumber();
