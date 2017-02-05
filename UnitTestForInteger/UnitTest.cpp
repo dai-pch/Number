@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#include <random>
+#include <ctime>
+#include <functional>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Number;
@@ -384,5 +387,46 @@ namespace UnitTestForNumber
 			TestRealCompareNumber(-65.336, (double)-30006587.2654, LINE_INFO());
 			TestRealCompareNumber((float)-23.3356, -30006587.2654, LINE_INFO());
 		}
+
+		Real RandomRealNumber() {
+			static std::default_random_engine generator(time(NULL));
+			static std::uniform_int_distribution<save_type> distribution, sig(0,1);
+			static auto dice = std::bind(distribution, generator);
+			int size = dice();
+			std::vector<save_type> vec(size);
+			for (auto& num : vec) {
+				num = dice();
+			}
+			if (vec.back() == 0)
+				++vec.back();
+			return Real(vec, sig(generator) ? 1 : -1);
+		}
+
+		void TestRealDecimal(const ::std::string src) {
+			Real num, res;
+			num.Parse(src);
+			res.Parse(num.ToString10());
+			Assert::AreEqual(num, res);
+		}
+
+		void TestRealDecimalRandom(const int times) {
+			for (unsigned ii = 0;ii < times;++ii) {
+				Real num, res;
+				num = RandomRealNumber();
+				res.Parse(num.ToString10());
+				Assert::AreEqual(num, res);
+			}
+		}
+
+		TEST_METHOD(TestRealDecimal) {
+			TestRealDecimal("3.14159265358979323846264338327950288e101");
+			TestRealDecimal("5");
+			TestRealDecimal("0e14");
+			TestRealDecimal("-0e0");
+			TestRealDecimal("1e65536");
+			TestRealDecimal("1.32468208213");
+			TestRealDecimalRandom(65536);
+		}
+
 	};
 }
