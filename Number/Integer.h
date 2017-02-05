@@ -22,24 +22,24 @@ namespace Number {
 		}
 		/*//无符号整数
 		template<typename UIntType>
-		explicit Integer(const UIntType& Source, typename std::enable_if_t<
-			std::is_integral<UIntType>::value && std::is_unsigned<UIntType>::value
+		explicit Integer(const UIntType& Source, typename ::std::enable_if_t<
+			::std::is_integral<UIntType>::value && ::std::is_unsigned<UIntType>::value
 		>* = nullptr)
 		{
 			*this = Source;
 		}
 		//有符号整数
 		template<typename IntType>
-		explicit Integer(const IntType& Source, typename std::enable_if_t<
-			std::is_integral<IntType>::value && std::is_signed<IntType>::value
+		explicit Integer(const IntType& Source, typename ::std::enable_if_t<
+			::std::is_integral<IntType>::value && ::std::is_signed<IntType>::value
 		>* = nullptr)
 		{
 			*this = Source;
 		}*/
 		//浮点数
 		/*template<typename T>
-		Integer(const T& Source, typename std::enable_if<
-		std::is_floating_point<T>::value
+		Integer(const T& Source, typename ::std::enable_if<
+		::std::is_floating_point<T>::value
 		>::type* = nullptr) : _number(0), _signal(1)
 		{
 		T temp = (Source < 0 ? (_signal = -1, -Source) : Source);
@@ -51,8 +51,8 @@ namespace Number {
 		// 赋值操作
 		//无符号整数
 		template<typename UIntType>
-		typename std::enable_if_t<
-			std::is_integral<UIntType>::value && std::is_unsigned<UIntType>::value, Integer>&
+		typename ::std::enable_if_t<
+			::std::is_integral<UIntType>::value && ::std::is_unsigned<UIntType>::value, Integer>&
 			operator = (const UIntType& Source)
 		{
 			this->SetNumber(Source);
@@ -60,11 +60,11 @@ namespace Number {
 		}
 		//有符号整数
 		template<typename IntType>
-		typename std::enable_if_t<
-			std::is_integral<IntType>::value && std::is_signed<IntType>::value, Integer>& 
+		typename ::std::enable_if_t<
+			::std::is_integral<IntType>::value && ::std::is_signed<IntType>::value, Integer>& 
 			operator = (const IntType& Source)
 		{
-			std::make_unsigned_t<IntType> temp = (Source < 0 ? (_signal = -1, -Source) : Source);
+			::std::make_unsigned_t<IntType> temp = (Source < 0 ? (_signal = -1, -Source) : Source);
 			this->SetNumber(temp);
 			return *this;
 		}
@@ -90,10 +90,10 @@ namespace Number {
 			Integer &Mod, Integer& quotient);
 
 		//转换为10进制字串
-		std::string ToString10() const;
-		std::string ToString16() const;
+		::std::string ToString10() const;
+		::std::string ToString16() const;
 
-		int Parse(std::string);
+		int Parse(::std::string);
 
 		size_t get_digit_number() const;
 		//save_type get_highest_digit() const;
@@ -135,10 +135,10 @@ namespace Number {
 
 		unsigned char backbit() const;
 
-		void FromString10(const std::string & c);
-		void FromString2(const std::string & c);
-		void FromString8(const std::string & c);
-		void FromString16(const std::string & c);
+		void FromString10(const ::std::string & c);
+		void FromString2(const ::std::string & c);
+		void FromString8(const ::std::string & c);
+		void FromString16(const ::std::string & c);
 
 	}; // class
 
@@ -148,12 +148,12 @@ namespace Number {
 		return ((Number1.Compare(Number2)) == 0);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator == (const IntType& Number1, const Integer& Number2) {
 		return (Number2 == Integer(Number1));
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator == (const Integer& Number1, const IntType& Number2) {
 		return (Number1 == Integer(Number2));
 	}
@@ -162,12 +162,12 @@ namespace Number {
 		return ((Number1.Compare(Number2)) != 0);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator != (const IntType& Number1, const Integer& Number2) {
 		return (Number2 != Integer(Number1));
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator != (const Integer& Number1, const IntType& Number2) {
 		return (Number1 != Integer(Number2));
 	}
@@ -176,12 +176,12 @@ namespace Number {
 		return ((number1.Compare(number2)) > 0);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator > (const Integer& Number1, const IntType& Number2)	{
 		return (Number1 > Integer(Number2));
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator > (const IntType& Number1, const Integer& Number2)	{
 		return (Integer(Number1) > Number2);
 	}
@@ -190,12 +190,12 @@ namespace Number {
 		return ((Number1.Compare(Number2)) < 0);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator < (const IntType& Number1, const Integer& Number2)	{
 		return (Integer(Number1) < Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator < (const Integer& Number1, const IntType& Number2)	{
 		return (Number1 < Integer(Number2));
 	}
@@ -204,12 +204,12 @@ namespace Number {
 		return ((Number1.Compare(Number2)) >= 0);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator >= (const IntType& Number1, const Integer& Number2) {
 		return (Integer(Number1) >= Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator >= (const Integer& Number1, const IntType& Number2) {
 		return (Number1 >= Integer(Number2));
 	}
@@ -218,12 +218,12 @@ namespace Number {
 		return ((Number1.Compare(Number2)) <= 0);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator <= (const IntType& Number1, const Integer& Number2) {
 		return (Integer(Number1) <= Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, bool> // bool
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, bool> // bool
 		operator <= (const Integer& Number1, const IntType& Number2) {
 		return (Number1 <= Integer(Number2));
 	}
@@ -232,12 +232,12 @@ namespace Number {
 		return Number1.Add(Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator + (const IntType& Number1, const Integer& Number2) {
 		return (Number2 + Integer(Number1));
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator + (const Integer& Number1, const IntType& Number2) {
 		return (Number1 + Integer(Number2));
 	}
@@ -246,12 +246,12 @@ namespace Number {
 		return Number1.Sub(Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator - (const IntType& Number1, const Integer& Number2) {
 		return (Integer(Number1) - Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator - (const Integer& Number1, const IntType& Number2) {
 		return (Number1 - Integer(Number2));
 	}
@@ -260,12 +260,12 @@ namespace Number {
 		return Number1.Multiply(Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator * (const IntType& Number1, const Integer& Number2) {
 		return (Integer(Number1) * Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator * (const Integer& Number1, const IntType& Number2) {
 		return (Number1 * Integer(Number2));
 	}
@@ -276,12 +276,12 @@ namespace Number {
 		return q;
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator / (const IntType& Number1, const Integer& Number2) {
 		return (Integer(Number1) / Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator / (const Integer& Number1, const IntType& Number2) {
 		return (Number1 / Integer(Number2));
 	}
@@ -292,12 +292,12 @@ namespace Number {
 		return r;
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator % (const IntType& Number1, const Integer& Number2) {
 		return (Integer(Number1) % Number2);
 	}
 	template<typename IntType>
-	inline std::enable_if_t<std::is_integral<IntType>::value, Integer> // Integer
+	inline ::std::enable_if_t<::std::is_integral<IntType>::value, Integer> // Integer
 		operator % (const Integer& Number1, const IntType& Number2) {
 		return (Number1 % Integer(Number2));
 	}

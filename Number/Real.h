@@ -13,8 +13,8 @@ namespace Number {
 		explicit Real(const Integer& inte);
 		//从整数构造
 		template<typename T>
-		explicit Real(const T& Number, typename std::enable_if<
-			std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
+		explicit Real(const T& Number, typename ::std::enable_if<
+			::std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
 		//从浮点数构造
 		explicit Real(const float& Number) {
 			detail::convertFloatingToInteger(Number, _signal, _number, _exp, _tolerance);
@@ -42,7 +42,7 @@ namespace Number {
 		//转换为字符串
 		::std::string ToString10() const;
 		::std::string ToString16() const;
-		int Parse(std::string);
+		int Parse(::std::string);
 
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
@@ -50,7 +50,7 @@ namespace Number {
 
 	private:
 		char _signal{ 1 };
-		std::vector<save_type> _number{ 0 };
+		::std::vector<save_type> _number{ 0 };
 		exp_type _exp{ 0 };
 		tolerance_type _tolerance{ 0 };
 	}; // class
@@ -60,16 +60,16 @@ namespace Number {
 		return (Number1.Compare(Number2) == 0);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator == (const Arithmetic& Number1, const Real& Number2) {
 		return (Real(Number1) == Number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator == (const Real& Number1, const Arithmetic& Number2) {
 		return (Number1 == Real(Number2));
 	}
@@ -78,16 +78,16 @@ namespace Number {
 		return (Number1.Compare(Number2) != 0);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator != (const Arithmetic& Number1, const Real& Number2) {
 		return (Real(Number1) != Number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator != (const Real& Number1, const Arithmetic& Number2) {
 		return (Number1 != Real(Number2));
 	}
@@ -96,16 +96,16 @@ namespace Number {
 		return (Number1.Compare(Number2) > 0);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator > (const Arithmetic& Number1, const Real& Number2) {
 		return (Real(Number1) > Number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator > (const Real& Number1, const Arithmetic& Number2) {
 		return (Number1 > Real(Number2));
 	}
@@ -114,16 +114,16 @@ namespace Number {
 		return (Number1.Compare(Number2) < 0);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator < (const Arithmetic& Number1, const Real& Number2) {
 		return (Real(Number1) < Number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator < (const Real& Number1, const Arithmetic& Number2) {
 		return (Number1 < Real(Number2));
 	}
@@ -132,16 +132,16 @@ namespace Number {
 		return (Number1.Compare(Number2) >= 0);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator >= (const Arithmetic& Number1, const Real& Number2) {
 		return (Real(Number1) >= Number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator >= (const Real& Number1, const Arithmetic& Number2) {
 		return (Number1 >= Real(Number2));
 	}
@@ -150,16 +150,16 @@ namespace Number {
 		return (Number1.Compare(Number2) <= 0);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator <= (const Arithmetic& Number1, const Real& Number2) {
 		return (Real(Number1) <= Number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, bool> // bool
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, bool> // bool
 		operator <= (const Real& Number1, const Arithmetic& Number2) {
 		return (Number1 <= Real(Number2));
 	}
@@ -170,17 +170,17 @@ namespace Number {
 		return number1.Add(number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator + (const Arithmetic& Number1, const Real& Number2)
 	{
 		return Real(Number1) + Number2;
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator + (const Real& Number1, const Arithmetic& Number2)
 	{
 		return Number1 + Real(Number2);
@@ -190,17 +190,17 @@ namespace Number {
 		return number1.Sub(number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator - (const Arithmetic& Number1, const Real& Number2)
 	{
 		return Real(Number1) - Number2;
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator - (const Real& Number1, const Arithmetic& Number2)
 	{
 		return Number1 - Real(Number2);
@@ -210,17 +210,17 @@ namespace Number {
 		return number1.Multiply(number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator * (const Arithmetic& Number1, const Real& Number2)
 	{
 		return Real(Number1) * Number2;
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator * (const Real& Number1, const Arithmetic& Number2)
 	{
 		return Number1 * Real(Number2);
@@ -230,17 +230,17 @@ namespace Number {
 		return number1.Devide(number2);
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator / (const Arithmetic& Number1, const Real& Number2)
 	{
 		return Real(Number1) / Number2;
 	}
 	template<typename Arithmetic>
-	inline typename std::enable_if_t<
-		std::is_arithmetic<Arithmetic>::value
-		|| std::is_same<Arithmetic, Integer>::value, Real>          //Real
+	inline typename ::std::enable_if_t<
+		::std::is_arithmetic<Arithmetic>::value
+		|| ::std::is_same<Arithmetic, Integer>::value, Real>          //Real
 		operator / (const Real& Number1, const Arithmetic& Number2)
 	{
 		return Number1 / Real(Number2);

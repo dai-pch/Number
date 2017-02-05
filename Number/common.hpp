@@ -1,11 +1,11 @@
 //#include "Number.h"
 namespace Number { namespace detail {
-	void CalcTypeToSaveType(const calc_type_u CalcValue, save_type &High, save_type &Low) {
+	inline void CalcTypeToSaveType(const calc_type_u CalcValue, save_type &High, save_type &Low) {
 		Low = static_cast<save_type>(CalcValue & MASK_CODE);
 		High = static_cast<save_type>(static_cast<calc_type_u>(CalcValue) >> BIT_NUMBER);
 	}
 
-	save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
+	inline save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c)
 	{
 		calc_type temp;
 		temp = static_cast<calc_type>(Num1)
@@ -17,7 +17,7 @@ namespace Number { namespace detail {
 	}
 
 	//一位减法器，c=0代表借位，c=1代表不借位
-	save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c)
+	inline save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c)
 	{
 		calc_type temp;
 		temp = static_cast<calc_type>(Num1)
@@ -30,8 +30,8 @@ namespace Number { namespace detail {
 	}
 
 	//逐位比较绝对值大小
-	int _compare_by_digit(std::vector<save_type>::const_reverse_iterator it1,
-		std::vector<save_type>::const_reverse_iterator it2,
+	inline int _compare_by_digit(::std::vector<save_type>::const_reverse_iterator it1,
+		::std::vector<save_type>::const_reverse_iterator it2,
 		size_t digit_num, size_t& NonEqualPosition)
 	{
 		NonEqualPosition = 0;
@@ -49,8 +49,8 @@ namespace Number { namespace detail {
 		return 0;
 	}
 
-	int _compare(std::vector<save_type>::const_reverse_iterator it1,
-		std::vector<save_type>::const_reverse_iterator it2,
+	inline int _compare(::std::vector<save_type>::const_reverse_iterator it1,
+		::std::vector<save_type>::const_reverse_iterator it2,
 		size_t digit_num, exp_type exp1, exp_type exp2, char signal1,
 		char signal2, size_t &NonEqualPosition) {
 		//两数均为零时有符号问题，单独考虑
@@ -67,10 +67,10 @@ namespace Number { namespace detail {
 			it2, digit_num, NonEqualPosition);
 	}
 
-	std::vector<save_type> multiply_vec(const std::vector<save_type>& number1,
-		const std::vector<save_type>& number2) {
+	inline ::std::vector<save_type> multiply_vec(const ::std::vector<save_type>& number1,
+		const ::std::vector<save_type>& number2) {
 		auto size1 = number1.size(), size2 = number2.size();
-		std::vector<save_type> result(size1 + size2, 0);
+		::std::vector<save_type> result(size1 + size2, 0);
 		for (unsigned int ii = 0;ii < size1;ii++)
 		{
 			for (unsigned int jj = 0;jj < size2;jj++)
@@ -90,18 +90,18 @@ namespace Number { namespace detail {
 	}
 
 	template<typename T>
-	inline void convertFloatingToInteger(T, signal_type&, std::vector<save_type>&, exp_type&, tolerance_type&) {
+	inline void convertFloatingToInteger(T, signal_type&, ::std::vector<save_type>&, exp_type&, tolerance_type&) {
 		static_assert(false, "Can't convert this type of floating point number.");
 	}
 
-	inline void convertFloatingToInteger(float number, signal_type& sig, std::vector<save_type>& res,
+	inline void convertFloatingToInteger(float number, signal_type& sig, ::std::vector<save_type>& res,
 		exp_type& exp, tolerance_type& tolerance) {
 		int32_t& src = reinterpret_cast<int32_t&>(number);
 		calc_type_u temp = src & ((1 << 23) - 1);
 		exp = (src >> 23) & ((1 << 8) - 1);
 		sig = (src >> 31) ? -1 : 1;;
 		if (exp == ((1 << 8) - 1))
-			throw(std::logic_error("Construct real number from NaN or Inf."));
+			throw(::std::logic_error("Construct real number from NaN or Inf."));
 
 		if (exp != 0)
 			temp |= (1 << 23);
@@ -121,14 +121,14 @@ namespace Number { namespace detail {
 			res.push_back(temp >> BIT_NUMBER);
 	}
 
-	inline void convertFloatingToInteger(double number, signal_type& sig, std::vector<save_type>& res,
+	inline void convertFloatingToInteger(double number, signal_type& sig, ::std::vector<save_type>& res,
 		exp_type& exp, tolerance_type& tolerance) {
 		int64_t& src = reinterpret_cast<int64_t&>(number);
 		calc_type_u temp = src & (((int64_t)1 << 52) - 1);
 		exp = (src >> 52) & ((1 << 11) - 1);
 		sig = (src >> 63) ? -1 : 1;
 		if (exp == ((1 << 11) - 1))
-			throw(std::logic_error("Construct real number from NaN or Inf."));
+			throw(::std::logic_error("Construct real number from NaN or Inf."));
 
 		if (exp != 0)
 			temp |= ((int64_t)1 << 52);

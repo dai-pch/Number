@@ -8,9 +8,9 @@ namespace Microsoft {
 		namespace CppUnitTestFramework
 		{
 			template<>
-			std::wstring ToString<Integer>(const Number::Integer &num) {
-				std::string temp = num.ToString10();
-				return std::wstring(temp.begin(), temp.end());
+			::std::wstring ToString<Integer>(const Number::Integer &num) {
+				::std::string temp = num.ToString10();
+				return ::std::wstring(temp.begin(), temp.end());
 			}
 		}
 	}
@@ -143,7 +143,7 @@ namespace UnitTestForNumber
 		}
 
 		template <typename T>
-		void TestIntegerParseBase(T num, const std::string &str, int res, __LineInfo* pLineInfo) {
+		void TestIntegerParseBase(T num, const ::std::string &str, int res, __LineInfo* pLineInfo) {
 			Integer a(num), b;
 			auto res2 = b.Parse(str);
 			Assert::AreEqual(res, res2, L"Integer Parse Error", pLineInfo);
@@ -151,11 +151,11 @@ namespace UnitTestForNumber
 		}
 
 		template <typename T>
-		void TestIntegerParseRight(T num, const std::string &str, __LineInfo* pLineInfo) {
+		void TestIntegerParseRight(T num, const ::std::string &str, __LineInfo* pLineInfo) {
 			TestIntegerParseBase(num, str, Number_Parse_OK, pLineInfo);
 		}
 
-		void TestIntegerParseWrong(const std::string &str, __LineInfo* pLineInfo) {
+		void TestIntegerParseWrong(const ::std::string &str, __LineInfo* pLineInfo) {
 			TestIntegerParseBase(0, str, Number_Parse_Failed, pLineInfo);
 		}
 
@@ -225,7 +225,7 @@ namespace UnitTestForNumber
 			//TestIntegerParseWrong("", LINE_INFO());
 		}
 
-		void TestIntegerToString(std::string str, std::string str10, std::string str16, __LineInfo* pLineInfo) {
+		void TestIntegerToString(::std::string str, ::std::string str10, ::std::string str16, __LineInfo* pLineInfo) {
 			Integer a;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str), L"Integer Parse error when test ToString()", pLineInfo);
 			if (!str10.empty())
@@ -259,7 +259,7 @@ namespace UnitTestForNumber
 			
 		}
 
-		void TestIntegerAddSub(std::string str1, std::string str2, std::string str3, __LineInfo* pLineInfo) {
+		void TestIntegerAddSub(::std::string str1, ::std::string str2, ::std::string str3, __LineInfo* pLineInfo) {
 			Integer a, b, s;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test +-", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test +-", pLineInfo);
@@ -290,7 +290,7 @@ namespace UnitTestForNumber
 				"-7581227677778165290588788823927263464087981117055072602322153315155810863056889", LINE_INFO());
 		}
 
-		void TestIntegerMulDev(std::string str1, std::string str2, std::string str3, __LineInfo* pLineInfo) {
+		void TestIntegerMulDev(::std::string str1, ::std::string str2, ::std::string str3, __LineInfo* pLineInfo) {
 			Integer a, b, s;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
@@ -303,7 +303,7 @@ namespace UnitTestForNumber
 				Assert::AreEqual(a, s / b, L"Dev error", pLineInfo);
 		}
 		
-		void TestIntegerModDev(std::string str1, std::string str2, std::string str3, std::string str4, __LineInfo* pLineInfo) {
+		void TestIntegerModDev(::std::string str1, ::std::string str2, ::std::string str3, ::std::string str4, __LineInfo* pLineInfo) {
 			Integer a, b, m, d;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);

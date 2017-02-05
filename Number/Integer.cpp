@@ -31,10 +31,10 @@ namespace Number {
 		else if (ch >= 10 && ch <= 15)
 			return (static_cast<char>(ch) + 'A' - 10);
 		else
-			throw std::logic_error("Wrong Number when convert number to char.");
+			throw ::std::logic_error("Wrong Number when convert number to char.");
 	}
 
-	void Integer::FromString10(const std::string &c) {
+	void Integer::FromString10(const ::std::string &c) {
 		assert(c[0] != '0' || c.length() == 1);
 		auto it = c.cbegin(), end = c.cend();
 
@@ -47,7 +47,7 @@ namespace Number {
 		result._number.swap(_number);
 	}
 
-	void Integer::FromString2(const std::string &c)	{
+	void Integer::FromString2(const ::std::string &c)	{
 		assert(c[0] != '0' || c.length() == 1);
 		auto it = c.crbegin(), end = c.crend();
 
@@ -63,7 +63,7 @@ namespace Number {
 		_number.swap(result);
 	}
 
-	void Integer::FromString8(const std::string &c)	{
+	void Integer::FromString8(const ::std::string &c)	{
 		assert(c[0] != '0' || c.length() == 1);
 		auto it = c.cbegin(), end = c.cend();
 
@@ -76,7 +76,7 @@ namespace Number {
 		result._number.swap(_number);
 	}
 
-	void Integer::FromString16(const std::string &c) {
+	void Integer::FromString16(const ::std::string &c) {
 		assert(c[0] != '0' || c.length() == 1);
 		auto it = c.crbegin(), end = c.crend();
 
@@ -102,7 +102,7 @@ namespace Number {
 	}
 
 	//除去可能的高位的零
-	void eraseZero(std::vector<save_type> &vec) {
+	void eraseZero(::std::vector<save_type> &vec) {
 		auto it_re = vec.rbegin();
 		size_t counter = 0;
 		while ((it_re != vec.rend() - 1) && *it_re == 0)
@@ -119,14 +119,14 @@ namespace Number {
 		return do_integer_compare(Obj2, temp);
 	}
 
-	std::vector<save_type> shift_left(const std::vector<save_type>& src, int num) {
+	::std::vector<save_type> shift_left(const ::std::vector<save_type>& src, int num) {
 		assert(num >= 0);
 		assert(!src.empty());
 		const unsigned int num_s = num % (BIT_NUMBER);
 		const unsigned int num_sr = BIT_NUMBER - num_s;
 		const unsigned int num_i = num / (BIT_NUMBER);
 		auto size = src.size();
-		std::vector<save_type> result(size + num_i);
+		::std::vector<save_type> result(size + num_i);
 
 		result[num_i] = src[0] << num_s;
 		for (decltype(size) ii = 1; ii < size; ii++)
@@ -138,7 +138,7 @@ namespace Number {
 		return result;
 	}
 
-	std::vector<save_type> shift_right(const std::vector<save_type>& src, int num) {
+	::std::vector<save_type> shift_right(const ::std::vector<save_type>& src, int num) {
 		assert(num >= 0);
 		assert(!src.empty());
 		const unsigned int num_s = num % (BIT_NUMBER);
@@ -147,8 +147,8 @@ namespace Number {
 		auto size = src.size();
 
 		if (num_d >= size)
-			return std::vector<save_type>{0};
-		std::vector<save_type> result(size - num_d);
+			return ::std::vector<save_type>{0};
+		::std::vector<save_type> result(size - num_d);
 		for (unsigned int ii = 0;ii < size - num_d - 1;ii++)
 		{
 			result[ii] = (src[ii + num_d] >> num_s) | (src[ii + num_d + 1] << num_sr);
@@ -162,7 +162,7 @@ namespace Number {
 
 	Integer Integer::operator<<(int num) const
 	{
-		std::vector<save_type> result;
+		::std::vector<save_type> result;
 		if (num < 0)
 			result = shift_right(_number, - num);
 		else
@@ -172,7 +172,7 @@ namespace Number {
 
 	Integer Integer::operator>>(int num) const
 	{
-		std::vector<save_type> result;
+		::std::vector<save_type> result;
 		if (num < 0)
 			result = shift_left(_number, -num);
 		else
@@ -233,7 +233,7 @@ namespace Number {
 		gt ? (p1 = this, p2 = &Obj2) : (p1 = &Obj2, p2 = this);
 
 		size_t size1 = p1->_number.size(), size2 = p2->_number.size();
-		std::vector<save_type> result(size1 - nonEqualCounter_re);
+		::std::vector<save_type> result(size1 - nonEqualCounter_re);
 		//vector<save_type>::const_iterator it1 = p1->_number.begin(), it2 = p2->_number.begin();
 		//vector<save_type>::iterator it_result = result.begin();
 		calc_type temp = 0;
@@ -266,8 +266,8 @@ namespace Number {
 	}
 
 	//除法
-	void devide_Knuth(const std::vector<save_type>& src1, const std::vector<save_type>& src2,
-		std::vector<save_type>& mod, std::vector<save_type>& quotient) {
+	void devide_Knuth(const ::std::vector<save_type>& src1, const ::std::vector<save_type>& src2,
+		::std::vector<save_type>& mod, ::std::vector<save_type>& quotient) {
 		assert(src1.size() > src2.size() || 
 			(src1.size() == src2.size() && src1.back() >= src2.back()));
 
@@ -279,14 +279,14 @@ namespace Number {
 		if ((temp & 0xf0f0f0f0) != 0) { shift -= 4; temp &= 0xf0f0f0f0; }
 		if ((temp & 0xcccccccc) != 0) { shift -= 2; temp &= 0xcccccccc; }
 		if ((temp & 0xaaaaaaaa) != 0) { shift -= 1; }
-		std::vector<save_type> number1 = shift_left(src1, shift);
-		const std::vector<save_type> number2 = shift_left(src2, shift);
+		::std::vector<save_type> number1 = shift_left(src1, shift);
+		const ::std::vector<save_type> number2 = shift_left(src2, shift);
 
 		//除法
 		if (number1.back() >= number2.back())
 			number1.push_back(0);
 		size_t size1 = number1.size(), size2 = number2.size();
-		std::vector<save_type> result(size1 - size2);
+		::std::vector<save_type> result(size1 - size2);
 		for (int ii = size1 - size2 - 1;ii >= 0;ii--)
 		{
 			//预测q
@@ -297,8 +297,8 @@ namespace Number {
 				qBar--;
 
 			//减法
-			std::vector<save_type> &tempvec = detail::multiply_vec(number2,
-				std::vector<save_type>{static_cast<save_type>(qBar)});
+			::std::vector<save_type> &tempvec = detail::multiply_vec(number2,
+				::std::vector<save_type>{static_cast<save_type>(qBar)});
 			if (tempvec.size() == size2)
 				tempvec.push_back(0);
 			save_type c = 1;
@@ -320,13 +320,13 @@ namespace Number {
 		mod = shift_right(number1, shift);
 		quotient = result;
 	}
-	void devide_simple(const std::vector<save_type>& src1, const save_type src2,
-		save_type& mod, std::vector<save_type>& quotient) {
+	void devide_simple(const ::std::vector<save_type>& src1, const save_type src2,
+		save_type& mod, ::std::vector<save_type>& quotient) {
 		calc_type_u temp = 0;
 		//save_type number2 = Obj2._number[0];
 		auto size1 = src1.size();
-		std::vector<save_type> result(size1);
-		//std::vector<save_type> number1 = Obj1._number;
+		::std::vector<save_type> result(size1);
+		//::std::vector<save_type> number1 = Obj1._number;
 		//temp = 0;
 		for (int ii = size1 - 1;ii >= 0;ii--)
 		{
@@ -356,7 +356,7 @@ namespace Number {
 		//如果除数只有一位
 		if (Obj2._number.size() < 2)
 		{
-			std::vector<save_type> quotient_v;
+			::std::vector<save_type> quotient_v;
 			save_type mod_n;
 
 			devide_simple(Obj1._number, Obj2._number[0], mod_n, quotient_v);
@@ -365,7 +365,7 @@ namespace Number {
 		}
 		else
 		{
-			std::vector<save_type> mod_v, quotient_v;
+			::std::vector<save_type> mod_v, quotient_v;
 
 			devide_Knuth(Obj1._number, Obj2._number, mod_v, quotient_v);
 			mod = Integer(mod_v, Obj1._signal);
@@ -374,13 +374,13 @@ namespace Number {
 		return;
 	}
 
-	std::ostream & operator<<(std::ostream & os, const Integer & Obj)
+	::std::ostream & operator<<(::std::ostream & os, const Integer & Obj)
 	{
 		// TODO: 在此处插入 return 语句
 		return (os << Obj.ToString10());
 	}
 
-	std::istream & operator>>(std::istream &is, Integer &Num)
+	::std::istream & operator>>(::std::istream &is, Integer &Num)
 	{
 		// TODO: 在此处插入 return 语句
 		::std::string str;
@@ -390,12 +390,12 @@ namespace Number {
 	}
 
 
-	std::string Integer::ToString10() const
+	::std::string Integer::ToString10() const
 	{
 #define TO_STRING_10_BIT_ONCE 8
-#define TO_STRING_MOD_ONCE (static_cast<unsigned int>(std::pow(10, TO_STRING_10_BIT_ONCE)))
+#define TO_STRING_MOD_ONCE (static_cast<unsigned int>(::std::pow(10, TO_STRING_10_BIT_ONCE)))
 
-		std::string result;
+		::std::string result;
 		if (_number.back() == 0)
 		{
 			result.push_back('0');
@@ -424,13 +424,13 @@ namespace Number {
 		} while (q != 0);
 		if (_signal < 0)
 			result.push_back('-');
-		std::reverse(result.begin(), result.end());
+		::std::reverse(result.begin(), result.end());
 		return result;
 	}
 
-	std::string Integer::ToString16() const
+	::std::string Integer::ToString16() const
 	{
-		std::string result;
+		::std::string result;
 		
 		if (_number.back() == 0)
 		{
@@ -497,7 +497,7 @@ if (*(it++) != (ch) \
 		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 	}
 
-	int IntegerParseNumber(std::string::const_iterator &SrcIt, std::string &c, decltype(IsCharB) fun, int Ret) {
+	int IntegerParseNumber(::std::string::const_iterator &SrcIt, ::std::string &c, decltype(IsCharB) fun, int Ret) {
 		if (!fun(*SrcIt))
 			return Number_Integer_Parse_Failed;
 		//跳过前导零
@@ -513,34 +513,34 @@ if (*(it++) != (ch) \
 		return Ret;
 	}
 
-	int IntegerParse2(std::string::const_iterator &SrcIt, std::string &c) {
+	int IntegerParse2(::std::string::const_iterator &SrcIt, ::std::string &c) {
 		return IntegerParseNumber(SrcIt, c, IsCharB, Number_Integer_Parse_B);
 	}
 
-	int IntegerParse8(std::string::const_iterator &SrcIt, std::string &c) {
+	int IntegerParse8(::std::string::const_iterator &SrcIt, ::std::string &c) {
 		return IntegerParseNumber(SrcIt, c, IsCharO, Number_Integer_Parse_O);
 	}
 
-	int IntegerParse16(std::string::const_iterator &SrcIt, std::string &c) {
+	int IntegerParse16(::std::string::const_iterator &SrcIt, ::std::string &c) {
 		return IntegerParseNumber(SrcIt, c, IsCharH, Number_Integer_Parse_H);
 	}
 
-	int IntegerParse10(std::string::const_iterator &SrcIt, std::string &c) {
+	int IntegerParse10(::std::string::const_iterator &SrcIt, ::std::string &c) {
 		return IntegerParseNumber(SrcIt, c, IsCharD, Number_Integer_Parse_D);
 	}
 
-	int IntegerParseZero(std::string::const_iterator &SrcIt, std::string &c) {
+	int IntegerParseZero(::std::string::const_iterator &SrcIt, ::std::string &c) {
 		switch (*SrcIt) {
 		case 'b': case 'B': return IntegerParse2(++SrcIt, c);
 		case 'o': case 'O': return IntegerParse8(++SrcIt, c);
 		case 'x': case 'X': return IntegerParse16(++SrcIt, c);
 		default: 
-			std::string c = "0";
+			::std::string c = "0";
 			return Number_Integer_Parse_D;
 		}
 	}
 
-	int IntegerParseValue(std::string::const_iterator &SrcIt, std::string &c) {
+	int IntegerParseValue(::std::string::const_iterator &SrcIt, ::std::string &c) {
 
 		switch (*SrcIt) {
 		case '0': return IntegerParseZero(++SrcIt, c);
@@ -562,11 +562,11 @@ if (*(it++) != (ch) \
 	//从字符串输入数值
 	//支持2，8，10，16进制
 	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|(num10 num10*))
-	int Integer::Parse(std::string str)
+	int Integer::Parse(::std::string str)
 	{
 		str.push_back('\0');
 		auto it = str.begin();
-		std::string c;
+		::std::string c;
 		//处理符号
 		IntegerParseSignal(it, _signal);
 
@@ -605,7 +605,7 @@ if (*(it++) != (ch) \
 
 	Integer Integer::Abs() const
 	{
-		return Integer(std::vector<save_type>(_number), 1);
+		return Integer(::std::vector<save_type>(_number), 1);
 	}
 
 	Integer Integer::Power(const Integer & Exp) const

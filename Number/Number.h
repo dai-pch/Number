@@ -34,23 +34,24 @@ namespace Number {
 	class Integer;
 	class Real;
 
-	namespace detail {
+/*	namespace detail {
 		inline void CalcTypeToSaveType(const calc_type_u CalcValue, save_type &High, save_type &Low);
 		inline save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c);
 		//一位减法器，c=0代表借位，c=1代表不借位
 		inline save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c);
 		//逐位比较绝对值大小
-		inline int _compare_by_digit(std::vector<save_type>::const_reverse_iterator it1,
-			std::vector<save_type>::const_reverse_iterator it2,
+		inline int _compare_by_digit(::std::vector<save_type>::const_reverse_iterator it1,
+			::std::vector<save_type>::const_reverse_iterator it2,
 			size_t digit_num, size_t& NonEqualPosition);
-		inline int _compare(std::vector<save_type>::const_reverse_iterator it1,
-			std::vector<save_type>::const_reverse_iterator it2,
+		inline int _compare(::std::vector<save_type>::const_reverse_iterator it1,
+			::std::vector<save_type>::const_reverse_iterator it2,
 			size_t digit_num, int exp1, int exp2, char signal1,
 			char signal2, size_t &NonEqualPosition);
-		inline std::vector<save_type> multiply_vec(const std::vector<save_type>& number1,
-			const std::vector<save_type>& number2);
+		inline ::std::vector<save_type> multiply_vec(const ::std::vector<save_type>& number1,
+			const ::std::vector<save_type>& number2);
 		
-}} //namespace
+} //namespace Number::detail */
+} //namespace Number
 #include "common.hpp"
 
 #endif

@@ -12,7 +12,7 @@ namespace Number {
 		exp_type exp1 = _number.size() + _exp;
 		exp_type exp2 = number2._number.size()
 			+ number2._exp;
-		size_t digit_num = std::min(_number.size(), number2._number.size());
+		size_t digit_num = ::std::min(_number.size(), number2._number.size());
 		auto ret = detail::_compare(_number.rbegin(), number2._number.rbegin(),
 			digit_num, exp1, exp2, _signal, number2._signal, temp);
 		if (ret == 0 && temp == digit_num)

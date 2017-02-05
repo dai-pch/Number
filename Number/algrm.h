@@ -7,8 +7,8 @@
 namespace Number {
 
 	template<typename T>
-	T Devide(const T& Obj1, const T& Obj2, T &mod, typename std::enable_if_t<
-		std::is_integral<T>::value>* = nullptr)
+	T Devide(const T& Obj1, const T& Obj2, T &mod, typename ::std::enable_if_t<
+		::std::is_integral<T>::value>* = nullptr)
 	{
 		mod = Obj1 % Obj2;
 		return Obj1 / Obj2;
@@ -16,8 +16,8 @@ namespace Number {
 
 	template<typename T>
 	T ExGCD(const T &a, const T &b, T &x, T &y,
-		typename std::enable_if_t<
-		(std::is_integral<T>::value) || (std::is_same<T, Integer>::value)
+		typename ::std::enable_if_t<
+		(::std::is_integral<T>::value) || (::std::is_same<T, Integer>::value)
 		>* = nullptr)
 	{
 		if (a < b)
