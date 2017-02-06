@@ -31,7 +31,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -112,6 +112,7 @@
   <ItemGroup>
     <ClInclude Include="algrm.h" />
     <ClInclude Include="common.hpp" />
+    <ClInclude Include="Functional.h" />
     <ClInclude Include="Integer.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="Real.h" />
