@@ -576,5 +576,25 @@ if (*(it++) != (ch) \
 		}
 	}
 
+	::std::ostream & operator<<(::std::ostream& os, const UInteger & Obj)
+	{
+		// TODO: 在此处插入 return 语句
+		return (os << Obj.ToString10());
+	}
+
+	::std::istream & operator>>(::std::istream& is, UInteger &Num)
+	{
+		// TODO: 在此处插入 return 语句
+		::std::string str;
+		is >> str;
+		Num.Parse(str);
+		return is;
+	}
+
+	size_t UInteger::get_digit_number() const
+	{
+		return _number.size();
+	}
+
 
 } // namespace Number
