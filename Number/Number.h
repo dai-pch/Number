@@ -31,6 +31,7 @@ const save_type MASK_CODE = (save_type)(MODULE - 1);
 #define	Number_Parse_OK     1
 
 namespace Number {
+	class UInteger;
 	class Integer;
 	class Real;
 
