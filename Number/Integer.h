@@ -7,6 +7,7 @@
 #include <string>
 #include <type_traits>
 #include "Number.h"
+#include "UInteger.h"
 
 namespace Number {
 	class Integer {
@@ -16,6 +17,8 @@ namespace Number {
 		Integer(const Integer&);
 
 		//类型转换
+		explicit Integer(const UInteger&, const char Signal = 1);
+
 		template<typename T>
 		explicit Integer(const T& Source) {
 			*this = Source;
@@ -103,16 +106,16 @@ namespace Number {
 		friend ::std::istream& operator>>(::std::istream&, Integer&);
 
 		//其他算数运算
-		Integer Abs() const;
-		Integer Power(const Integer &exp) const;
-
-		friend class Real;
+		UInteger Abs() const;
+		Integer Power(save_type exp) const;
+		Integer Power(const UInteger &exp) const;
 
 	private:
 		char _signal = 1;
-		::std::vector<save_type> _number{ 0 };
+		UInteger _number{ (unsigned)0 };
 
-		Integer(::std::vector<save_type>& Number, char Signal = 1);
+		Integer(const ::std::vector<save_type>& Number, char Signal = 1);
+		Integer(::std::vector<save_type>&& Number, char Signal = 1);
 
 		template<typename T>
 		void SetNumber(const T &num)
@@ -128,17 +131,6 @@ namespace Number {
 		}
 
 		int setSignal(const int& signal);
-		//int negative();
-
-		//其他辅助操作
-		int do_integer_compare(const Integer&, size_t&) const;
-
-		unsigned char backbit() const;
-
-		void FromString10(const ::std::string & c);
-		void FromString2(const ::std::string & c);
-		void FromString8(const ::std::string & c);
-		void FromString16(const ::std::string & c);
 
 	}; // class
 
