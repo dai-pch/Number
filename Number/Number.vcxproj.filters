@@ -33,12 +33,18 @@
     <ClInclude Include="Functional.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="UInteger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Integer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Real.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UInteger.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
