@@ -52,6 +52,8 @@ namespace Number {
 		~Integer() {}
 
 		// 赋值操作
+		Integer& operator=(const Integer&);
+		Integer& operator=(Integer&&);
 		//无符号整数
 		template<typename UIntType>
 		typename ::std::enable_if_t<
@@ -117,19 +119,6 @@ namespace Number {
 
 		Integer(const ::std::vector<save_type>& Number, char Signal = 1);
 		Integer(::std::vector<save_type>&& Number, char Signal = 1);
-
-		template<typename T>
-		void SetNumber(const T &num)
-		{
-			T temp = num;
-			_numvec.clear();
-			do {
-				save_type lowbyte, highbyte;
-				Number::detail::CalcTypeToSaveType(temp, highbyte, lowbyte);
-				_numvec.push_back(lowbyte);
-				temp = static_cast<T>(highbyte);
-			} while (temp != 0);
-		}
 
 		int setSignal(const int& signal);
 

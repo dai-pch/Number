@@ -16,17 +16,33 @@ namespace Number {
 		}
 		Real(::std::vector<save_type> vec, signal_type sig = 1) :_number(vec), _signal(sig){}
 		explicit Real(const Integer& inte);
+		explicit Real(const UInteger& inte);
 		//从整数构造
 		template<typename T>
 		explicit Real(const T& Number, typename ::std::enable_if<
 			::std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
 		//从浮点数构造
-		explicit Real(const float& Number) {
+		explicit Real(float Number) {
 			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
 		}
-		explicit Real(const double& Number) {
+		explicit Real(double Number) {
 			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
 		}
+
+		//赋值
+		Real& operator=(const Real&);
+		Real& operator=(Real&&);
+		Real& operator=(const Integer&);
+		Real& operator=(const UInteger&);
+		template<typename IntType>
+		typename ::std::enable_if_t<::std::is_integral<IntType>::value, Real>& 
+			operator=(IntType src) {
+			*this = Integer(src);
+			return *this;
+		}
+		Real& operator=(float src);
+		Real& operator=(double src);
+		
 
 		//比较函数
 		int Compare(const Real&) const;

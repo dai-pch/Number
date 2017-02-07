@@ -7,6 +7,18 @@ using ::std::vector;
 namespace Number {
 	UInteger::UInteger(const UInteger& src) : _number(src._number) {}
 
+	UInteger & UInteger::operator=(const UInteger &src)
+	{
+		_number = src._number;
+		return *this;
+	}
+
+	UInteger & UInteger::operator=(UInteger &&src)
+	{
+		_number.swap(src._number);
+		return *this;
+	}
+
 	UInteger::UInteger(const vector<save_type>& src) : _number(src) {}
 	UInteger::UInteger(vector<save_type>&& src) 
 		: _number(::std::forward<vector<save_type>>(src)) {}

@@ -23,6 +23,20 @@ namespace Number {
 		return _signal = signal >= 0 ? 1 : -1;
 	}
 
+	Integer & Integer::operator=(const Integer &src)
+	{
+		_number = src._number;
+		_signal = src._signal;
+		return *this;
+	}
+
+	Integer & Integer::operator=(Integer &&src)
+	{
+		_number = ::std::forward<UInteger>(src._number);
+		_signal = src._signal;
+		return *this;
+	}
+
 	int Integer::Compare(const Integer &Obj2) const
 	{
 		if (_number._number[0] == 0 && Obj2._number._number[0] == 0)

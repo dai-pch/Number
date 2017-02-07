@@ -25,6 +25,8 @@ namespace Number {
 		~UInteger() = default;
 
 		// 赋值操作
+		UInteger& operator=(const UInteger&);
+		UInteger& operator=(UInteger&&);
 		//无符号整数
 		template<typename UIntType>
 		typename ::std::enable_if_t<

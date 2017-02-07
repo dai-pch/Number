@@ -10,7 +10,25 @@ namespace Number {
 
 	size_t Real::default_precision = 96;
 
-	Real::Real(const Integer& Obj): _number(Obj._number._number), _signal(Obj._signal) {}
+	Real::Real(const Integer& Obj): _number(Obj._number._number), _signal(Obj._signal) {
+		while (0);
+	}
+
+	Real & Real::operator=(const Real &src)
+	{
+		_number = (src._number);
+		_signal = src._signal;
+		_exp = src._exp;
+		return *this;
+	}
+
+	Real &Real::operator=(Real &&src)
+	{
+		_number = ::std::forward<UInteger>(src._number);
+		_signal = src._signal;
+		_exp = src._exp;
+		return *this;
+	}
 
 	int Real::Compare(const Real& number2) const
 	{
