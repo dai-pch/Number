@@ -172,6 +172,97 @@ namespace Number {
 		return UInteger(result);
 	}
 
+	::std::string UInteger::ToString10() const
+	{
+#define TO_STRING_10_BIT_ONCE 8
+#define TO_STRING_MOD_ONCE (static_cast<unsigned int>(::std::pow(10, TO_STRING_10_BIT_ONCE)))
+
+		::std::string result;
+		if (_number.back() == 0)
+		{
+			result.push_back('0');
+			return result;
+		}
+
+		UInteger q = *this, mod, q_tmp;
+		do
+		{
+			Devide(q, UInteger(TO_STRING_MOD_ONCE), mod, q_tmp);
+			q = q_tmp;
+			save_type temp = mod._number[0];
+			if (q != (unsigned)0) {
+				for (size_t ii = 0;ii < TO_STRING_10_BIT_ONCE;ii++) {
+					result.push_back('0' + temp % 10);
+					temp /= 10;
+				}
+			}
+			else {
+				size_t ii = 0;
+				do {
+					result.push_back('0' + temp % 10);
+					temp /= 10;
+				} while (ii < TO_STRING_10_BIT_ONCE && temp != 0);
+			}
+		} while (q != (unsigned)0);
+		::std::reverse(result.begin(), result.end());
+		return result;
+	}
+
+	char NumberToChar(const unsigned ch)
+	{
+		if (ch >= 0 && ch < 10)
+			return (static_cast<char>(ch) + '0');
+		else if (ch >= 10 && ch <= 15)
+			return (static_cast<char>(ch) + 'A' - 10);
+		else
+			throw ::std::logic_error("Wrong Number when convert number to char.");
+	}
+
+	::std::string UInteger::ToString16() const
+	{
+		::std::string result;
+
+		if (_number.back() == 0)
+		{
+			result = "0x0";
+			return result;
+		}
+		result.append("0x");
+
+		auto it = _number.crbegin();
+		save_type temp = *(it++);
+		assert(temp != 0);
+		unsigned int jj = 0;
+		while (!(temp & ((save_type)15 << (BIT_NUMBER - 4))))
+		{
+			temp <<= 4;
+			jj++;
+		}
+		for (;jj < 8;jj++)
+		{
+			result.push_back(
+				NumberToChar(
+					static_cast<unsigned int>(
+					(temp & ((save_type)15 << (BIT_NUMBER - 4))) >> (BIT_NUMBER - 4)
+						)));
+			temp <<= 4;
+		}
+		for (;it != _number.crend();it++)
+		{
+			temp = *it;
+			for (jj = 0;jj < 8;jj++)
+			{
+				result.push_back(
+					NumberToChar(
+						static_cast<unsigned int>(
+						(temp & ((save_type)15 << (BIT_NUMBER - 4))) >> (BIT_NUMBER - 4)
+							)));
+				temp <<= 4;
+			}
+		}
+		return result;
+	}
+
 	//除法
 	void devide_Knuth(const vector<save_type>& src1, const vector<save_type>& src2,
 		vector<save_type>& mod, vector<save_type>& quotient) {
@@ -301,6 +392,16 @@ namespace Number {
 		return UInteger(result);
 	}
 
+	unsigned CharToNumber(const char& ch)
+	{
+		if (ch >= '0' && ch <= '9')
+			return (ch - '0');
+		else if (ch >= 'a' && ch <= 'f')
+			return (ch - 'a' + 10);
+		else
+			return (ch - 'A' + 10);
+	}
+
 	UInteger UInteger::Power(const UInteger & exp) const
 	{
 		UInteger result((unsigned)1), base(_number);
@@ -309,5 +410,171 @@ namespace Number {
 		}
 		return UInteger(result);
 	}
+
+	void UInteger::FromString10(const ::std::string &c) {
+		assert(c[0] != '0' || c.length() == 1);
+		auto it = c.cbegin(), end = c.cend();
+
+		UInteger result;
+		for (;it != end;it++)
+		{
+			result = (result << 3) + (result << 1);
+			result = result + CharToNumber(*it);
+		}
+		result._number.swap(_number);
+	}
+
+	void UInteger::FromString2(const ::std::string &c) {
+		assert(c[0] != '0' || c.length() == 1);
+		auto it = c.crbegin(), end = c.crend();
+
+		vector<save_type> result;
+		do {
+			save_type temp = 0;
+			for (int jj = 0;jj < 32 && it != end;++it, ++jj)
+			{
+				temp += (CharToNumber(*it) << jj);
+			}
+			result.push_back(temp);
+		} while (it != end);
+		_number.swap(result);
+	}
+
+	void UInteger::FromString8(const ::std::string &c) {
+		assert(c[0] != '0' || c.length() == 1);
+		auto it = c.cbegin(), end = c.cend();
+
+		UInteger result;
+		for (;it != end;it++)
+		{
+			result = result << 3;
+			result = result + CharToNumber(*it);
+		}
+		result._number.swap(_number);
+	}
+
+	void UInteger::FromString16(const ::std::string &c) {
+		assert(c[0] != '0' || c.length() == 1);
+		auto it = c.crbegin(), end = c.crend();
+
+		vector<save_type> result;
+		do {
+			save_type temp = 0;
+			for (int jj = 0;jj < 8 && it != end;++it, ++jj)
+			{
+				temp += (CharToNumber(*it) << (4 * jj));
+			}
+			result.push_back(temp);
+		} while (it != end);
+		_number.swap(result);
+	}
+
+#define Number_UInteger_Parse_B 2
+#define Number_UInteger_Parse_O 8
+#define Number_UInteger_Parse_H 16
+#define Number_UInteger_Parse_D 4
+
+#define EXPECT(it, ch) do{ \
+if (*(it++) != (ch) \
+	throw std::runtime_error("Invalid char."); \
+}
+
+	bool IsCharB(char c) {
+		return (c >= '0' && c <= '1');
+	}
+
+	bool IsCharO(char c) {
+		return (c >= '0' && c <= '7');
+	}
+
+	bool IsCharD(char c) {
+		return (c >= '0' && c <= '9');
+	}
+
+	bool IsCharH(char c) {
+		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+	}
+
+	int IntegerParseNumber(::std::string::const_iterator &SrcIt, ::std::string &c, decltype(IsCharB) fun, int Ret) {
+		if (!fun(*SrcIt))
+			throw std::runtime_error("Invalid char.");
+		//跳过前导零
+		while (*SrcIt == '0')
+			++SrcIt;
+		if (!fun(*SrcIt))
+			--SrcIt;
+
+		c.clear();
+		while (fun(*SrcIt)) {
+			c.push_back(*(SrcIt++));
+		}
+		return Ret;
+	}
+
+	int IntegerParse2(::std::string::const_iterator &SrcIt, ::std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharB, Number_UInteger_Parse_B);
+	}
+
+	int IntegerParse8(::std::string::const_iterator &SrcIt, ::std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharO, Number_UInteger_Parse_O);
+	}
+
+	int IntegerParse16(::std::string::const_iterator &SrcIt, ::std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharH, Number_UInteger_Parse_H);
+	}
+
+	int IntegerParse10(::std::string::const_iterator &SrcIt, ::std::string &c) {
+		return IntegerParseNumber(SrcIt, c, IsCharD, Number_UInteger_Parse_D);
+	}
+
+	int IntegerParseZero(::std::string::const_iterator &SrcIt, ::std::string &c) {
+		switch (*SrcIt) {
+		case 'b': case 'B': return IntegerParse2(++SrcIt, c);
+		case 'o': case 'O': return IntegerParse8(++SrcIt, c);
+		case 'x': case 'X': return IntegerParse16(++SrcIt, c);
+		default:
+			::std::string c = "0";
+			return Number_UInteger_Parse_D;
+		}
+	}
+
+	int IntegerParseValue(::std::string::const_iterator &SrcIt, ::std::string &c) {
+
+		switch (*SrcIt) {
+		case '0': return IntegerParseZero(++SrcIt, c);
+		default:  return IntegerParse10(SrcIt, c);
+		}
+	}
+
+	//从字符串输入数值
+	//支持2，8，10，16进制
+	//词法规则：((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|(num10 num10*))
+	int UInteger::Parse(::std::string str)
+	{
+		try {
+			if (str.back() != '\0')
+				str.push_back('\0');
+			auto it = str.begin();
+			::std::string c;
+
+			int res = IntegerParseValue(it, c);
+
+			if (*it != '\0')
+				return Number_Parse_Failed;
+
+			switch (res) {
+			case Number_UInteger_Parse_B:  this->FromString2(c);  break;
+			case Number_UInteger_Parse_O:  this->FromString8(c);  break;
+			case Number_UInteger_Parse_D:  this->FromString10(c); break;
+			case Number_UInteger_Parse_H:  this->FromString16(c); break;
+			}
+			return Number_Parse_OK;
+		}
+		catch (std::exception)
+		{
+			return Number_Parse_Failed;
+		}
+	}
+
 
 } // namespace Number

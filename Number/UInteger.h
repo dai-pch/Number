@@ -89,11 +89,6 @@ namespace Number {
 			} while (num != 0);
 		}
 
-		//int negative();
-
-		//ÆäËû¸¨Öú²Ù×÷
-		int do_integer_compare(const UInteger&, size_t&) const;
-
 		void FromString10(const ::std::string & c);
 		void FromString2(const ::std::string & c);
 		void FromString8(const ::std::string & c);
