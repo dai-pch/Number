@@ -59,7 +59,7 @@ namespace Number {
 
 		int Parse(::std::string);
 
-		size_t get_digit_number() const;
+		size_t size() const;
 		//save_type get_highest_digit() const;
 
 		//ÊäÈëÊä³ö

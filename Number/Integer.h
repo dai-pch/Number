@@ -58,7 +58,7 @@ namespace Number {
 			::std::is_integral<UIntType>::value && ::std::is_unsigned<UIntType>::value, Integer>&
 			operator = (const UIntType& Source)
 		{
-			this->SetNumber(Source);
+			_number = Source;
 			return *this;
 		}
 		//有符号整数
@@ -68,7 +68,7 @@ namespace Number {
 			operator = (const IntType& Source)
 		{
 			::std::make_unsigned_t<IntType> temp = (Source < 0 ? (_signal = -1, -Source) : Source);
-			this->SetNumber(temp);
+			_number = temp;
 			return *this;
 		}
 		//比较运算
@@ -98,7 +98,7 @@ namespace Number {
 
 		int Parse(::std::string);
 
-		size_t get_digit_number() const;
+		size_t size() const;
 		//save_type get_highest_digit() const;
 
 		//输入输出
@@ -113,6 +113,7 @@ namespace Number {
 	private:
 		char _signal = 1;
 		UInteger _number{ (unsigned)0 };
+		::std::vector<save_type>& _numvec = _number._number;
 
 		Integer(const ::std::vector<save_type>& Number, char Signal = 1);
 		Integer(::std::vector<save_type>&& Number, char Signal = 1);
@@ -121,11 +122,11 @@ namespace Number {
 		void SetNumber(const T &num)
 		{
 			T temp = num;
-			_number.clear();
+			_numvec.clear();
 			do {
 				save_type lowbyte, highbyte;
 				Number::detail::CalcTypeToSaveType(temp, highbyte, lowbyte);
-				_number.push_back(lowbyte);
+				_numvec.push_back(lowbyte);
 				temp = static_cast<T>(highbyte);
 			} while (temp != 0);
 		}

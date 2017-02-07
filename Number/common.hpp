@@ -32,10 +32,10 @@ namespace Number { namespace detail {
 	//逐位比较绝对值大小
 	inline int _compare_by_digit(::std::vector<save_type>::const_reverse_iterator it1,
 		::std::vector<save_type>::const_reverse_iterator it2,
-		size_t digit_num, size_t& NonEqualPosition)
+		size_t digit_num)
 	{
-		NonEqualPosition = 0;
-		while (NonEqualPosition < digit_num) {
+		size_t ii = 0;
+		while (ii < digit_num) {
 			if (*it1 < *it2) {
 				return -1;
 			}
@@ -44,27 +44,9 @@ namespace Number { namespace detail {
 			}
 			++it1;
 			++it2;
-			++NonEqualPosition;
+			++ii;
 		}
 		return 0;
-	}
-
-	inline int _compare(::std::vector<save_type>::const_reverse_iterator it1,
-		::std::vector<save_type>::const_reverse_iterator it2,
-		size_t digit_num, exp_type exp1, exp_type exp2, char signal1,
-		char signal2, size_t &NonEqualPosition) {
-		//两数均为零时有符号问题，单独考虑
-		if (*it1 == 0 && *it2 == 0)
-			return 0;
-		//符号不同直接判断
-		if (signal1 != signal2)
-			return static_cast<int>(signal1 - signal2);
-		//位数不同直接判断
-		if (exp1 != exp2)
-			return signal1 * (exp1 - exp2);
-		//逐位比较绝对值大小
-		return signal1 * detail::_compare_by_digit(it1,
-			it2, digit_num, NonEqualPosition);
 	}
 
 	inline ::std::vector<save_type> multiply_vec(const ::std::vector<save_type>& number1,
@@ -114,10 +96,10 @@ namespace Number { namespace detail {
 			exp_sh += BIT_NUMBER;
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
-		res.clear();
-		res.push_back(temp & MASK_CODE);
-		if (temp >> BIT_NUMBER != 0)
-			res.push_back(temp >> BIT_NUMBER);
+		auto it = res.rbegin(), end = res.rend();
+		*(it++) = (temp & MASK_CODE);
+		if (temp >> BIT_NUMBER != 0 && it != end)
+			*it = (temp >> BIT_NUMBER);
 	}
 
 	inline void convertFloatingToInteger(double number, signal_type& sig, ::std::vector<save_type>& res,
@@ -141,12 +123,12 @@ namespace Number { namespace detail {
 		save_type temp_h = static_cast<save_type>(temp >> (BIT_NUMBER - exp_sh));
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
-		res.clear();
-		res.push_back(temp & MASK_CODE);
-		if (temp_h != 0 || (temp >> BIT_NUMBER != 0))
-			res.push_back(temp >> BIT_NUMBER);
-		if (temp_h != 0)
-			res.push_back(temp_h);
+		auto it = res.rbegin(), end = res.rend();
+		*(it++) = (temp & MASK_CODE);
+		if ((temp_h != 0 || (temp >> BIT_NUMBER != 0)) && it != end)
+			*(it++) = (temp >> BIT_NUMBER);
+		if (temp_h != 0 && it != end)
+			*it = temp_h;
 	}
 
 	inline void NumberParseSignal(::std::string::const_iterator &SrcIt, char& Signal) {

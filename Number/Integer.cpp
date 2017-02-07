@@ -23,18 +23,6 @@ namespace Number {
 		return _signal = signal >= 0 ? 1 : -1;
 	}
 
-	//除去可能的高位的零
-	void eraseZero(vector<save_type> &vec) {
-		auto it_re = vec.rbegin();
-		size_t counter = 0;
-		while ((it_re != vec.rend() - 1) && *it_re == 0)
-		{
-			++counter;
-			++it_re;
-		}
-		vec.erase(vec.end() - counter, vec.end());
-	}
-
 	int Integer::Compare(const Integer &Obj2) const
 	{
 		if (_number._number[0] == 0 && Obj2._number._number[0] == 0)
@@ -142,7 +130,7 @@ namespace Number {
 		return _number.Parse(str);
 	}
 
-	size_t Integer::get_digit_number() const
+	size_t Integer::size() const
 	{
 		return _number._number.size();
 	}

@@ -13,11 +13,11 @@ namespace Number {
 
 	int UInteger::Compare(const UInteger &Obj2) const
 	{
-		size_t size1 = _number.size(), size2 = Obj2._number.size(), temp;
+		size_t size1 = _number.size(), size2 = Obj2._number.size();
 		//位数不同直接判断
 		if (size1 != size2)
 			return (size1 - size2);
-		return detail::_compare_by_digit(this->_number.crbegin(), Obj2._number.crbegin(), size1, temp);
+		return detail::_compare_by_digit(this->_number.crbegin(), Obj2._number.crbegin(), size1);
 	}
 
 	vector<save_type> shift_left(const vector<save_type>& src, int num) {
@@ -344,7 +344,7 @@ namespace Number {
 	//使用Knuth算法
 	void Devide(const UInteger& Obj1, const UInteger& Obj2, UInteger& mod, UInteger& quotient)
 	{
-		assert(Obj2 != (unsigned)0);
+		assert(Obj2._number.back() != 0);
 		//如果被除数小于除数，直接返回结果
 		if (Obj1 < Obj2)
 		{
@@ -591,7 +591,7 @@ if (*(it++) != (ch) \
 		return is;
 	}
 
-	size_t UInteger::get_digit_number() const
+	size_t UInteger::size() const
 	{
 		return _number.size();
 	}

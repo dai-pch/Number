@@ -3,6 +3,7 @@
 #define _NUMBER_REAL_H__
 
 #include "Number.h"
+#include "UInteger.h"
 
 namespace Number {
 	class Real {
@@ -21,10 +22,10 @@ namespace Number {
 			::std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
 		//从浮点数构造
 		explicit Real(const float& Number) {
-			detail::convertFloatingToInteger(Number, _signal, _number, _exp);
+			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
 		}
 		explicit Real(const double& Number) {
-			detail::convertFloatingToInteger(Number, _signal, _number, _exp);
+			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
 		}
 
 		//比较函数
@@ -59,15 +60,17 @@ namespace Number {
 	private:
 		static size_t default_precision;
 		char _signal{ 1 };
-		::std::vector<save_type> _number =
-			::std::vector<save_type>((default_precision - 1) / BIT_NUMBER + 2, 0);
+		UInteger _number =
+			UInteger(::std::vector<save_type>((default_precision - 1) / BIT_NUMBER + 2, 0));
 		exp_type _exp{ 0 }; // radix is MODULE
 
+		std::vector<save_type>& _numvec = _number._number;
+
 		inline void RealParseF(::std::string::const_iterator it,
-			::std::string::const_iterator end, ::std::vector<save_type>& f,
+			const ::std::string::const_iterator end, ::std::vector<save_type>& f,
 			exp_type& e);
 		inline void RealParseExp(::std::string::const_iterator it,
-			::std::string::const_iterator end, exp_type& e);
+			const ::std::string::const_iterator end, exp_type& e);
 
 	public:
 		
