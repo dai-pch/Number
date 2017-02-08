@@ -558,29 +558,34 @@ if (*(it++) != (ch) \
 		}
 	}
 
+	int UInteger::_parse(::std::string::const_iterator & it)
+	{
+		::std::string c;
+
+		int res = IntegerParseValue(it, c);
+
+		if (*it != '\0')
+			return Number_Parse_Failed;
+
+		switch (res) {
+		case Number_UInteger_Parse_B:  this->FromString2(c);  break;
+		case Number_UInteger_Parse_O:  this->FromString8(c);  break;
+		case Number_UInteger_Parse_D:  this->FromString10(c); break;
+		case Number_UInteger_Parse_H:  this->FromString16(c); break;
+		}
+		return Number_Parse_OK;
+	}
+
 	//从字符串输入数值
 	//支持2，8，10，16进制
 	//词法规则：((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|(num10 num10*))
 	int UInteger::Parse(::std::string str)
 	{
 		try {
-			if (str.back() != '\0')
+			if (str.empty() || str.back() != '\0')
 				str.push_back('\0');
-			auto it = str.begin();
-			::std::string c;
-
-			int res = IntegerParseValue(it, c);
-
-			if (*it != '\0')
-				return Number_Parse_Failed;
-
-			switch (res) {
-			case Number_UInteger_Parse_B:  this->FromString2(c);  break;
-			case Number_UInteger_Parse_O:  this->FromString8(c);  break;
-			case Number_UInteger_Parse_D:  this->FromString10(c); break;
-			case Number_UInteger_Parse_H:  this->FromString16(c); break;
-			}
-			return Number_Parse_OK;
+			auto it = str.cbegin();
+			return _parse(it);
 		}
 		catch (std::exception)
 		{

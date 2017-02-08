@@ -96,10 +96,11 @@ namespace Number { namespace detail {
 			exp_sh += BIT_NUMBER;
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
-		auto it = res.rbegin(), end = res.rend();
-		*(it++) = (temp & MASK_CODE);
-		if (temp >> BIT_NUMBER != 0 && it != end)
-			*it = (temp >> BIT_NUMBER);
+		res.clear();
+		res.push_back(temp & MASK_CODE);
+		if (temp >> BIT_NUMBER != 0) {
+			res.push_back(temp >> BIT_NUMBER);
+		}
 	}
 
 	inline void convertFloatingToInteger(double number, signal_type& sig, ::std::vector<save_type>& res,
@@ -123,12 +124,12 @@ namespace Number { namespace detail {
 		save_type temp_h = static_cast<save_type>(temp >> (BIT_NUMBER - exp_sh));
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
-		auto it = res.rbegin(), end = res.rend();
-		*(it++) = (temp & MASK_CODE);
-		if ((temp_h != 0 || (temp >> BIT_NUMBER != 0)) && it != end)
-			*(it++) = (temp >> BIT_NUMBER);
-		if (temp_h != 0 && it != end)
-			*it = temp_h;
+		res.clear();
+		res.push_back(temp & MASK_CODE);
+		if ((temp_h != 0 || (temp >> BIT_NUMBER != 0)))
+			res.push_back(temp >> BIT_NUMBER);
+		if (temp_h != 0)
+			res.push_back(temp_h);
 	}
 
 	inline void NumberParseSignal(::std::string::const_iterator &SrcIt, char& Signal) {

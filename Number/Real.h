@@ -9,24 +9,30 @@ namespace Number {
 	class Real {
 	public:
 		//构造函数
-		Real(size_t precision = default_precision) :_number((precision - 1) / BIT_NUMBER + 2, 0) {} //空构造
+		Real() 
+			:_number(std::vector<save_type>((default_precision - 1) / BIT_NUMBER + 2, 0)) {} //空构造
 		Real(const Real&) = default; //拷贝构造
 		Real(const Real& real, size_t precision) :Real(real) {
 			this->SetPrecision(precision);
 		}
 		Real(::std::vector<save_type> vec, signal_type sig = 1) :_number(vec), _signal(sig){}
-		explicit Real(const Integer& inte);
-		explicit Real(const UInteger& inte);
+		explicit Real(const Integer& inte, size_t precision = default_precision);
+		explicit Real(const UInteger& inte, size_t precision = default_precision);
 		//从整数构造
 		template<typename T>
-		explicit Real(const T& Number, typename ::std::enable_if<
-			::std::is_integral<T>::value>::type* = nullptr) :Real(Integer(Number)){}
-		//从浮点数构造
-		explicit Real(float Number) {
-			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
+		explicit Real(const T& Number, size_t precision = default_precision,
+			typename ::std::enable_if<::std::is_integral<T>::value>::type* = nullptr)
+			:Real(Integer(Number)){
+			SetPrecision(precision);
 		}
-		explicit Real(double Number) {
+		//从浮点数构造
+		explicit Real(float Number, size_t precision = default_precision) {
 			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
+			SetPrecision(precision);
+		}
+		explicit Real(double Number, size_t precision = default_precision) {
+			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
+			SetPrecision(precision);
 		}
 
 		//赋值
@@ -82,13 +88,13 @@ namespace Number {
 
 		std::vector<save_type>& _numvec = _number._number;
 
+	private:
 		inline void RealParseF(::std::string::const_iterator it,
 			const ::std::string::const_iterator end, ::std::vector<save_type>& f,
 			exp_type& e);
 		inline void RealParseExp(::std::string::const_iterator it,
 			const ::std::string::const_iterator end, exp_type& e);
-
-	public:
+		void Normalize(size_t n);
 		
 	}; // class
 

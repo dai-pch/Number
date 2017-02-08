@@ -10,8 +10,14 @@ namespace Number {
 
 	size_t Real::default_precision = 96;
 
-	Real::Real(const Integer& Obj): _number(Obj._number._number), _signal(Obj._signal) {
-		while (0);
+	Real::Real(const Integer& Obj, size_t precision)
+		: _number(Obj._number._number), _signal(Obj._signal) {
+		SetPrecision(precision);
+	}
+
+	Real::Real(const UInteger& Obj, size_t precision)
+		: _number(Obj._number), _signal(1) {
+		SetPrecision(precision);
 	}
 
 	Real & Real::operator=(const Real &src)
@@ -104,6 +110,25 @@ namespace Number {
 			throw ::std::runtime_error("Invalid format of floating point number.");
 	}
 
+	void Real::Normalize(size_t precision)
+	{
+		int diff = _number.size() - precision;
+		if (diff == 0)
+			return;
+		else if (diff > 0) {
+			_numvec.erase(_numvec.cbegin(), _numvec.cbegin() + diff);
+		}
+		else {
+			vector<save_type> temp(precision);
+			std::copy(_numvec.crbegin(), _numvec.crend(), temp.rbegin());
+			_numvec.swap(temp);
+		}
+		if (_numvec.back() != 0)
+			_exp += diff;
+		else
+			_exp = 0;
+	}
+
 	inline void AlgorithmM(const UInteger& f, const exp_type e, UInteger& m, exp_type& k) {
 		UInteger u, v;
 		if (e < 0) {
@@ -144,14 +169,7 @@ namespace Number {
 	void Real::SetPrecision(size_t precision)
 	{
 		precision = (precision - 1) / BIT_NUMBER + 2;
-		if (_number.size() > precision) {
-			auto it = _numvec.begin() + (_number.size() - precision);
-			_numvec.erase(_numvec.begin(), it);
-		}
-		else 
-			while(_number.size() < precision) {
-				_numvec.push_back(0);
-			}
+		Normalize(precision);
 	}
 
 	size_t Real::GetPrecision()

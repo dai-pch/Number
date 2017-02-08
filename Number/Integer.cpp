@@ -39,7 +39,7 @@ namespace Number {
 
 	int Integer::Compare(const Integer &Obj2) const
 	{
-		if (_number._number[0] == 0 && Obj2._number._number[0] == 0)
+		if (_numvec.back() == 0 && Obj2._numvec.back() == 0)
 			return 0;
 		//符号不同直接判断
 		else if (_signal != Obj2._signal)
@@ -116,17 +116,21 @@ namespace Number {
 	}
 
 	string Integer::ToString10() const {
-		string result = _number.ToString10();
-		if (_signal < 0)
-			result += "-";
+		string result;
+		if (_signal < 0 && _numvec.back() != 0)
+			result = '-' + _number.ToString10();
+		else
+			result = _number.ToString10();
 		return result;
 	}
 
 	::std::string Integer::ToString16() const
 	{
-		string result = _number.ToString16();
-		if (_signal < 0)
-			result += "-";
+		string result;
+		if (_signal < 0 && _numvec.back() != 0)
+			result = '-' + _number.ToString16();
+		else
+			result = _number.ToString16();
 		return result;
 	}
 
@@ -135,13 +139,17 @@ namespace Number {
 	//词法规则：(+|-|ε)((0b num2 num2*)|(0o num8 num8*)|(0x num16 num16*)|(num10 num10*))
 	int Integer::Parse(::std::string str)
 	{
-		if (str.back() != '\0')
+		if (str.empty() || str.back() != '\0')
 			str.push_back('\0');
 		auto it = str.cbegin();
-		//处理符号
-		detail::NumberParseSignal(it, _signal);
-		str.erase(it);
-		return _number.Parse(str);
+		try {
+			//处理符号
+			detail::NumberParseSignal(it, _signal);
+			return _number._parse(it);
+		}
+		catch (std::exception) {
+			return Number_Parse_Failed;
+		}
 	}
 
 	size_t Integer::size() const

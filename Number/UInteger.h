@@ -96,6 +96,8 @@ namespace Number {
 		void FromString8(const ::std::string & c);
 		void FromString16(const ::std::string & c);
 
+		int _parse(::std::string::const_iterator& it);
+
 	}; // class
 
 	   // compare operator
