@@ -42,14 +42,18 @@ namespace Number {
 		const unsigned int num_i = num / (BIT_NUMBER);
 		auto size = src.size();
 		vector<save_type> result(size + num_i);
-
-		result[num_i] = src[0] << num_s;
-		for (decltype(size) ii = 1; ii < size; ii++)
-		{
-			result[ii + num_i] = (src[ii] << num_s) | (src[ii - 1] >> num_sr);
+		
+		if (num_s == 0)
+			::std::copy(src.crbegin(), src.crend(), result.rbegin());
+		else {
+			result[num_i] = src[0] << num_s;
+			for (decltype(size) ii = 1; ii < size; ii++)
+			{
+				result[ii + num_i] = (src[ii] << num_s) | (src[ii - 1] >> num_sr);
+			}
+			if ((src.back() >> num_sr) != 0)
+				result.push_back(src[size - 1] >> num_sr);
 		}
-		if ((src[size - 1] >> num_sr) != 0)
-			result.push_back(src[size - 1] >> num_sr);
 		return result;
 	}
 
@@ -64,14 +68,18 @@ namespace Number {
 		if (num_d >= size)
 			return vector<save_type>{0};
 		vector<save_type> result(size - num_d);
-		for (unsigned int ii = 0;ii < size - num_d - 1;ii++)
-		{
-			result[ii] = (src[ii + num_d] >> num_s) | (src[ii + num_d + 1] << num_sr);
-		}
-		result[size - num_d - 1] = src[size - 1] >> num_s;
+		if (num_s == 0)
+			::std::copy(src.crbegin(), src.crend() - num_d, result.rbegin());
+		else {
+			for (unsigned int ii = 0;ii < size - num_d - 1;ii++)
+			{
+				result[ii] = (src[ii + num_d] >> num_s) | (src[ii + num_d + 1] << num_sr);
+			}
+			result[size - num_d - 1] = src[size - 1] >> num_s;
 
-		if (result.back() == 0 && size != 1)
-			result.pop_back();
+			if (result.back() == 0 && size != 1)
+				result.pop_back();
+		}
 		return result;
 	}
 
@@ -385,23 +393,9 @@ namespace Number {
 		return;
 	}
 
-	void _power(UInteger& result, UInteger& base, save_type exp) {
-		for (unsigned ii = 0;ii < BIT_NUMBER;++ii) {
-			if ((exp & 1) == 1) {
-				result = result * base;
-			}
-			base = base * base;
-			exp >>= 1;
-		}
-		assert(exp == 0);
-	}
-
-	UInteger UInteger::Power(const save_type exp) const
+	bool IsEven(const UInteger& num)
 	{
-		UInteger result((unsigned)1);
-		UInteger base(_number);
-		_power(result, base, exp);
-		return UInteger(result);
+		return !(bool)(num._number[0] & 1);
 	}
 
 	unsigned CharToNumber(const char& ch)
@@ -412,15 +406,6 @@ namespace Number {
 			return (ch - 'a' + 10);
 		else
 			return (ch - 'A' + 10);
-	}
-
-	UInteger UInteger::Power(const UInteger & exp) const
-	{
-		UInteger result((unsigned)1), base(_number);
-		for (save_type ele : exp._number) {
-			_power(result, base, ele);
-		}
-		return UInteger(result);
 	}
 
 	void UInteger::FromString10(const ::std::string &c) {

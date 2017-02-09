@@ -143,5 +143,11 @@ namespace Number { namespace detail {
 			++SrcIt;
 	}
 
-};
-};
+}; // detail
+
+template<typename IntType>
+inline bool IsEven(IntType num, ::std::void_t<decltype(num & 0)>* = nullptr) {
+	return !(bool)(num & 1);
+}
+
+}; // Number

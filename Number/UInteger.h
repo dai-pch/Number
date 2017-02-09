@@ -68,9 +68,27 @@ namespace Number {
 		friend ::std::ostream& operator<<(::std::ostream&, const UInteger&);
 		friend ::std::istream& operator>>(::std::istream&, UInteger&);
 
+		//
+		friend bool IsEven(const UInteger&);
+
 		//其他算数运算
-		UInteger Power(const save_type exp) const;
-		UInteger Power(const UInteger &exp) const;
+		/*UInteger Power(const save_type exp) const;
+		UInteger Power(const UInteger &exp) const;*/
+		template<typename Ty>
+		UInteger Power(Ty exp,
+			::std::void_t<decltype(IsEven(exp)), decltype(exp >> 1)>* = nullptr) const {
+			UInteger result((unsigned)1), base(_number);
+			while (1) {
+				if (!IsEven(exp)) {
+					result = result * base;
+				}
+				if (exp < (unsigned)2)
+					break;
+				base = base * base;
+				exp = exp >> 1;
+			}
+			return result;
+		}
 
 	private:
 		::std::vector<save_type> _number{ 0 };
