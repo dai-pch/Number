@@ -26,20 +26,16 @@ namespace Number {
 			SetPrecision(precision);
 		}
 		//从浮点数构造
-		explicit Real(float Number, size_t precision = default_precision) {
-			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
-			SetPrecision(precision);
-		}
-		explicit Real(double Number, size_t precision = default_precision) {
-			detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
-			SetPrecision(precision);
-		}
+		explicit Real(float number, size_t precision = default_precision);
+		explicit Real(double number, size_t precision = default_precision);
 
 		//赋值
 		Real& operator=(const Real&);
 		Real& operator=(Real&&);
 		Real& operator=(const Integer&);
+		Real& operator=(Integer&&);
 		Real& operator=(const UInteger&);
+		Real& operator=(UInteger&&);
 		template<typename IntType>
 		typename ::std::enable_if_t<::std::is_integral<IntType>::value, Real>& 
 			operator=(IntType src) {
@@ -76,7 +72,7 @@ namespace Number {
 
 		static void SetDefaultPrecision(size_t);
 		static size_t GetDefaultPrecision();
-		void SetPrecision(size_t);
+		void SetPrecision(size_t precision = default_precision);
 		size_t GetPrecision();
 
 	private:
@@ -89,10 +85,10 @@ namespace Number {
 		std::vector<save_type>& _numvec = _number._number;
 
 	private:
-		inline void RealParseF(::std::string::const_iterator it,
-			const ::std::string::const_iterator end, ::std::vector<save_type>& f,
+		inline void RealParseF(::std::string::const_iterator& it,
+			const ::std::string::const_iterator end, UInteger& f,
 			exp_type& e);
-		inline void RealParseExp(::std::string::const_iterator it,
+		inline void RealParseExp(::std::string::const_iterator& it,
 			const ::std::string::const_iterator end, exp_type& e);
 		void Normalize(size_t n);
 		

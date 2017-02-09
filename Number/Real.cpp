@@ -20,6 +20,18 @@ namespace Number {
 		SetPrecision(precision);
 	}
 
+	Real::Real(float Number, size_t precision)
+	{
+		detail::convertFloatingToInteger(Number, _signal, _number._number, _exp);
+		SetPrecision(precision);
+	}
+
+	Real::Real(double number, size_t precision)
+	{
+		detail::convertFloatingToInteger(number, _signal, _number._number, _exp);
+		SetPrecision(precision);
+	}
+
 	Real & Real::operator=(const Real &src)
 	{
 		_number = (src._number);
@@ -33,6 +45,56 @@ namespace Number {
 		_number = ::std::forward<UInteger>(src._number);
 		_signal = src._signal;
 		_exp = src._exp;
+		return *this;
+	}
+
+	Real & Real::operator=(const Integer &number)
+	{
+		_number = number._number;
+		_signal = number._signal;
+		_exp = 0;
+		SetPrecision(default_precision);
+		return *this;
+	}
+
+	Real & Real::operator=(Integer &&number)
+	{
+		_number = ::std::forward<UInteger>(number._number);
+		_signal = number._signal;
+		_exp = 0;
+		SetPrecision(default_precision);
+		return *this;
+	}
+
+	Real & Real::operator=(const UInteger &number)
+	{
+		_number = number;
+		_signal = 1;
+		_exp = 0;
+		SetPrecision(default_precision);
+		return *this;
+	}
+
+	Real & Real::operator=(UInteger &&number)
+	{
+		_number = ::std::forward<UInteger>(number);
+		_signal = 1;
+		_exp = 0;
+		SetPrecision(default_precision);
+		return *this;
+	}
+
+	Real & Real::operator=(float src)
+	{
+		detail::convertFloatingToInteger(src, _signal, _number._number, _exp);
+		SetPrecision(default_precision);
+		return *this;
+	}
+
+	Real & Real::operator=(double src)
+	{
+		detail::convertFloatingToInteger(src, _signal, _number._number, _exp);
+		SetPrecision(default_precision);
 		return *this;
 	}
 
@@ -61,14 +123,19 @@ namespace Number {
 		return _signal < 0 ? -res : res;
 	}
 
+	Real Real::operator-() const
+	{
+		return Real(_numvec, -1);
+	}
+
 
 	::std::string Real::ToString10() const
 	{
 		return ::std::string();
 	}
 
-	void Real::RealParseF(::std::string::const_iterator it,
-		const ::std::string::const_iterator end, vector<save_type>& f,
+	void Real::RealParseF(::std::string::const_iterator& it,
+		const ::std::string::const_iterator end, UInteger& f,
 		exp_type& e) {
 		::std::string f_dec;
 		auto range = ::std::find_if_not(it, end,
@@ -81,14 +148,13 @@ namespace Number {
 			::std::copy(it, range, ::std::back_inserter(f_dec));
 		}
 		e = -(range - it);
+		it = range;
 		//::std::cout << f_dec << ::std::endl;
-		Integer temp;
-		if (temp.Parse(f_dec) == Number_Parse_Failed)
+		if (f.Parse(f_dec) == Number_Parse_Failed)
 			throw ::std::runtime_error("Parse error in number part.");
-		f.swap(temp._number._number);
 	}
 
-	void Real::RealParseExp(::std::string::const_iterator it,
+	void Real::RealParseExp(::std::string::const_iterator& it,
 		const ::std::string::const_iterator end, exp_type& e) {
 		if (*it == 'e' || *it == 'E')
 		{
@@ -97,17 +163,77 @@ namespace Number {
 				[](char c) {return c >= '0' && c <= '9';});
 			if (range != end) // if the exponent part contains invalid char.
 				throw ::std::runtime_error("Invalid charactor in exponential part.");
+			std::copy(it, end, std::back_inserter(exp_dec));
 			Integer temp;
 			if (temp.Parse(exp_dec) == Number_Parse_Failed)
 				throw ::std::runtime_error("Invalid charactor in number part.");
 			if (temp.size() > 1)
 				throw ::std::runtime_error("Overflow or underflow.");
-			e += temp._signal * temp.size();
+			e += temp._signal * temp._numvec[0];
 		}
 		else if (it == end)
 			return;
 		else
 			throw ::std::runtime_error("Invalid format of floating point number.");
+	}
+
+	// Reference: 
+	// Clinger W D. How to read floating point numbers accurately[J].
+	// programming language design and implementation, 1990, 25(6): 92-101.
+	inline void AlgorithmM(const UInteger& f, const exp_type e, size_t prec, UInteger& m, exp_type& k) {
+		UInteger u, v;
+		k = 0;
+		if (e < 0) {
+			u = f;
+			v = UInteger((unsigned)10).Power(e);
+		}
+		else {
+			u = f * UInteger((unsigned)10).Power(e);
+			v = (unsigned)1;
+		}
+		// loop(u v k)
+		UInteger x, r;
+		Devide(u, v, r, x);
+		int diff = x.size() - prec;
+		if (diff >= 1) {
+			v = v << (diff*BIT_NUMBER);
+		}
+		else if (diff < 0) {
+			u = u << ((-diff)*BIT_NUMBER);
+		}
+		k += diff;
+		Devide(u, v, r, x);
+		assert(x.size() == prec);
+
+		if ((r << 1) < v) // err < 1/2 * precision
+			m = x;
+		else if ((r << 1) > v) // err > 1/2 * precision
+			m = x + (unsigned)1;
+		else if (IsEven(x)) // err == 1/2 * precision
+			m = x;
+		else
+			m = x + (unsigned)1;
+	}
+
+	int Real::Parse(const ::std::string& str)
+	{
+		auto it = str.begin(), end = str.end();
+		UInteger f;
+		exp_type e;
+		int res = Number_Parse_OK;
+		auto prec = _number.size();
+		
+		try {
+			detail::NumberParseSignal(it, _signal);
+			RealParseF(it, end, f, e);
+			RealParseExp(it, end, e);
+			AlgorithmM(f, e, prec, _number, _exp);
+			Normalize(prec);
+		}
+		catch (std::exception) {
+			res = Number_Parse_Failed;
+		}
+		return res;
 	}
 
 	void Real::Normalize(size_t precision)
@@ -127,33 +253,6 @@ namespace Number {
 			_exp += diff;
 		else
 			_exp = 0;
-	}
-
-	inline void AlgorithmM(const UInteger& f, const exp_type e, UInteger& m, exp_type& k) {
-		UInteger u, v;
-		if (e < 0) {
-			u = f;
-			
-		}
-	}
-
-	int Real::Parse(const ::std::string& str)
-	{
-		auto it = str.begin(), end = str.end();
-		vector<save_type> f;
-		exp_type e;
-		int res = Number_Parse_OK;
-		
-		try {
-			detail::NumberParseSignal(it, _signal);
-			RealParseF(it, end, f, e);
-			RealParseExp(it, end, e);
-			AlgorithmM(f, e, _number, _exp);
-		}
-		catch (std::exception e) {
-			res = Number_Parse_Failed;
-		}
-		return res;
 	}
 
 	void Real::SetDefaultPrecision(size_t pre)
