@@ -21,6 +21,7 @@ namespace Number {
 			::std::is_integral<UIntType>::value && ::std::is_unsigned<UIntType>::value>* = nullptr) {
 			*this = Source;
 		}
+		explicit operator save_type() const;
 
 		~UInteger() = default;
 

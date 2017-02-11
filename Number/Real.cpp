@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iterator>
 #include <exception>
+#include <sstream>
 
 using ::std::vector;
 
@@ -128,21 +129,118 @@ namespace Number {
 		return Real(_numvec, -1);
 	}
 
+	// Algorthm comes from:
+	// Burger R G, Dybvig R K. Printing floating-point numbers
+	// quickly and accurately[J]. Acm Sigplan Notices, 1996, 31(5):108-116.
+	void _to_radix_10(const UInteger& f, const exp_type e, std::string& m, exp_type k = 0) {
+		// initialize
+		size_t p = f.size();
+		bool even = IsEven(f);
+		UInteger b_p1((unsigned)1),b_e((unsigned)1), r, s, m_u, m_d;
+		b_p1 = b_p1 << (p*BIT_NUMBER);
+		b_e = b_e << (e*BIT_NUMBER);
+		if (e >= 0) {
+			r = (f * b_e) << 1; // r = 2 * f * b^e
+			s = (unsigned)2; // s = 2
+			m_d = m_u = b_e; // m_d = m_u = b^e
+			if (f == b_p1) {
+				r = r << BIT_NUMBER; // r = 2 * f * b^(e+1)
+				s = s << BIT_NUMBER; // s = 2 * b
+				m_u = m_u << BIT_NUMBER; // m_u = b^(e+1)
+			}
+		}
+		else {
+			r = f << 1; // r = 2 * f
+			s = (unsigned)2; 
+			s = s << (-e * BIT_NUMBER); // s = 2 * b^(-e)
+			m_d = m_u = (unsigned)1; // m_d = m_u = 1
+			if (f == b_p1) {
+				r = r << BIT_NUMBER; // r = 2 * f * b
+				s = s << BIT_NUMBER; // s = 2 * b^(-e+1)
+				m_u = m_u << BIT_NUMBER; // m_u = b
+			}
+		}
+
+		// scale
+		UInteger B((unsigned)10);
+		// using k approxmation
+		
+		if (k > 0)
+			s = s * B.Power(k);
+		else if (k < 0) {
+			UInteger B_k = B.Power(-k);
+			r = r * B_k;
+			m_u = m_u * B_k;
+			m_d = m_d * B_k;
+		}
+		// fix
+		while (1) {
+			if (r + m_u >= s) {
+				s = s * B;
+				++k;
+			}
+			else if ((r + m_u)*B < s) {
+				r = r * B;
+				m_u = m_u * B;
+				m_d = m_d * B;
+				--k;
+			}
+			else
+				break;
+		}
+
+		//generate
+		while (1) {
+			UInteger mod;
+			Devide(r * B, s, r, mod);
+			char d = (save_type)mod + '0';
+			m_u = m_u * B;
+			m_d = m_d * B;
+			bool cond1 = r < m_d;
+			bool cond2 = r + m_u > s;
+			if (!cond1 && !cond2)
+				m.push_back(d);
+			else if (cond1 && !cond2) {
+				m.push_back(d);
+				break;
+			}
+			else if (!cond1 && cond2) {
+				m.push_back(d + 1);
+				break;
+			}
+			else {
+				if (r << 1 < s)
+					m.push_back(d);
+				else if (r << 1 > s)
+					m.push_back(d + 1);
+				else
+					m.push_back(((d & 1) == 0) ? d : d + 1);
+				break;
+			}
+		}
+		m.push_back('e');
+		m += Integer(k).ToString10();
+		return;
+	}
 
 	::std::string Real::ToString10() const
 	{
-		return ::std::string();
+		std::string res;
+		res = (_signal > 0) ? "0." : "-0.";
+		_to_radix_10(_number, _exp, res);
+		return res;
 	}
 
 	void Real::RealParseF(::std::string::const_iterator& it,
 		const ::std::string::const_iterator end, UInteger& f,
 		exp_type& e) {
 		::std::string f_dec;
+		it = std::find_if_not(it, end, [](char c) {return c == '0';});
 		auto range = ::std::find_if_not(it, end,
 			[](char c) {return c >= '0' && c <= '9';});
 		::std::copy(it, range, ::std::back_inserter(f_dec));
-		it = range + 1;
-		if (*range == '.') {
+		if (range != end && *range == '.') {
+			it = range + 1;
 			range = ::std::find_if_not(it, end,
 				[](char c) {return c >= '0' && c <= '9';});
 			::std::copy(it, range, ::std::back_inserter(f_dec));
