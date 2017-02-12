@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iterator>
 #include <exception>
-#include <sstream>
+#include <cctype>
 
 using ::std::vector;
 
@@ -223,56 +223,71 @@ namespace Number {
 		return;
 	}
 
+	exp_type _approxmate_k(const vector<save_type>& num, const exp_type e) {
+		exp_type len = 0;
+		auto h = num.back();
+		while (h != 0) {
+			++len;
+			h >>= 1;
+		}
+		len += (e + num.size() - 1) * BIT_NUMBER;
+		len = len / 3.3219280948873623478703194294894; // len / log_2(10)
+		return len;
+	}
+
 	::std::string Real::ToString10() const
 	{
 		std::string res;
+		if (_numvec.back() == 0)
+			return std::string("0.0");
 		res = (_signal > 0) ? "0." : "-0.";
-		_to_radix_10(_number, _exp, res);
+		auto k = _approxmate_k(_numvec, _exp);
+		_to_radix_10(_number, _exp, res, k);
 		return res;
 	}
 
-	void Real::RealParseF(::std::string::const_iterator& it,
-		const ::std::string::const_iterator end, UInteger& f,
-		exp_type& e) {
+	void Real::RealParseF(const char** it, UInteger& f, exp_type& e) {
 		::std::string f_dec;
-		it = std::find_if_not(it, end, [](char c) {return c == '0';});
-		auto range = ::std::find_if_not(it, end,
-			[](char c) {return c >= '0' && c <= '9';});
-		::std::copy(it, range, ::std::back_inserter(f_dec));
-		if (range != end && *range == '.') {
-			it = range + 1;
-			range = ::std::find_if_not(it, end,
-				[](char c) {return c >= '0' && c <= '9';});
-			::std::copy(it, range, ::std::back_inserter(f_dec));
+		const char* p = *it;
+		e = 0;
+		auto isdigit = [](char c) {return c >= '0'&&c <= '9';};
+		while (isdigit(*p)) {
+			f = f * (unsigned)10 + (unsigned)(*p - '0');
+			++p;
 		}
-		e = -(range - it);
-		it = range;
-		//::std::cout << f_dec << ::std::endl;
-		if (f.Parse(f_dec) == Number_Parse_Failed)
-			throw ::std::runtime_error("Parse error in number part.");
+		if (*p == '.')
+		{
+			++p;
+			while (isdigit(*p)) {
+				f = f * (unsigned)10 + (unsigned)(*p - '0');
+				++p;
+				--e;
+			}
+		}
+		*it = p;
 	}
 
-	void Real::RealParseExp(::std::string::const_iterator& it,
-		const ::std::string::const_iterator end, exp_type& e) {
-		if (*it == 'e' || *it == 'E')
+	void Real::RealParseExp(const char** it, exp_type& e) {
+		const char* p = *it;
+		exp_type exp = 0;
+		auto isdigit = [](char c) {return c >= '0'&&c <= '9';};
+		bool isneg = false;
+		if (*p == 'e' || *p == 'E')
 		{
-			::std::string exp_dec;
-			auto range = ::std::find_if_not(++it, end,
-				[](char c) {return c >= '0' && c <= '9';});
-			if (range != end) // if the exponent part contains invalid char.
-				throw ::std::runtime_error("Invalid charactor in exponential part.");
-			std::copy(it, end, std::back_inserter(exp_dec));
-			Integer temp;
-			if (temp.Parse(exp_dec) == Number_Parse_Failed)
-				throw ::std::runtime_error("Invalid charactor in number part.");
-			if (temp.size() > 1)
-				throw ::std::runtime_error("Overflow or underflow.");
-			e += temp._signal * temp._numvec[0];
+			++p;
+			if (*p == '-')
+				isneg = true;
+			if (!isdigit(*p))
+				throw std::runtime_error("Invalid exponiential number.");
+			while (isdigit(*p)) {
+				exp = exp * 10 + *p - '0';
+				++p;
+			}
+			if (isneg)
+				exp = -exp;
 		}
-		else if (it == end)
-			return;
-		else
-			throw ::std::runtime_error("Invalid format of floating point number.");
+		*it = p;
+		e += exp;
 	}
 
 	// Reference: 
@@ -283,7 +298,7 @@ namespace Number {
 		k = 0;
 		if (e < 0) {
 			u = f;
-			v = UInteger((unsigned)10).Power(e);
+			v = UInteger((unsigned)10).Power(-e);
 		}
 		else {
 			u = f * UInteger((unsigned)10).Power(e);
@@ -301,7 +316,7 @@ namespace Number {
 		}
 		k += diff;
 		Devide(u, v, r, x);
-		assert(x.size() == prec);
+		//assert(x.size() == prec);
 
 		if ((r << 1) < v) // err < 1/2 * precision
 			m = x;
@@ -313,9 +328,9 @@ namespace Number {
 			m = x + (unsigned)1;
 	}
 
-	int Real::Parse(const ::std::string& str)
+	int Real::Parse(const char* str)
 	{
-		auto it = str.begin(), end = str.end();
+		const char* it = str;
 		UInteger f;
 		exp_type e;
 		int res = Number_Parse_OK;
@@ -323,8 +338,10 @@ namespace Number {
 		
 		try {
 			detail::NumberParseSignal(it, _signal);
-			RealParseF(it, end, f, e);
-			RealParseExp(it, end, e);
+			RealParseF(&it, f, e);
+			RealParseExp(&it, e);
+			if (*it != '\0')
+				return Number_Parse_Failed;
 			AlgorithmM(f, e, prec, _number, _exp);
 			Normalize(prec);
 		}

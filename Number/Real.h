@@ -64,7 +64,7 @@ namespace Number {
 
 		//转换为字符串
 		::std::string ToString10() const;
-		int Parse(const ::std::string&);
+		int Parse(const char*);
 
 		//输入输出
 		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
@@ -85,11 +85,8 @@ namespace Number {
 		std::vector<save_type>& _numvec = _number._number;
 
 	private:
-		inline void RealParseF(::std::string::const_iterator& it,
-			const ::std::string::const_iterator end, UInteger& f,
-			exp_type& e);
-		inline void RealParseExp(::std::string::const_iterator& it,
-			const ::std::string::const_iterator end, exp_type& e);
+		inline void RealParseF(const char** it, UInteger& f, exp_type& e);
+		inline void RealParseExp(const char** it, exp_type& e);
 		void Normalize(size_t n);
 		
 	}; // class

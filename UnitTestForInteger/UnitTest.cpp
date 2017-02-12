@@ -395,7 +395,7 @@ namespace UnitTestForNumber
 
 		Real RandomRealNumber() {
 			static std::default_random_engine generator(time(NULL));
-			static std::uniform_int_distribution<save_type> distribution, sig(0,1);
+			static std::uniform_int_distribution<save_type> distribution(1,1024), sig(0,1);
 			static auto dice = std::bind(distribution, generator);
 			int size = dice();
 			std::vector<save_type> vec(size);
@@ -409,8 +409,8 @@ namespace UnitTestForNumber
 
 		void TestRealDecimal(const ::std::string src) {
 			Real num, res;
-			num.Parse(src);
-			res.Parse(num.ToString10());
+			num.Parse(src.c_str());
+			res.Parse(num.ToString10().c_str());
 			Assert::AreEqual(num, res);
 		}
 
@@ -418,7 +418,7 @@ namespace UnitTestForNumber
 			for (unsigned ii = 0;ii < times;++ii) {
 				Real num, res;
 				num = RandomRealNumber();
-				res.Parse(num.ToString10());
+				res.Parse(num.ToString10().c_str());
 				Assert::AreEqual(num, res);
 			}
 		}
@@ -428,9 +428,9 @@ namespace UnitTestForNumber
 			TestRealDecimal("5");
 			TestRealDecimal("0e14");
 			TestRealDecimal("-0e0");
-			TestRealDecimal("1e65536");
+			TestRealDecimal("1e128");
 			TestRealDecimal("1.32468208213");
-			TestRealDecimalRandom(65536);
+			TestRealDecimalRandom(100);
 		}
 
 	};

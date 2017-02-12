@@ -132,7 +132,8 @@ namespace Number { namespace detail {
 			res.push_back(temp_h);
 	}
 
-	inline void NumberParseSignal(::std::string::const_iterator &SrcIt, char& Signal) {
+	template<typename T>
+	inline void NumberParseSignal(T SrcIt, char& Signal) {
 		Signal = 1;
 		if (*SrcIt == '-')
 		{
