@@ -34,7 +34,7 @@ namespace Number {
 		//位数不同直接判断
 		if (size1 != size2)
 			return (size1 - size2);
-		return detail::_compare_by_digit(this->_number.crbegin(), Obj2._number.crbegin(), size1);
+		return detail::_compare_by_digit(this->_number.crbegin(), Obj2._number.crbegin(), size1, size2);
 	}
 
 	vector<save_type> shift_left(const vector<save_type>& src, int num) {

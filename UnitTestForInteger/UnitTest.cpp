@@ -32,10 +32,7 @@ namespace UnitTestForNumber
 	template<typename T, typename U>
 	void TestInitializeBase(U num, const wchar_t* message = NULL, __LineInfo* pLineInfo = NULL) {
 		T temp(num);
-		U num2 = num + 2;
-		T temp2(num2);
 		Assert::IsTrue(temp == (num), message, pLineInfo);
-		Assert::IsTrue(temp2 != (num), message, pLineInfo);
 	}
 #define TEST_INTEGER_INITIALIZE(num) TestInitializeBase<Integer>(num, L"Initialize Integer failed", LINE_INFO())
 #define TEST_REAL_INITIALIZE(num) TestInitializeBase<Real>(num, L"Initialize Real failed", LINE_INFO())
@@ -395,9 +392,9 @@ namespace UnitTestForNumber
 
 		Real RandomRealNumber() {
 			static std::default_random_engine generator(time(NULL));
-			static std::uniform_int_distribution<save_type> distribution(1,1024), sig(0,1);
+			static std::uniform_int_distribution<save_type> distribution, size_d(1,1024), sig(0,1);
 			static auto dice = std::bind(distribution, generator);
-			int size = dice();
+			int size = size_d(generator);
 			std::vector<save_type> vec(size);
 			for (auto& num : vec) {
 				num = dice();
@@ -410,6 +407,7 @@ namespace UnitTestForNumber
 		void TestRealDecimal(const ::std::string src) {
 			Real num, res;
 			num.Parse(src.c_str());
+			res.SetPrecision(num.GetPrecision());
 			res.Parse(num.ToString10().c_str());
 			Assert::AreEqual(num, res);
 		}

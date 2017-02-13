@@ -44,8 +44,9 @@ namespace Number { namespace detail {
 	//逐位比较绝对值大小
 	inline int _compare_by_digit(::std::vector<save_type>::const_reverse_iterator it1,
 		::std::vector<save_type>::const_reverse_iterator it2,
-		size_t digit_num)
+		size_t n1, size_t n2)
 	{
+		size_t digit_num = std::min(n1, n2);
 		size_t ii = 0;
 		while (ii < digit_num) {
 			if (*it1 < *it2) {
@@ -58,7 +59,7 @@ namespace Number { namespace detail {
 			++it2;
 			++ii;
 		}
-		return 0;
+		return n1 - n2;
 	}
 
 	inline ::std::vector<save_type> multiply_vec(const ::std::vector<save_type>& number1,

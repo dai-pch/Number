@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <vector>
+#include <algorithm>
 
 //debug
 #define DEBUG_MODE false

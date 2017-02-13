@@ -120,7 +120,7 @@ namespace Number {
 		if (exp1 != exp2)
 			return _signal * (exp1 - exp2);
 		int res = detail::_compare_by_digit(_numvec.crbegin(),
-			number2._numvec.crbegin(), _number.size());
+			number2._numvec.crbegin(), _number.size(), number2.size());
 		return _signal < 0 ? -res : res;
 	}
 
