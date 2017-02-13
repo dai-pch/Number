@@ -258,6 +258,19 @@ namespace Number {
 		return res;
 	}
 
+	::std::ostream & operator<<(::std::ostream &os, const Real &num)
+	{
+		return os << num.ToString10();
+	}
+
+	::std::istream & operator >> (::std::istream &os, Real &num)
+	{
+		std::string tem;
+		os >> tem;
+		num.Parse(tem.c_str());
+		return os;
+	}
+
 	// Algorthm comes from:
 	// Burger R G, Dybvig R K. Printing floating-point numbers
 	// quickly and accurately[J]. Acm Sigplan Notices, 1996, 31(5):108-116.

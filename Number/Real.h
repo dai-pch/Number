@@ -67,8 +67,8 @@ namespace Number {
 		int Parse(const char*);
 
 		//ÊäÈëÊä³ö
-		friend ::std::ostream& operator<<(::std::ostream&, const Integer&);
-		friend ::std::istream& operator>>(::std::istream&, Integer&);
+		friend ::std::ostream& operator<<(::std::ostream&, const Real&);
+		friend ::std::istream& operator>>(::std::istream&, Real&);
 
 		static void SetDefaultPrecision(size_t);
 		static size_t GetDefaultPrecision();
