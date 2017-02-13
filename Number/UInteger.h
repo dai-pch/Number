@@ -54,7 +54,7 @@ namespace Number {
 		UInteger Multiply(const UInteger& Number2) const;
 		// Devide
 		friend void Devide(const UInteger &Number1, const UInteger &Number2,
-			UInteger &Mod, UInteger& quotient);
+			UInteger &Mod, UInteger &quotient);
 
 		//转换为10进制字串
 		::std::string ToString10() const;

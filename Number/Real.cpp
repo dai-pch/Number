@@ -1,3 +1,4 @@
+#include "UInteger.h"
 #include "Integer.h"
 #include "Real.h"
 #include <algorithm>
@@ -217,7 +218,7 @@ namespace Number {
 			exp_type exp_res;
 			vector<save_type> res;
 			char sig;
-			if (*this >= num) {
+			if (_number >= num._number) {
 				_sub(_numvec, num._numvec, _exp, num._exp, res, exp_res);
 				sig = _signal;
 			}
@@ -229,6 +230,32 @@ namespace Number {
 			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
 			return r;
 		}
+	}
+
+	Real Real::Multiply(const Real & num) const
+	{
+		Real res;
+		res._number = _number * num._number;
+		res._exp = _exp + num._exp;
+		res._signal = _signal == num._signal ? 1 : -1;
+		res.RoundTo(std::min(size(), num.size()));
+		return res;
+	}
+
+	Real Devide(const Real &n1, const Real &n2)
+	{
+		Real res;
+		UInteger mod;
+		size_t prec = std::min(n1.size(), n2.size());
+		size_t diff = n2.size() + prec - n1.size();
+		Devide((n1._number << (diff * BIT_NUMBER)), n2._number, mod, res._number);
+		if (((mod << 1) > n2._number)
+			|| ((mod << 1)==n2._number && IsEven(res._number)))
+			res._number = res._number + (unsigned)1;
+		res._exp = n1._exp - n2._exp - diff;
+		res._signal = (n1._signal == n2._signal ? 1 : -1);
+		res.RoundTo(std::min(n1.size(), n2.size()));
+		return res;
 	}
 
 	// Algorthm comes from:

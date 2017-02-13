@@ -3,7 +3,6 @@
 #define _NUMBER_REAL_H__
 
 #include "Number.h"
-#include "UInteger.h"
 
 namespace Number {
 	class Real {
@@ -15,7 +14,8 @@ namespace Number {
 		Real(const Real& real, size_t precision) :Real(real) {
 			this->SetPrecision(precision);
 		}
-		Real(::std::vector<save_type> vec, signal_type sig = 1) :_number(vec), _signal(sig){}
+		Real(::std::vector<save_type> vec, signal_type sig = 1, exp_type exp = 0) 
+			:_number(vec), _signal(sig), _exp(exp){}
 		explicit Real(const Integer& inte, size_t precision = default_precision);
 		explicit Real(const UInteger& inte, size_t precision = default_precision);
 		//从整数构造
@@ -59,7 +59,7 @@ namespace Number {
 		// Multiply
 		Real Multiply(const Real& num) const;
 		// Devide
-		Real Devide(const Real& num) const;
+		friend Real Devide(const Real& n1, const Real& n2);
 
 
 		//转换为字符串
@@ -264,7 +264,7 @@ namespace Number {
 	}
 	// /
 	inline Real operator / (const Real& number1, const Real& number2) {
-		return number1.Devide(number2);
+		return Devide(number1, number2);
 	}
 	template<typename Arithmetic>
 	inline typename ::std::enable_if_t<
