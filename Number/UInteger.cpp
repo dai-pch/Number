@@ -108,18 +108,6 @@ namespace Number {
 		return UInteger(result);
 	}
 
-	//除去可能的高位的零
-	void eraseZero(vector<save_type> &vec) {
-		auto it_re = vec.rbegin();
-		size_t counter = 0;
-		while ((it_re != vec.rend() - 1) && *it_re == 0)
-		{
-			++counter;
-			++it_re;
-		}
-		vec.erase(vec.end() - counter, vec.end());
-	}
-
 	UInteger UInteger::Add(const UInteger& Obj2) const
 	{
 		const UInteger *p1, *p2;
@@ -169,7 +157,7 @@ namespace Number {
 		}
 
 		//除去可能的高位的零
-		eraseZero(result);
+		detail::eraseZero(result);
 
 		return UInteger(result);
 	}
@@ -339,7 +327,7 @@ namespace Number {
 		}
 
 		//除去可能的高位的零
-		eraseZero(number1);
+		detail::eraseZero(number1);
 		mod = shift_right(number1, shift);
 		quotient = result;
 	}

@@ -73,7 +73,8 @@ namespace Number {
 		static void SetDefaultPrecision(size_t);
 		static size_t GetDefaultPrecision();
 		void SetPrecision(size_t precision = default_precision);
-		size_t GetPrecision();
+		size_t GetPrecision() const;
+		size_t size() const;
 
 	private:
 		static size_t default_precision;
@@ -87,7 +88,7 @@ namespace Number {
 	private:
 		inline void RealParseF(const char** it, UInteger& f, exp_type& e);
 		inline void RealParseExp(const char** it, exp_type& e);
-		void Normalize(size_t n);
+		void RoundTo(size_t n);
 		
 	}; // class
 

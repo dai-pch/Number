@@ -124,9 +124,111 @@ namespace Number {
 		return _signal < 0 ? -res : res;
 	}
 
+	void _add(const vector<save_type>& a, const vector<save_type>& b, const exp_type exp_a, const exp_type exp_b,
+		vector<save_type>& res, exp_type& exp_res) {
+		exp_type s_a = a.size(), s_b = b.size();
+		exp_type h_a = s_a + exp_a, h_b = s_b + exp_b;
+		// The highest bit of one number is smaller than the lowest bit of another;
+		if (h_a < exp_b) {
+			res = b;
+			exp_res = exp_b;
+		}
+		else if (h_b < exp_a) {
+			res = a;
+			exp_res = exp_a;
+		}
+		else //else
+		{
+			exp_res = std::min(exp_a, exp_b);
+			exp_type len = std::max(h_a, h_b) - exp_res;
+			vector<save_type> result(len, 0);
+			save_type c = 0;
+			for (exp_type ii = 0;ii < len;++ii) {
+				result[ii] = detail::FullAdder(
+					ii >= exp_a - exp_res && ii < h_a - exp_res ? a[ii + exp_res - exp_a] : 0,
+					ii >= exp_b - exp_res && ii < h_b - exp_res ? b[ii + exp_res - exp_b] : 0,
+					c);
+			}
+			if (c != 0)
+				result.push_back(c);
+			res = result;
+		}
+	}
+	
+	// assert a >= b
+	void _sub(const vector<save_type>& a, const vector<save_type>& b, const exp_type exp_a, const exp_type exp_b,
+		vector<save_type>& res, exp_type& exp_res) {
+		exp_type h_a = a.size() + exp_a, h_b = b.size() + exp_b;
+		assert(h_a >= h_b);
+		// The highest bit of one number is smaller than the lowest bit of another;
+		if (h_b < exp_a) {
+			res = a;
+			exp_res = exp_a;
+		}
+		else //else
+		{
+			exp_res = std::min(exp_a, exp_b);
+			exp_type len = h_a - exp_res;
+			vector<save_type> result(len, 0);
+			save_type c = 1;
+			for (exp_type ii = 0;ii < len;++ii) {
+				result[ii] = detail::FullSuber(
+					ii + exp_res >= exp_a && ii + exp_res < h_a ? a[ii + exp_res - exp_a] : 0,
+					ii + exp_res >= exp_b && ii + exp_res < h_b ? b[ii + exp_res - exp_b] : 0,
+					c);
+			}
+			detail::eraseZero(result);
+			res = result;
+		}
+	}
+
 	Real Real::operator-() const
 	{
 		return Real(_numvec, -1);
+	}
+
+	Real Real::Add(const Real & num) const
+	{
+		if (_signal != num._signal)
+			return this->Sub(-num);
+		else
+		{
+			exp_type exp_res;
+			vector<save_type> res;
+			_add(_numvec, num._numvec, _exp, num._exp, res, exp_res);
+			Real r(res);
+			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
+			return r;
+		}
+	}
+
+	Real Real::Sub(const Real & num) const
+	{
+		if (_signal != num._signal) {
+			exp_type exp_res;
+			vector<save_type> res;
+			_add(_numvec, num._numvec, _exp, num._exp, res, exp_res);
+			Real r(res, _signal);
+			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
+			return r;
+		}
+		else
+		{
+			exp_type exp_res;
+			vector<save_type> res;
+			char sig;
+			if (*this >= num) {
+				_sub(_numvec, num._numvec, _exp, num._exp, res, exp_res);
+				sig = _signal;
+			}
+			else {
+				_sub(num._numvec, _numvec, num._exp, _exp, res, exp_res);
+				sig = -_signal;
+			}
+			Real r(res, sig);
+			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
+			return r;
+		}
 	}
 
 	// Algorthm comes from:
@@ -231,7 +333,7 @@ namespace Number {
 			h >>= 1;
 		}
 		len += (e + num.size() - 1) * BIT_NUMBER;
-		len = len / 3.3219280948873623478703194294894; // len / log_2(10)
+		len = (exp_type)(len / 3.3219280948873623478703194294894); // len / log_2(10)
 		return len;
 	}
 
@@ -343,7 +445,7 @@ namespace Number {
 			if (*it != '\0')
 				return Number_Parse_Failed;
 			AlgorithmM(f, e, prec, _number, _exp);
-			Normalize(prec);
+			RoundTo(prec);
 		}
 		catch (std::exception) {
 			res = Number_Parse_Failed;
@@ -351,13 +453,32 @@ namespace Number {
 		return res;
 	}
 
-	void Real::Normalize(size_t precision)
+	void Real::RoundTo(size_t precision)
 	{
 		int diff = _number.size() - precision;
 		if (diff == 0)
 			return;
 		else if (diff > 0) {
+			// judge round
+			bool round_up = false;
+			if (_numvec[diff - 1] > (MODULE >> 1))
+				round_up = true;
+			else if (_numvec[diff - 1] == (MODULE >> 1)) {
+				for (auto it = _numvec.crbegin() + precision + 1;
+					it != _numvec.rend();++it) {
+					if (*it > 0) {
+						round_up = true;
+						break;
+					}
+				}
+			}
+
 			_numvec.erase(_numvec.cbegin(), _numvec.cbegin() + diff);
+			if (round_up) {
+				_number = _number + (unsigned)1;
+				if (_numvec.size() > precision)
+					_numvec.erase(_numvec.begin());
+			}
 		}
 		else {
 			vector<save_type> temp(precision);
@@ -383,12 +504,17 @@ namespace Number {
 	void Real::SetPrecision(size_t precision)
 	{
 		precision = (precision - 1) / BIT_NUMBER + 2;
-		Normalize(precision);
+		RoundTo(precision);
 	}
 
-	size_t Real::GetPrecision()
+	size_t Real::GetPrecision() const
 	{
-		return _number.size() - 1;
+		return (_number.size() - 1) * BIT_NUMBER;
+	}
+
+	size_t Real::size() const
+	{
+		return _number.size();
 	}
 
 }

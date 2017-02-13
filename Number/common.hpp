@@ -29,6 +29,18 @@ namespace Number { namespace detail {
 		return res;
 	}
 
+	//除去可能的高位的零
+	inline void eraseZero(std::vector<save_type> &vec) {
+		auto it_re = vec.rbegin();
+		size_t counter = 0;
+		while ((it_re != vec.rend() - 1) && *it_re == 0)
+		{
+			++counter;
+			++it_re;
+		}
+		vec.erase(vec.end() - counter, vec.end());
+	}
+
 	//逐位比较绝对值大小
 	inline int _compare_by_digit(::std::vector<save_type>::const_reverse_iterator it1,
 		::std::vector<save_type>::const_reverse_iterator it2,
@@ -133,7 +145,7 @@ namespace Number { namespace detail {
 	}
 
 	template<typename T>
-	inline void NumberParseSignal(T SrcIt, char& Signal) {
+	inline void NumberParseSignal(T& SrcIt, char& Signal) {
 		Signal = 1;
 		if (*SrcIt == '-')
 		{
