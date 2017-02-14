@@ -1,14 +1,26 @@
 #include "catch.hpp"
 
+#include <iostream>
 #include <random>
 #include <functional>
 #include "../Number/Real.h"
 using namespace Number;
 
-static int real_test_num = 50;
+static int real_test_num = 5;
+static unsigned seed = 0;
+
+unsigned genSeed(unsigned t) {
+	unsigned a;
+	if (t == 0)
+		a = (unsigned)time(NULL);
+	else
+		a = t;
+	std::cout << "Seed is:" << a << std::endl;
+	return a;
+}
 
 Real RandomRealNumber() {
-	static std::default_random_engine generator((unsigned)time(NULL));
+	static std::default_random_engine generator(genSeed(seed));
 	static std::uniform_int_distribution<save_type> distribution, size_d(1, 1024), sig(0, 1);
 	static auto dice = std::bind(distribution, generator);
 	int size = size_d(generator);
@@ -18,7 +30,7 @@ Real RandomRealNumber() {
 	}
 	if (vec.back() == 0)
 		++vec.back();
-	return Real(vec, sig(generator) ? 1 : -1);
+	return Real(vec, sig(generator) ? 1 : -1, dice()%128);
 }
 
 TEST_CASE("Test initialize for Real", "[Initialize][Real]") {
@@ -141,6 +153,87 @@ TEST_CASE("Test Parse and Tostring for Real.", "[ParseAndToString][Real]") {
 			n2.SetPrecision(n1.GetPrecision());
 			n2.Parse(n1.ToString10().c_str());
 			REQUIRE(n1 == n2);
+		}
+	}
+}
+
+TEST_CASE("Test Add and Sub for Real", "[AddSub][Real]") {
+	SECTION("Special number test.") {
+		std::tuple<std::string, std::string, std::string> test_number[] = { { "0.0", "0.0", "0.0" },
+		{ "-0.0", "0.0", "0.0" },{ "0", "1.3", "1.3" },{ "0", "-3", "-3" },{ "-7", "7", "0" },
+		{ "32768", "65536", "98304" },{ "10000", "1000000", "1010000" } };
+
+		for (auto ele : test_number) {
+			Real s, a, b;
+			REQUIRE(a.Parse(std::get<0>(ele).c_str()) == Number_Parse_OK);
+			REQUIRE(b.Parse(std::get<1>(ele).c_str()) == Number_Parse_OK);
+			REQUIRE(s.Parse(std::get<2>(ele).c_str()) == Number_Parse_OK);
+			REQUIRE(a + b == s);
+			REQUIRE(b + a == s);
+			REQUIRE(s - a == b);
+			REQUIRE(s - b == a);
+			REQUIRE(a - s == -b);
+			REQUIRE(b - s == -a);
+		}
+	}
+
+	SECTION("Random number test.") {
+		for (int ii = 0;ii < real_test_num;++ii) {
+			Real a = RandomRealNumber();
+			Real b = RandomRealNumber();
+			Real r1 = a + b;
+			Real r2 = r1 - a;
+			REQUIRE((r2 - b)/b <= 0.001);
+		}
+	}
+}
+
+TEST_CASE("Test Multiply and Devide for Real", "[MulDev][Real]") {
+	SECTION("Special number test.") {
+		std::tuple<std::string, std::string, std::string> test_number[] = { { "0", "0", "0" },
+		{ "-0", "0", "0" },
+		{ "0", "1", "0" },
+		{ "-3", "0", "0" },
+		{ "2", "70", "140" },
+		{ "-5", "30", "-150" },
+
+		{ "338745", "24325", "8239972125" },
+		{ "-60374", "22580", "-1363244920" },
+		{ "-34750247679359595104195192713491853248905703459234", "-1",
+			"34750247679359595104195192713491853248905703459234" },
+			{ "34502938750234750245703459234857029503464564775029452934509287437676816581876214",
+			"7490918801118394765103491091168307360192023441273509150198327409213539834673455",
+			"258458712577969901107793595983076419519271833012883483684123496626476994193811141762278729300587831551290525355683871785611321045319590811232460657255921699370" },
+			{ "2384750193485324891786231019822357117632491019432579320923759071264016501924345",
+			"-9965977871263490182375019843750912381720472136487651923245912386419827364981234",
+			"-23766367656766074498187360121055082313211874311420286616610754823487880627777351412999960762652087319961498758734391202707977726944188275025244657025812741730" }
+		};
+
+		for (auto ele : test_number) {
+			Real s, a, b;
+			REQUIRE(a.Parse(std::get<0>(ele).c_str()) == Number_Parse_OK);
+			REQUIRE(b.Parse(std::get<1>(ele).c_str()) == Number_Parse_OK);
+			REQUIRE(s.Parse(std::get<2>(ele).c_str()) == Number_Parse_OK);
+			REQUIRE(a * b == s);
+			REQUIRE(b * a == s);
+			if (a != 0) {
+				Real r1 = s / a;
+				REQUIRE((r1 - b) / b <= 0.001);
+			}
+			if (b != 0) {
+				Real r2 = s / b;
+				REQUIRE((r2 - a) / a <= 0.001);
+			}
+		}
+	}
+
+	SECTION("Random number test.") {
+		for (int ii = 0;ii < real_test_num;++ii) {
+			Real a = RandomRealNumber() + 1.0;
+			Real b = RandomRealNumber();
+			Real r1 = a * b;
+			Real r2 = r1 / a;
+			REQUIRE(((r2 - b) / b) <= 0.001);
 		}
 	}
 }
