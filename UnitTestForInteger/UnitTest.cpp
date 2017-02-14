@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "CppUnitTest.h"
-#include <string>
+#include <random>
+#include <ctime>
+#include <functional>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Number;
@@ -10,9 +11,14 @@ namespace Microsoft {
 		namespace CppUnitTestFramework
 		{
 			template<>
-			std::wstring ToString<Integer>(const Number::Integer &num) {
-				std::string temp = num.ToString10();
-				return std::wstring(temp.begin(), temp.end());
+			::std::wstring ToString<Integer>(const Number::Integer &num) {
+				::std::string temp = num.ToString10();
+				return ::std::wstring(temp.begin(), temp.end());
+			}
+			template<>
+			::std::wstring ToString<Real>(const Number::Real &num) {
+				::std::string temp = num.ToString10();
+				return ::std::wstring(temp.begin(), temp.end());
 			}
 		}
 	}
@@ -20,8 +26,67 @@ namespace Microsoft {
 namespace UnitTestForNumber
 {		
 	BEGIN_TEST_MODULE_ATTRIBUTE()
-		TEST_MODULE_ATTRIBUTE(L"Date", L"2010/6/12")
+	TEST_MODULE_ATTRIBUTE(L"Date", L"2010/6/12")
 	END_TEST_MODULE_ATTRIBUTE()
+
+	template<typename T, typename U>
+	void TestInitializeBase(U num, const wchar_t* message = NULL, __LineInfo* pLineInfo = NULL) {
+		T temp(num);
+		Assert::IsTrue(temp == (num), message, pLineInfo);
+	}
+#define TEST_INTEGER_INITIALIZE(num) TestInitializeBase<Integer>(num, L"Initialize Integer failed", LINE_INFO())
+#define TEST_REAL_INITIALIZE(num) TestInitializeBase<Real>(num, L"Initialize Real failed", LINE_INFO())
+
+#define TEST_COM_BASE(TYPE, num1, num2, op, res, linfo) do{ \
+	if(res) { \
+		Assert::IsTrue(TYPE(num1) op TYPE(num2), L"Comparing true failed1" , linfo); \
+		Assert::IsTrue(TYPE(num1) op (num2), L"Comparing true failed2", linfo); \
+		Assert::IsTrue((num1) op TYPE(num2), L"Comparing true failed3", linfo); \
+	} \
+	else { \
+		Assert::IsFalse(TYPE(num1) op TYPE(num2), L"Comparing false failed1", linfo);\
+		Assert::IsFalse((num1) op TYPE(num2), L"Comparing false failed2", linfo);\
+		Assert::IsFalse(TYPE(num1) op (num2), L"Comparing false failed3", linfo);\
+	}\
+}while(0)
+
+	//num1 <= num2, eq = true iff. num1 == num2
+	template<typename Type, typename U, typename V>
+	void TestCompareBase2(U num1, V num2, bool eq, const __LineInfo* pLineInfo = NULL) {
+		TEST_COM_BASE(Type, num1, num2, == , eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, != , !eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, == , eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, != , !eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, <, !eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, <, false, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, >, false, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, >, !eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, <= , true, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, <= , eq, pLineInfo);
+		TEST_COM_BASE(Type, num1, num2, >= , eq, pLineInfo);
+		TEST_COM_BASE(Type, num2, num1, >= , true, pLineInfo);
+	}
+
+	template<typename Type, typename U, typename V>
+	void TestCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
+		if (num1 < num2)
+			TestCompareBase2<Type>(num1, num2, false, pLineInfo);
+		else if (num1 > num2)
+			TestCompareBase2<Type>(num2, num1, false, pLineInfo);
+		else
+			TestCompareBase2<Type>(num1, num2, true, pLineInfo);
+	}
+
+	template<typename U, typename V>
+	void TestIntegerCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
+		TestCompareNumber<Integer>(num1, num2, pLineInfo);
+	}
+
+	template<typename U, typename V>
+	void TestRealCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
+		TestCompareNumber<Real>(num1, num2, pLineInfo);
+	}
+
 
 	TEST_CLASS(UnitTestForInteger)
 	{
@@ -37,11 +102,6 @@ namespace UnitTestForNumber
 		TEST_METHOD(TestIntegerInitialize)
 		{
 			// TODO: 在此输入测试代码
-
-#define TEST_INTEGER_INITIALIZE(num) do{\
-Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO());\
-}while(0)
-
 			Assert::IsTrue(Integer() == 0, L"Initialize Integer failed", LINE_INFO());
 			TEST_INTEGER_INITIALIZE((char)0);
 			TEST_INTEGER_INITIALIZE((unsigned char)1);
@@ -55,51 +115,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TEST_INTEGER_INITIALIZE((unsigned long long)0xfff0fff0fff0fff0);
 		}
 
-#define TEST_INTEGER_COM_BASE(num1, num2, op, res, linfo) do{ \
-	if(res) { \
-		Assert::IsTrue(Integer(num1) op Integer(num2), L"Comparing failed", linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed", linfo); \
-		Assert::IsTrue(Integer(num1) op (num2), L"Comparing failed", linfo); \
-	} \
-	else { \
-		Assert::IsFalse(Integer(num1) op Integer(num2), L"Comparing failed", linfo);\
-		Assert::IsFalse((num1) op Integer(num2), L"Comparing failed", linfo);\
-		Assert::IsFalse(Integer(num1) op (num2), L"Comparing failed", linfo);\
-	}\
-}while(0)
-
-		//num1 <= num2, eq = true iff. num1 == num2
-		template<typename U, typename V> 
-		void TestIntegerCompareBase2(U num1, V num2, bool eq, const __LineInfo* pLineInfo = NULL) {
-			TEST_INTEGER_COM_BASE(num1, num2, == , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, != , !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, == , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, != , !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, <, !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, <, false, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, >, false, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, >, !eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, <= , true, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, <= , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num1, num2, >= , eq, pLineInfo);
-			TEST_INTEGER_COM_BASE(num2, num1, >= , true, pLineInfo);
-		}
-
-		template<typename U, typename V>
-		void TestIntegerCompareNumber(U num1, V num2, const __LineInfo* pLineInfo = NULL) {
-			if (num1 < num2)
-				TestIntegerCompareBase2(num1, num2, false, pLineInfo);
-			else if (num1 > num2)
-				TestIntegerCompareBase2(num2, num1, false, pLineInfo);
-			else
-				TestIntegerCompareBase2(num1, num2, true, pLineInfo);
-		}
-
 		TEST_METHOD(TestIntegerCompareOperator)
 		{
-			// TODO: 在此输入测试代码
-			Logger::WriteMessage("In Method TestIntegerCompareOperator");
-
 			//two equal numbers
 			TestIntegerCompareNumber(0, 0, LINE_INFO());
 			TestIntegerCompareNumber(0, -0, LINE_INFO());
@@ -131,7 +148,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 		}
 
 		template <typename T>
-		void TestIntegerParseBase(T num, const std::string &str, int res, __LineInfo* pLineInfo) {
+		void TestIntegerParseBase(T num, const ::std::string &str, int res, __LineInfo* pLineInfo) {
 			Integer a(num), b;
 			auto res2 = b.Parse(str);
 			Assert::AreEqual(res, res2, L"Integer Parse Error", pLineInfo);
@@ -139,11 +156,11 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 		}
 
 		template <typename T>
-		void TestIntegerParseRight(T num, const std::string &str, __LineInfo* pLineInfo) {
+		void TestIntegerParseRight(T num, const ::std::string &str, __LineInfo* pLineInfo) {
 			TestIntegerParseBase(num, str, Number_Parse_OK, pLineInfo);
 		}
 
-		void TestIntegerParseWrong(const std::string &str, __LineInfo* pLineInfo) {
+		void TestIntegerParseWrong(const ::std::string &str, __LineInfo* pLineInfo) {
 			TestIntegerParseBase(0, str, Number_Parse_Failed, pLineInfo);
 		}
 
@@ -213,7 +230,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			//TestIntegerParseWrong("", LINE_INFO());
 		}
 
-		void TestIntegerToString(std::string str, std::string str10, std::string str16, __LineInfo* pLineInfo) {
+		void TestIntegerToString(::std::string str, ::std::string str10, ::std::string str16, __LineInfo* pLineInfo) {
 			Integer a;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str), L"Integer Parse error when test ToString()", pLineInfo);
 			if (!str10.empty())
@@ -229,6 +246,8 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			TestIntegerToString("10", "10", "", LINE_INFO());
 			TestIntegerToString("-20", "-20", "", LINE_INFO());
 			TestIntegerToString("65536327680", "65536327680", "", LINE_INFO());
+			TestIntegerToString("10000000000000000000000000000000000000",
+				"10000000000000000000000000000000000000", "", LINE_INFO());
 			TestIntegerToString("12345678909876543211357924681010987654321",
 				"12345678909876543211357924681010987654321", "", LINE_INFO());
 			TestIntegerToString("-12345678909876543211357924681010987654321",
@@ -245,7 +264,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 			
 		}
 
-		void TestIntegerAddSub(std::string str1, std::string str2, std::string str3, __LineInfo* pLineInfo) {
+		void TestIntegerAddSub(::std::string str1, ::std::string str2, ::std::string str3, __LineInfo* pLineInfo) {
 			Integer a, b, s;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test +-", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test +-", pLineInfo);
@@ -276,7 +295,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 				"-7581227677778165290588788823927263464087981117055072602322153315155810863056889", LINE_INFO());
 		}
 
-		void TestIntegerMulDev(std::string str1, std::string str2, std::string str3, __LineInfo* pLineInfo) {
+		void TestIntegerMulDev(::std::string str1, ::std::string str2, ::std::string str3, __LineInfo* pLineInfo) {
 			Integer a, b, s;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
@@ -289,7 +308,7 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 				Assert::AreEqual(a, s / b, L"Dev error", pLineInfo);
 		}
 		
-		void TestIntegerModDev(std::string str1, std::string str2, std::string str3, std::string str4, __LineInfo* pLineInfo) {
+		void TestIntegerModDev(::std::string str1, ::std::string str2, ::std::string str3, ::std::string str4, __LineInfo* pLineInfo) {
 			Integer a, b, m, d;
 			Assert::AreEqual(Number_Parse_OK, a.Parse(str1), L"Integer Parse error when test */", pLineInfo);
 			Assert::AreEqual(Number_Parse_OK, b.Parse(str2), L"Integer Parse error when test */", pLineInfo);
@@ -332,5 +351,85 @@ Assert::IsTrue(Integer(num) == (num), L"Initialize Integer failed", LINE_INFO())
 				"-561482593430106196115167812503616771605925073683615704771777410662229",
 				"-1554144376565044617564612370009628257964710266", LINE_INFO());	
 		}
+	};
+
+	TEST_CLASS(UnitTestForReal) {
+
+		TEST_METHOD(TestRealInitialize)
+		{
+			Assert::IsTrue(Real() == 0, L"Initialize Real failed", LINE_INFO());
+			TEST_REAL_INITIALIZE(Integer(0));
+			TEST_REAL_INITIALIZE((unsigned char)120);
+			TEST_REAL_INITIALIZE((unsigned int)3);
+			TEST_REAL_INITIALIZE((unsigned long)65536);
+			TEST_REAL_INITIALIZE((char)-105);
+			TEST_REAL_INITIALIZE((int)-236);
+			TEST_REAL_INITIALIZE((long)-657386);
+			TEST_REAL_INITIALIZE((float)3.1415926e10);
+			TEST_REAL_INITIALIZE((double)-2.718281828e6);
+			TEST_REAL_INITIALIZE((double)308273954e-200);
+		}
+
+		TEST_METHOD(TestRealCompareOperator)
+		{
+			//equal number
+			TestRealCompareNumber(0, 0, LINE_INFO());
+			TestRealCompareNumber(1, 1, LINE_INFO());
+			TestRealCompareNumber(-2567, -2567, LINE_INFO());
+			TestRealCompareNumber(0.0, 0.0, LINE_INFO());
+			TestRealCompareNumber((float)27.1828354, (float)27.1828354, LINE_INFO());
+			TestRealCompareNumber(-65.336, (double)-65.336, LINE_INFO());
+
+			//nonequal number
+			TestRealCompareNumber(0, -1, LINE_INFO());
+			TestRealCompareNumber(1, 65372, LINE_INFO());
+			TestRealCompareNumber(-106825736, -2567, LINE_INFO());
+			TestRealCompareNumber(0.0, 3.14159265358979, LINE_INFO());
+			TestRealCompareNumber((float)27.1828354, (float)-27.1828354, LINE_INFO());
+			TestRealCompareNumber(-65.336, (double)-30006587.2654, LINE_INFO());
+			TestRealCompareNumber((float)-23.3356, -30006587.2654, LINE_INFO());
+		}
+
+		Real RandomRealNumber() {
+			static std::default_random_engine generator(time(NULL));
+			static std::uniform_int_distribution<save_type> distribution, size_d(1,1024), sig(0,1);
+			static auto dice = std::bind(distribution, generator);
+			int size = size_d(generator);
+			std::vector<save_type> vec(size);
+			for (auto& num : vec) {
+				num = dice();
+			}
+			if (vec.back() == 0)
+				++vec.back();
+			return Real(vec, sig(generator) ? 1 : -1);
+		}
+
+		void TestRealDecimal(const ::std::string src) {
+			Real num, res;
+			num.Parse(src.c_str());
+			res.SetPrecision(num.GetPrecision());
+			res.Parse(num.ToString10().c_str());
+			Assert::AreEqual(num, res);
+		}
+
+		void TestRealDecimalRandom(const unsigned times) {
+			for (unsigned ii = 0;ii < times;++ii) {
+				Real num, res;
+				num = RandomRealNumber();
+				res.Parse(num.ToString10().c_str());
+				Assert::AreEqual(num, res);
+			}
+		}
+
+		TEST_METHOD(TestRealDecimal) {
+			TestRealDecimal("3.14159265358979323846264338327950288e101");
+			TestRealDecimal("5");
+			TestRealDecimal("0e14");
+			TestRealDecimal("-0e0");
+			TestRealDecimal("1e128");
+			TestRealDecimal("1.32468208213");
+			TestRealDecimalRandom(100);
+		}
+
 	};
 }

@@ -15,37 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Integer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="algrm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Number.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Real.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="common.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Functional.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UInteger.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TestForInteger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TestForReal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Integer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Real.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UInteger.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
+    <ClInclude Include="catch.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
