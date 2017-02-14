@@ -6,7 +6,7 @@
 #include "../Number/Integer.h"
 using namespace Number;
 
-static int integer_test_num = 50;
+static int integer_test_num = 10;
 
 TEST_CASE("Test initialize of Integer", "[Initialize][Integer]") {
 	long long test_number[] = { 0, 1, 2, 10, 256, 65536, 0x60000000, 0x800700060005000, 0xff0fff0fff0fff0 };

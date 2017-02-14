@@ -6,7 +6,7 @@
 #include "../Number/Real.h"
 using namespace Number;
 
-static int real_test_num = 5;
+static int real_test_num = 10;
 static unsigned seed = 0;
 
 unsigned genSeed(unsigned t) {
@@ -183,7 +183,7 @@ TEST_CASE("Test Add and Sub for Real", "[AddSub][Real]") {
 			Real b = RandomRealNumber();
 			Real r1 = a + b;
 			Real r2 = r1 - a;
-			REQUIRE((r2 - b)/b <= 0.001);
+			REQUIRE((r2 - b) <= (0.001 * b.Abs()));
 		}
 	}
 }
@@ -211,6 +211,9 @@ TEST_CASE("Test Multiply and Devide for Real", "[MulDev][Real]") {
 
 		for (auto ele : test_number) {
 			Real s, a, b;
+			s.SetPrecision(1024);
+			b.SetPrecision(1024);
+			a.SetPrecision(1024);
 			REQUIRE(a.Parse(std::get<0>(ele).c_str()) == Number_Parse_OK);
 			REQUIRE(b.Parse(std::get<1>(ele).c_str()) == Number_Parse_OK);
 			REQUIRE(s.Parse(std::get<2>(ele).c_str()) == Number_Parse_OK);
@@ -218,11 +221,11 @@ TEST_CASE("Test Multiply and Devide for Real", "[MulDev][Real]") {
 			REQUIRE(b * a == s);
 			if (a != 0) {
 				Real r1 = s / a;
-				REQUIRE((r1 - b) / b <= 0.001);
+				REQUIRE((r1 - b) <= (0.001 * b.Abs()));
 			}
 			if (b != 0) {
 				Real r2 = s / b;
-				REQUIRE((r2 - a) / a <= 0.001);
+				REQUIRE((r2 - a) <= (0.001 * a.Abs()));
 			}
 		}
 	}
@@ -233,7 +236,7 @@ TEST_CASE("Test Multiply and Devide for Real", "[MulDev][Real]") {
 			Real b = RandomRealNumber();
 			Real r1 = a * b;
 			Real r2 = r1 / a;
-			REQUIRE(((r2 - b) / b) <= 0.001);
+			REQUIRE((r2 - b) <= (0.001 * b.Abs()));
 		}
 	}
 }
