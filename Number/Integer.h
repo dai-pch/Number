@@ -16,6 +16,8 @@ namespace Number {
 		Integer() = default;
 		Integer(const Integer&);
 
+		Integer(const ::std::vector<save_type>& Number, char Signal = 1);
+		Integer(::std::vector<save_type>&& Number, char Signal = 1);
 		//ÀàĞÍ×ª»»
 		explicit Integer(const UInteger&, const char Signal = 1);
 
@@ -116,9 +118,6 @@ namespace Number {
 		char _signal = 1;
 		UInteger _number{ (unsigned)0 };
 		::std::vector<save_type>& _numvec = _number._number;
-
-		Integer(const ::std::vector<save_type>& Number, char Signal = 1);
-		Integer(::std::vector<save_type>&& Number, char Signal = 1);
 
 		int setSignal(const int& signal);
 

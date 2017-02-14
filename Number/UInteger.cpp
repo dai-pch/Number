@@ -163,9 +163,11 @@ namespace Number {
 	}
 
 	UInteger UInteger::Multiply(const UInteger& Obj2) const {
-		unsigned int size1 = this->_number.size(), size2 = Obj2._number.size();
 		auto& number1 = this->_number;
 		auto& number2 = Obj2._number;
+		if (number1.back() == 0 || number2.back() == 0)
+			return UInteger((unsigned)0);
+		unsigned int size1 = number1.size(), size2 = number2.size();
 		vector<save_type> result(size1 + size2, 0);
 		for (unsigned int ii = 0;ii < size1;ii++)
 		{
@@ -319,8 +321,9 @@ namespace Number {
 			//如果预测不正确
 			if (c == 0)
 			{
-				for (decltype(tempvec.size()) jj = 0;jj <= tempvec.size();jj++)
+				for (decltype(tempvec.size()) jj = 0;jj < size2;jj++)
 					number1[jj + ii] = detail::FullAdder(number1[jj + ii], number2[jj], c);
+				number1[size2 + ii] = detail::FullAdder(number1[size2 + ii], 0, c);
 				qBar--;
 			}
 			result[ii] = static_cast<save_type>(qBar);

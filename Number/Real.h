@@ -3,6 +3,8 @@
 #define _NUMBER_REAL_H__
 
 #include "Number.h"
+#include "UInteger.h"
+#include "Integer.h"
 
 namespace Number {
 	class Real {

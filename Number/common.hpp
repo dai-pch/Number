@@ -134,7 +134,9 @@ namespace Number { namespace detail {
 		exp_type exp_sh = (exp % (exp_type)BIT_NUMBER);
 		if (exp_sh < 0)
 			exp_sh += BIT_NUMBER;
-		save_type temp_h = static_cast<save_type>(temp >> (BIT_NUMBER - exp_sh));
+		save_type temp_h;
+		temp_h = static_cast<save_type>(temp >> BIT_NUMBER);
+		temp_h >>= (BIT_NUMBER - exp_sh);
 		temp <<= exp_sh;
 		exp = (exp - exp_sh) / (exp_type)BIT_NUMBER;
 		res.clear();

@@ -393,6 +393,8 @@ namespace Number {
 		const char* p = *it;
 		e = 0;
 		auto isdigit = [](char c) {return c >= '0'&&c <= '9';};
+		if (!isdigit(*p))
+			throw std::runtime_error("Invalid exponiential number.");
 		while (isdigit(*p)) {
 			f = f * (unsigned)10 + (unsigned)(*p - '0');
 			++p;
