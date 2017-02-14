@@ -321,9 +321,12 @@ namespace Number {
 			//如果预测不正确
 			if (c == 0)
 			{
-				for (decltype(tempvec.size()) jj = 0;jj < size2;jj++)
+				decltype(tempvec.size()) jj = 0;
+				for (;jj < size2;jj++)
 					number1[jj + ii] = detail::FullAdder(number1[jj + ii], number2[jj], c);
-				number1[size2 + ii] = detail::FullAdder(number1[size2 + ii], 0, c);
+				if (jj < tempvec.size())
+					number1[size2 + ii] = detail::FullAdder(number1[size2 + ii], 0, c);
+				assert(c == 1);
 				qBar--;
 			}
 			result[ii] = static_cast<save_type>(qBar);

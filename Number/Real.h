@@ -16,8 +16,10 @@ namespace Number {
 		Real(const Real& real, size_t precision) :Real(real) {
 			this->SetPrecision(precision);
 		}
-		Real(::std::vector<save_type> vec, signal_type sig = 1, exp_type exp = 0) 
-			:_number(vec), _signal(sig), _exp(exp){}
+		Real(::std::vector<save_type> vec, signal_type sig, exp_type exp)
+			:_number(vec), _signal(sig), _exp(exp) {}
+		Real(UInteger num, signal_type sig, exp_type exp)
+			:_number(num), _signal(sig), _exp(exp) {}
 		explicit Real(const Integer& inte, size_t precision = default_precision);
 		explicit Real(const UInteger& inte, size_t precision = default_precision);
 		//从整数构造
@@ -84,8 +86,6 @@ namespace Number {
 		UInteger _number =
 			UInteger(::std::vector<save_type>((default_precision - 1) / BIT_NUMBER + 2, 0));
 		exp_type _exp{ 0 }; // radix is MODULE
-
-		std::vector<save_type>& _numvec = _number._number;
 
 	private:
 		inline void RealParseF(const char** it, UInteger& f, exp_type& e);

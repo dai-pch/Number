@@ -106,13 +106,13 @@ namespace Number {
 		exp_type exp2 = number2._number.size()
 			+ number2._exp;
 		//两数有一个为零时有符号问题，单独考虑
-		if (_numvec.back() == 0) {
-			if (number2._numvec.back() == 0)
+		if (_number._number.back() == 0) {
+			if (number2._number._number.back() == 0)
 				return 0;
 			else
 				return -number2._signal;
 		}
-		else if (number2._numvec.back() == 0)
+		else if (number2._number._number.back() == 0)
 			return _signal;
 		// 符号不同直接判断
 		if (_signal != number2._signal)
@@ -120,116 +120,106 @@ namespace Number {
 		//指数不同直接判断
 		if (exp1 != exp2)
 			return _signal * (exp1 - exp2);
-		int res = detail::_compare_by_digit(_numvec.crbegin(),
-			number2._numvec.crbegin(), _number.size(), number2.size());
+		int res = detail::_compare_by_digit(_number._number.crbegin(),
+			number2._number._number.crbegin(), _number.size(), number2.size());
 		return _signal < 0 ? -res : res;
 	}
 
-	void _add(const vector<save_type>& a, const vector<save_type>& b, const exp_type exp_a, const exp_type exp_b,
-		vector<save_type>& res, exp_type& exp_res) {
-		exp_type s_a = a.size(), s_b = b.size();
+	bool should_do_addsub(const size_t s_a, const size_t s_b, const exp_type exp_a,
+		const exp_type exp_b){
 		exp_type h_a = s_a + exp_a, h_b = s_b + exp_b;
+		if (h_a < exp_b || h_b < exp_a)
+			return false;
+		else
+			return true;
+	}
+
+	Real _add(const UInteger& a, const UInteger& b, exp_type exp_a,
+		exp_type exp_b, const signal_type sig) {
 		// The highest bit of one number is smaller than the lowest bit of another;
-		if (h_a < exp_b) {
-			res = b;
-			exp_res = exp_b;
+		if (!should_do_addsub(a.size(), b.size(), exp_a, exp_b))
+			return exp_a > exp_b ? Real(a, sig, exp_a) : Real(b, sig, exp_b);
+		//else
+		exp_type diff = exp_a - exp_b;
+		UInteger r;
+		if (diff >= 0) {
+			r = (a << (diff * BIT_NUMBER)) + b;
+			exp_a -= diff;
 		}
-		else if (h_b < exp_a) {
-			res = a;
-			exp_res = exp_a;
+		else {
+			r = a + (b << (-diff * BIT_NUMBER));
+			exp_b += diff;
 		}
-		else //else
-		{
-			exp_res = std::min(exp_a, exp_b);
-			exp_type len = std::max(h_a, h_b) - exp_res;
-			vector<save_type> result(len, 0);
-			save_type c = 0;
-			for (exp_type ii = 0;ii < len;++ii) {
-				result[ii] = detail::FullAdder(
-					ii >= exp_a - exp_res && ii < h_a - exp_res ? a[ii + exp_res - exp_a] : 0,
-					ii >= exp_b - exp_res && ii < h_b - exp_res ? b[ii + exp_res - exp_b] : 0,
-					c);
-			}
-			if (c != 0)
-				result.push_back(c);
-			res = result;
-		}
+		assert(exp_a == exp_b);
+		return Real(r, sig, exp_a);
 	}
 	
 	// assert a >= b
-	void _sub(const vector<save_type>& a, const vector<save_type>& b, const exp_type exp_a, const exp_type exp_b,
-		vector<save_type>& res, exp_type& exp_res) {
-		exp_type h_a = a.size() + exp_a, h_b = b.size() + exp_b;
-		assert(h_a >= h_b);
+	Real _sub(const UInteger& a, const UInteger& b, exp_type exp_a, exp_type exp_b, signal_type sig) {
 		// The highest bit of one number is smaller than the lowest bit of another;
-		if (h_b < exp_a) {
-			res = a;
-			exp_res = exp_a;
+		if (!should_do_addsub(a.size(), b.size(), exp_a, exp_b))
+			return exp_a > exp_b ? Real(a, sig, exp_a) : Real(b, sig, exp_b);
+		//else
+		exp_type diff = exp_a - exp_b;
+		UInteger pa, pb;
+		UInteger r;
+		if (diff >= 0) {
+			pa = (a << (diff * BIT_NUMBER));
+			pb = b;
+			exp_a -= diff;
 		}
-		else //else
-		{
-			exp_res = std::min(exp_a, exp_b);
-			exp_type len = h_a - exp_res;
-			vector<save_type> result(len, 0);
-			save_type c = 1;
-			for (exp_type ii = 0;ii < len;++ii) {
-				result[ii] = detail::FullSuber(
-					ii + exp_res >= exp_a && ii + exp_res < h_a ? a[ii + exp_res - exp_a] : 0,
-					ii + exp_res >= exp_b && ii + exp_res < h_b ? b[ii + exp_res - exp_b] : 0,
-					c);
-			}
-			detail::eraseZero(result);
-			res = result;
+		else {
+			pa = a;
+			pb = (b << (-diff * BIT_NUMBER));
+			exp_b += diff;
 		}
+		assert(exp_a == exp_b);
+		if (pa < pb) {
+			r = pb - pa;
+			sig = -sig;
+		}
+		else
+			r = pa - pb;
+		return Real(r, sig, exp_a);
 	}
 
 	Real Real::operator-() const
 	{
-		return Real(_numvec, -1);
+		return Real(_number._number, -_signal, _exp);
 	}
 
 	Real Real::Add(const Real & num) const
 	{
+		if (_number._number.back() == 0)
+			return num;
+		else if (num._number._number.back() == 0)
+			return *this;
+
+		size_t len = std::max(size(), num.size());
+		Real res;
 		if (_signal != num._signal)
-			return this->Sub(-num);
+			res = _sub(_number, num._number, _exp, num._exp, _signal);
 		else
-		{
-			exp_type exp_res;
-			vector<save_type> res;
-			_add(_numvec, num._numvec, _exp, num._exp, res, exp_res);
-			Real r(res);
-			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
-			return r;
-		}
+			res = _add(_number, num._number, _exp, num._exp, _signal);
+		res.RoundTo(len);
+		return res;
 	}
 
 	Real Real::Sub(const Real & num) const
 	{
-		if (_signal != num._signal) {
-			exp_type exp_res;
-			vector<save_type> res;
-			_add(_numvec, num._numvec, _exp, num._exp, res, exp_res);
-			Real r(res, _signal);
-			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
-			return r;
-		}
+		if (_number._number.back() == 0)
+			return -num;
+		else if (num._number._number.back() == 0)
+			return *this;
+
+		size_t len = std::max(size(), num.size());
+		Real res;
+		if (_signal != num._signal)
+			res = _add(_number, num._number, _exp, num._exp, _signal);
 		else
-		{
-			exp_type exp_res;
-			vector<save_type> res;
-			char sig;
-			if (_number >= num._number) {
-				_sub(_numvec, num._numvec, _exp, num._exp, res, exp_res);
-				sig = _signal;
-			}
-			else {
-				_sub(num._numvec, _numvec, num._exp, _exp, res, exp_res);
-				sig = -_signal;
-			}
-			Real r(res, sig);
-			r.RoundTo(std::max(_numvec.size(), num._numvec.size()));
-			return r;
-		}
+			res = _sub(_number, num._number, _exp, num._exp, _signal);
+		res.RoundTo(len);
+		return res;
 	}
 
 	Real Real::Multiply(const Real & num) const
@@ -380,10 +370,10 @@ namespace Number {
 	::std::string Real::ToString10() const
 	{
 		std::string res;
-		if (_numvec.back() == 0)
+		if (_number._number.back() == 0)
 			return std::string("0.0");
 		res = (_signal > 0) ? "0." : "-0.";
-		auto k = _approxmate_k(_numvec, _exp);
+		auto k = _approxmate_k(_number._number, _exp);
 		_to_radix_10(_number, _exp, res, k);
 		return res;
 	}
@@ -503,11 +493,11 @@ namespace Number {
 		else if (diff > 0) {
 			// judge round
 			bool round_up = false;
-			if (_numvec[diff - 1] > (MODULE >> 1))
+			if (_number._number[diff - 1] > (MODULE >> 1))
 				round_up = true;
-			else if (_numvec[diff - 1] == (MODULE >> 1)) {
-				for (auto it = _numvec.crbegin() + precision + 1;
-					it != _numvec.rend();++it) {
+			else if (_number._number[diff - 1] == (MODULE >> 1)) {
+				for (auto it = _number._number.crbegin() + precision + 1;
+					it != _number._number.rend();++it) {
 					if (*it > 0) {
 						round_up = true;
 						break;
@@ -515,19 +505,19 @@ namespace Number {
 				}
 			}
 
-			_numvec.erase(_numvec.cbegin(), _numvec.cbegin() + diff);
+			_number._number.erase(_number._number.cbegin(), _number._number.cbegin() + diff);
 			if (round_up) {
 				_number = _number + (unsigned)1;
-				if (_numvec.size() > precision)
-					_numvec.erase(_numvec.begin());
+				if (_number._number.size() > precision)
+					_number._number.erase(_number._number.begin());
 			}
 		}
 		else {
 			vector<save_type> temp(precision);
-			std::copy(_numvec.crbegin(), _numvec.crend(), temp.rbegin());
-			_numvec.swap(temp);
+			std::copy(_number._number.crbegin(), _number._number.crend(), temp.rbegin());
+			_number._number.swap(temp);
 		}
-		if (_numvec.back() != 0)
+		if (_number._number.back() != 0)
 			_exp += diff;
 		else
 			_exp = 0;
