@@ -46,20 +46,18 @@ namespace Number { namespace detail {
 		::std::vector<save_type>::const_reverse_iterator it2,
 		size_t n1, size_t n2)
 	{
-		size_t digit_num = std::min(n1, n2);
-		size_t ii = 0;
-		while (ii < digit_num) {
-			if (*it1 < *it2) {
+		size_t digit_num = std::max(n1, n2);
+		for (size_t ii = 0;ii < digit_num;++ii) {
+			auto a = ii < n1 ? *(it1++) : 0;
+			auto b = ii < n2 ? *(it2++) : 0;
+			if (a < b) {
 				return -1;
 			}
-			else if (*it1 > *it2) {
+			else if (a > b) {
 				return 1;
 			}
-			++it1;
-			++it2;
-			++ii;
 		}
-		return n1 - n2;
+		return 0;
 	}
 
 	inline ::std::vector<save_type> multiply_vec(const ::std::vector<save_type>& number1,
