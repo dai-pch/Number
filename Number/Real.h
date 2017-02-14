@@ -64,6 +64,7 @@ namespace Number {
 		Real Multiply(const Real& num) const;
 		// Devide
 		friend Real Devide(const Real& n1, const Real& n2);
+		Real Abs() const;
 
 
 		//×ª»»Îª×Ö·û´®

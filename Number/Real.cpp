@@ -232,6 +232,14 @@ namespace Number {
 		return res;
 	}
 
+	Real Real::Abs() const
+	{
+		if (_signal >= 0)
+			return *this;
+		else
+			return -*this;
+	}
+
 	Real Devide(const Real &n1, const Real &n2)
 	{
 		Real res;
