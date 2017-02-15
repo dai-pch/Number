@@ -391,7 +391,7 @@ namespace UnitTestForNumber
 		}
 
 		Real RandomRealNumber() {
-			static std::default_random_engine generator(time(NULL));
+			static std::default_random_engine generator((unsigned)time(NULL));
 			static std::uniform_int_distribution<save_type> distribution, size_d(1,1024), sig(0,1);
 			static auto dice = std::bind(distribution, generator);
 			int size = size_d(generator);
@@ -401,7 +401,7 @@ namespace UnitTestForNumber
 			}
 			if (vec.back() == 0)
 				++vec.back();
-			return Real(vec, sig(generator) ? 1 : -1);
+			return Real(vec, sig(generator) ? 1 : -1, 0);
 		}
 
 		void TestRealDecimal(const ::std::string src) {

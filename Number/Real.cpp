@@ -154,11 +154,10 @@ namespace Number {
 		return Real(r, sig, exp_a);
 	}
 	
-	// assert a >= b
 	Real _sub(const UInteger& a, const UInteger& b, exp_type exp_a, exp_type exp_b, signal_type sig) {
 		// The highest bit of one number is smaller than the lowest bit of another;
 		if (!should_do_addsub(a.size(), b.size(), exp_a, exp_b))
-			return exp_a > exp_b ? Real(a, sig, exp_a) : Real(b, sig, exp_b);
+			return exp_a > exp_b ? Real(a, sig, exp_a) : Real(b, -sig, exp_b);
 		//else
 		exp_type diff = exp_a - exp_b;
 		UInteger pa, pb;
