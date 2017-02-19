@@ -155,6 +155,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestForInteger.cpp" />
     <ClCompile Include="TestForReal.cpp" />
+    <ClCompile Include="TestIntegration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="catch.hpp" />

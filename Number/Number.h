@@ -9,11 +9,23 @@
 //debug
 #define DEBUG_MODE false
 
-//ËùÓÃÀàĞÍµÄ¶¨Òå£¬¸ù¾İÆ½Ì¨²»Í¬½øĞĞ¸Ä¶¯
+//æ‰€ç”¨ç±»å‹çš„å®šä¹‰ï¼Œæ ¹æ®å¹³å°ä¸åŒè¿›è¡Œæ”¹åŠ¨
+#if defined(_MSC_VER)
 #define int64 __int64
 #define uint64 unsigned __int64
 #define int32 __int32
 #define uint32 unsigned __int32
+#elif defined(__GNUC__) || defined(__GNUG__)
+#define int64 long long
+#define uint64 unsigned long long
+#define int32 int
+#define uint32 unsigned int
+#elif defined __clang__
+#define int64 long long
+#define uint64 unsigned long long
+#define int32 int
+#define uint32 unsigned int
+#endif
 
 typedef uint32 save_type;
 typedef uint64 calc_type_u;
@@ -22,7 +34,7 @@ typedef int exp_type;
 typedef int tolerance_type;
 typedef char signal_type;
 
-//¶¨Òå´æ´¢½øÖÆ
+//å®šä¹‰å­˜å‚¨è¿›åˆ¶
 const size_t BYTE_NUMBER = sizeof(save_type);
 const size_t BIT_NUMBER = (8 * sizeof(save_type));
 const calc_type_u MODULE = ((calc_type_u)1 << BIT_NUMBER); //0x100000000//4294967296 //2^32
@@ -39,9 +51,9 @@ namespace Number {
 /*	namespace detail {
 		inline void CalcTypeToSaveType(const calc_type_u CalcValue, save_type &High, save_type &Low);
 		inline save_type FullAdder(const save_type& Num1, const save_type& Num2, save_type& c);
-		//Ò»Î»¼õ·¨Æ÷£¬c=0´ú±í½èÎ»£¬c=1´ú±í²»½èÎ»
+		//ä¸€ä½å‡æ³•å™¨ï¼Œc=0ä»£è¡¨å€Ÿä½ï¼Œc=1ä»£è¡¨ä¸å€Ÿä½
 		inline save_type FullSuber(const save_type& Num1, const save_type& Num2, save_type& c);
-		//ÖğÎ»±È½Ï¾ø¶ÔÖµ´óĞ¡
+		//é€ä½æ¯”è¾ƒç»å¯¹å€¼å¤§å°
 		inline int _compare_by_digit(::std::vector<save_type>::const_reverse_iterator it1,
 			::std::vector<save_type>::const_reverse_iterator it2,
 			size_t digit_num, size_t& NonEqualPosition);
