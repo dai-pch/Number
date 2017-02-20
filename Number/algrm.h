@@ -81,7 +81,7 @@ namespace Number {
 		DataType S_R = _simpson(b - c, f_c, f_e, f_b);
 		DataType err = (S_L + S_R - S) / 15;
 		err = err < 0 ? -err : err;
-		if (err < epsilon)
+		if (3 * err < epsilon)
 			return S_L + S_R + err;
 		else
 		{
