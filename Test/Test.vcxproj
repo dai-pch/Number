@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestForInteger.cpp" />
+    <ClCompile Include="TestForPolynomial.cpp" />
     <ClCompile Include="TestForReal.cpp" />
     <ClCompile Include="TestIntegration.cpp" />
   </ItemGroup>
